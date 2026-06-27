@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_facts_quantity_values",
+  "info": {
+    "displayName": "QuantityValue",
+    "description": "Single numeric value with unit and display value."
+  },
+  "attributes": {
+    "value": {
+      "type": "decimal",
+      "required": true
+    },
+    "unit": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["pa", "kpa", "mpa", "bar", "mbar", "psi", "mh2o", "mm", "m", "c", "f", "k", "ma", "v", "mv", "hz", "percent", "ph", "us_cm", "cycle", "custom"]
+    },
+    "display": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

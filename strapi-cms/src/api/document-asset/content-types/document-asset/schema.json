@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "document_assets",
+  "info": {
+    "singularName": "document-asset",
+    "pluralName": "document-assets",
+    "displayName": "DocumentAsset",
+    "description": "Factual document or media asset used by ProductFact."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "factId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^(doc|asset)_[a-z0-9_]+$"
+    },
+    "assetClass": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["document", "media"]
+    },
+    "title": {
+      "type": "string"
+    },
+    "documentKind": {
+      "type": "enumeration",
+      "enum": ["datasheet", "manual", "certificate", "drawing", "catalog", "software"]
+    },
+    "assetKind": {
+      "type": "enumeration",
+      "enum": ["primary-image", "gallery-image", "diagram", "dimension-drawing", "installation-photo"]
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images", "files"]
+    },
+    "hrefOverride": {
+      "type": "string"
+    },
+    "alt": {
+      "type": "string"
+    },
+    "locale": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "string"
+    }
+  }
+}

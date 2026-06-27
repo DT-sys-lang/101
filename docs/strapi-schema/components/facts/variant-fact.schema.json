@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_facts_variant_facts",
+  "info": {
+    "displayName": "VariantFact",
+    "description": "Product variant facts."
+  },
+  "attributes": {
+    "factId": {
+      "type": "string",
+      "required": true,
+      "regex": "^var_[a-z0-9_]+$"
+    },
+    "orderCode": {
+      "type": "string",
+      "required": true
+    },
+    "optionValues": {
+      "type": "component",
+      "repeatable": true,
+      "component": "facts.option-value-fact"
+    },
+    "availability": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["stock-model", "standard-lead-time", "configurable", "made-to-order", "quote-required", "not-available"]
+    },
+    "lifecycle": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["draft", "active", "phase-out", "discontinued", "hidden"]
+    }
+  }
+}

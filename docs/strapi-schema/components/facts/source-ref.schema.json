@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_facts_source_refs",
+  "info": {
+    "displayName": "SourceRef",
+    "description": "Document or evidence source reference."
+  },
+  "attributes": {
+    "sourceId": {
+      "type": "string",
+      "required": true,
+      "regex": "^(doc|evidence)_[a-z0-9_]+$"
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string"
+    },
+    "page": {
+      "type": "integer"
+    },
+    "confidence": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["source-backed", "derived", "editorial", "unverified"]
+    }
+  }
+}

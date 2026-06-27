@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_facts_option_value_facts",
+  "info": {
+    "displayName": "OptionValueFact",
+    "description": "Variant option value."
+  },
+  "attributes": {
+    "optionKey": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "string",
+      "required": true
+    },
+    "code": {
+      "type": "string"
+    }
+  }
+}

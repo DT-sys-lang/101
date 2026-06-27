@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_facts_specification_group_facts",
+  "info": {
+    "displayName": "SpecificationGroupFact",
+    "description": "Group of factual specification values."
+  },
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "values": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "facts.specification-value-fact"
+    }
+  }
+}

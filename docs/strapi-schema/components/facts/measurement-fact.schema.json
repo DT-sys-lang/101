@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_facts_measurement_facts",
+  "info": {
+    "displayName": "MeasurementFact",
+    "description": "Measurement kind, range, accuracy, and required overload limit."
+  },
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["pressure", "differential-pressure", "level", "temperature", "flow", "humidity", "conductivity", "ph", "position", "vibration", "speed", "switch-state"]
+    },
+    "range": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.quantity-range"
+    },
+    "accuracy": {
+      "type": "string"
+    },
+    "overloadLimit": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.quantity-value"
+    }
+  }
+}

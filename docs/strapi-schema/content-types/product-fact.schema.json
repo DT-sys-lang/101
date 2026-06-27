@@ -1,0 +1,173 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_facts",
+  "info": {
+    "singularName": "product-fact",
+    "pluralName": "product-facts",
+    "displayName": "ProductFact",
+    "description": "Facts-only product record for adapter-generated ProductRecord output."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "factId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^prd_[a-z0-9_]+$"
+    },
+    "sku": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "model": {
+      "type": "string",
+      "required": true
+    },
+    "seriesId": {
+      "type": "string",
+      "required": true,
+      "regex": "^ser_[a-z0-9_]+$"
+    },
+    "brand": {
+      "type": "string",
+      "required": true
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "lifecycle": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["draft", "active", "phase-out", "discontinued", "hidden"]
+    },
+    "availability": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["stock-model", "standard-lead-time", "configurable", "made-to-order", "quote-required", "not-available"]
+    },
+    "releasedAt": {
+      "type": "date"
+    },
+    "revisedAt": {
+      "type": "date",
+      "required": true
+    },
+    "primaryCategory": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category-fact.category-fact"
+    },
+    "additionalCategories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category-fact.category-fact"
+    },
+    "industries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    },
+    "measurementKinds": {
+      "type": "json",
+      "required": true
+    },
+    "name": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "shortName": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "summary": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "highlights": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "applicationCopy": {
+      "type": "component",
+      "repeatable": true,
+      "component": "facts.localized-text"
+    },
+    "measurements": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "facts.measurement-fact"
+    },
+    "outputs": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "facts.signal-output-fact"
+    },
+    "connections": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.connection-set-fact"
+    },
+    "environmentalLimits": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.environmental-limit-fact"
+    },
+    "specificationGroups": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "facts.specification-group-fact"
+    },
+    "variants": {
+      "type": "component",
+      "repeatable": true,
+      "component": "facts.variant-fact"
+    },
+    "documents": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::document-asset.document-asset"
+    },
+    "assets": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::document-asset.document-asset"
+    },
+    "certifications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::certification.certification"
+    },
+    "commercialTerms": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.commercial-term-fact"
+    }
+  }
+}

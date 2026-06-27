@@ -1,0 +1,344 @@
+{
+  "categoryFacts": [
+    {
+      "id": "cat_industrial_sensors",
+      "parentId": null,
+      "name": {
+        "en": "Industrial Sensors",
+        "zh": "Industrial Sensors"
+      }
+    },
+    {
+      "id": "cat_pressure_transmitters",
+      "parentId": "cat_industrial_sensors",
+      "name": {
+        "en": "Pressure Transmitters",
+        "zh": "Pressure Transmitters"
+      }
+    },
+    {
+      "id": "cat_temperature_transmitters",
+      "parentId": "cat_industrial_sensors",
+      "name": {
+        "en": "Temperature Transmitters",
+        "zh": "Temperature Transmitters"
+      }
+    }
+  ],
+  "productFacts": [
+    {
+      "id": "prd_cms_pt_100",
+      "sku": "CMS-PT-100",
+      "model": "HY-PT-100",
+      "seriesId": "ser_cms_pt",
+      "brand": "HEIYU Industrial",
+      "manufacturer": "HEIYU Industrial",
+      "lifecycle": "active",
+      "availability": "configurable",
+      "releasedAt": "2026-01-15",
+      "revisedAt": "2026-06-22",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": ["ind_water", "ind_oem"],
+      "applicationIds": ["app_pump_monitoring"],
+      "measurementKinds": ["pressure"],
+      "name": {
+        "en": "PT-100 Pressure Transmitter",
+        "zh": "PT-100 Pressure Transmitter"
+      },
+      "shortName": {
+        "en": "PT-100",
+        "zh": "PT-100"
+      },
+      "summary": {
+        "en": "PT-100 is a general-purpose pressure transmitter for industrial water and OEM monitoring.",
+        "zh": "PT-100 is a general-purpose pressure transmitter for industrial water and OEM monitoring."
+      },
+      "highlights": [
+        {
+          "en": "Source-backed export",
+          "zh": "Source-backed export"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Pump monitoring",
+          "zh": "Pump monitoring"
+        },
+        {
+          "en": "OEM equipment integration",
+          "zh": "OEM equipment integration"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 16,
+            "unit": "bar",
+            "display": "0...16 bar"
+          },
+          "accuracy": "0.5% FS",
+          "overloadLimit": {
+            "value": 24,
+            "unit": "bar",
+            "display": "24 bar"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-current",
+          "value": "4-20 mA",
+          "wiring": "2-wire"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/4",
+          "material": "316L stainless steel"
+        },
+        "electrical": {
+          "kind": "m12",
+          "value": "M12x1 connector"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP65",
+        "mediaTemperature": {
+          "min": -20,
+          "max": 85,
+          "unit": "c",
+          "display": "-20...85 C"
+        },
+        "ambientTemperature": {
+          "min": -20,
+          "max": 70,
+          "unit": "c",
+          "display": "-20...70 C"
+        },
+        "wettedMaterials": ["316L stainless steel", "FKM"],
+        "compatibleMedia": ["Water", "Air"]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "Measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...16 bar",
+              "unit": "bar",
+              "display": "0...16 bar"
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 24,
+              "unit": "bar",
+              "display": "24 bar"
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "Electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "4-20 mA",
+              "display": "4-20 mA"
+            }
+          ]
+        }
+      ],
+      "certifications": ["ce", "rohs"],
+      "documents": [
+        {
+          "id": "doc_cms_pt_100_datasheet",
+          "title": "PT-100 Datasheet",
+          "kind": "datasheet",
+          "href": "/documents/cms/pt-100-datasheet.pdf",
+          "locale": "en",
+          "revision": "v1"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_cms_pt_100_primary",
+          "kind": "primary-image",
+          "href": "/images/cms/pt-100.jpg",
+          "alt": "PT-100 pressure transmitter"
+        }
+      ],
+      "commercialTerms": {
+        "minimumOrderQuantity": 1,
+        "standardLeadTime": "2-3 weeks",
+        "warranty": "12 months",
+        "oemCustomizable": true,
+        "privateLabelAvailable": false
+      }
+    },
+    {
+      "id": "prd_cms_tt_200",
+      "sku": "CMS-TT-200",
+      "model": "HY-TT-200",
+      "seriesId": "ser_cms_tt",
+      "brand": "HEIYU Industrial",
+      "manufacturer": "HEIYU Industrial",
+      "lifecycle": "active",
+      "availability": "made-to-order",
+      "releasedAt": "2026-01-15",
+      "revisedAt": "2026-06-22",
+      "primaryCategoryId": "cat_temperature_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": ["ind_water", "ind_oem"],
+      "applicationIds": ["app_pump_monitoring"],
+      "measurementKinds": ["temperature"],
+      "name": {
+        "en": "TT-200 Temperature Transmitter",
+        "zh": "TT-200 Temperature Transmitter"
+      },
+      "shortName": {
+        "en": "TT-200",
+        "zh": "TT-200"
+      },
+      "summary": {
+        "en": "TT-200 is a temperature transmitter for industrial process and OEM applications.",
+        "zh": "TT-200 is a temperature transmitter for industrial process and OEM applications."
+      },
+      "highlights": [
+        {
+          "en": "Source-backed export",
+          "zh": "Source-backed export"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Process temperature monitoring",
+          "zh": "Process temperature monitoring"
+        },
+        {
+          "en": "OEM machine integration",
+          "zh": "OEM machine integration"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "temperature",
+          "range": {
+            "min": -40,
+            "max": 200,
+            "unit": "c",
+            "display": "-40...200 C"
+          },
+          "accuracy": "0.3% FS",
+          "overloadLimit": {
+            "value": 250,
+            "unit": "c",
+            "display": "250 C"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-current",
+          "value": "4-20 mA",
+          "wiring": "2-wire"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "probe",
+          "value": "Insertion probe",
+          "material": "316L stainless steel"
+        },
+        "electrical": {
+          "kind": "m12",
+          "value": "M12x1 connector"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP67",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 200,
+          "unit": "c",
+          "display": "-40...200 C"
+        },
+        "ambientTemperature": {
+          "min": -20,
+          "max": 80,
+          "unit": "c",
+          "display": "-20...80 C"
+        },
+        "wettedMaterials": ["316L stainless steel", "Ceramic"],
+        "compatibleMedia": ["Water", "Oil", "Air"]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "Measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "-40...200 C",
+              "unit": "c",
+              "display": "-40...200 C"
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 250,
+              "unit": "c",
+              "display": "250 C"
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "Electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "4-20 mA",
+              "display": "4-20 mA"
+            }
+          ]
+        }
+      ],
+      "certifications": ["ce"],
+      "documents": [
+        {
+          "id": "doc_cms_tt_200_datasheet",
+          "title": "TT-200 Datasheet",
+          "kind": "datasheet",
+          "href": "/documents/cms/tt-200-datasheet.pdf",
+          "locale": "en",
+          "revision": "v1"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_cms_tt_200_primary",
+          "kind": "primary-image",
+          "href": "/images/cms/tt-200.jpg",
+          "alt": "TT-200 temperature transmitter"
+        }
+      ],
+      "commercialTerms": {
+        "minimumOrderQuantity": 1,
+        "standardLeadTime": "4-6 weeks",
+        "warranty": "12 months",
+        "oemCustomizable": true,
+        "privateLabelAvailable": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "certifications",
+  "info": {
+    "singularName": "certification",
+    "pluralName": "certifications",
+    "displayName": "Certification",
+    "description": "Controlled compliance code lookup."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "code": {
+      "type": "enumeration",
+      "required": true,
+      "unique": true,
+      "enum": ["ce", "rohs", "atex", "iecex", "sil", "iso9001", "food-grade", "marine", "custom"]
+    },
+    "label": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "issuer": {
+      "type": "string"
+    }
+  }
+}

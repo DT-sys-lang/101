@@ -1,0 +1,69 @@
+name: CI Release Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  release-gates:
+    name: Release gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Validate boundaries
+        run: npm run validate:boundaries
+
+      - name: Validate CMS facts
+        run: npm run validate:cms-facts
+
+      - name: Validate domain
+        run: npm run validate:domain
+
+      - name: Validate SEO
+        run: npm run validate:seo
+
+      - name: Validate GEO
+        run: npm run validate:geo
+
+      - name: Validate 300-product scale
+        run: npm run validate:scale-300
+
+      - name: Validate 1000-product scale
+        run: npm run validate:scale-1000
+
+      - name: Guard frontend build env
+        shell: bash
+        run: |
+          blocked_vars=$(env | cut -d= -f1 | grep -E '^(NEXT_PUBLIC_.*(CMS|STRAPI|WEBHOOK|FACTS)|CMS_FACTS_JSON|CMS_WEBHOOK_SECRET|CMS_REVALIDATE_SECRET|STRAPI_API_TOKEN|STRAPI_URL)$' || true)
+          if [ -n "$blocked_vars" ]; then
+            echo "Blocked CMS/Strapi/webhook variables must not be present in the frontend build environment:"
+            echo "$blocked_vars"
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build

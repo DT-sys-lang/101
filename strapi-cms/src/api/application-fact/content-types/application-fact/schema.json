@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "application_facts",
+  "info": {
+    "singularName": "application-fact",
+    "pluralName": "application-facts",
+    "displayName": "ApplicationFact",
+    "description": "Lookup-only application fact. ProductFact relations map to applicationIds."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "factId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^app_[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "description": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    }
+  }
+}

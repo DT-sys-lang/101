@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #f7f8f9;
+  --color-panel: #ffffff;
+  --color-ink-950: #111827;
+  --color-ink-900: #1f2933;
+  --color-ink-800: #2f3a45;
+  --color-ink-700: #46525f;
+  --color-ink-600: #64707d;
+  --color-ink-500: #7d8790;
+  --color-ink-400: #a3abb3;
+  --color-ink-300: #c8cdd2;
+  --color-ink-200: #e3e7ea;
+  --color-ink-100: #edf0f2;
+  --color-ink-50: #f7f8f9;
+  --color-steel-900: #243244;
+  --color-steel-800: #2f4056;
+  --color-steel-700: #3e536b;
+  --color-steel-100: #e6ebef;
+  --color-steel-50: #f2f5f7;
+  --color-signal-700: #235f7a;
+  --color-signal-100: #dbeaf0;
+  --color-process-700: #2f7656;
+  --color-process-100: #dfeee6;
+  --color-copper-700: #98611a;
+  --color-copper-100: #f1e4d0;
+  --color-silver: #a8b2be;
+  --color-border: #d8dde2;
+  --font-sans: "Aptos", "IBM Plex Sans", "Noto Sans SC", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-industrial: 0 10px 30px -22px rgb(17 24 39 / 0.42);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-background);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-signal-100);
+    color: var(--color-ink-950);
+  }
+}
+
+@layer utilities {
+  .industrial-grid {
+    background-image:
+      linear-gradient(to right, rgb(36 50 68 / 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(36 50 68 / 0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .metal-rule {
+    background: linear-gradient(90deg, transparent, var(--color-silver), transparent);
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_facts_environmental_limit_facts",
+  "info": {
+    "displayName": "EnvironmentalLimitFact",
+    "description": "Environmental and material compatibility facts."
+  },
+  "attributes": {
+    "ingressProtection": {
+      "type": "string",
+      "regex": "^IP[0-9][0-9]$"
+    },
+    "mediaTemperature": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.quantity-range"
+    },
+    "ambientTemperature": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.quantity-range"
+    },
+    "wettedMaterials": {
+      "type": "json",
+      "required": true
+    },
+    "compatibleMedia": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

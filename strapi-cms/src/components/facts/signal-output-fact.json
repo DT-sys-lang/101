@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_facts_signal_output_facts",
+  "info": {
+    "displayName": "SignalOutputFact",
+    "description": "Output signal fact."
+  },
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["analog-current", "analog-voltage", "relay", "switch", "pulse", "fieldbus", "wireless"]
+    },
+    "value": {
+      "type": "string",
+      "required": true
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "wiring": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_facts_commercial_term_facts",
+  "info": {
+    "displayName": "CommercialTermFact",
+    "description": "Commercial terms facts."
+  },
+  "attributes": {
+    "minimumOrderQuantity": {
+      "type": "integer"
+    },
+    "standardLeadTime": {
+      "type": "string"
+    },
+    "warranty": {
+      "type": "string"
+    },
+    "oemCustomizable": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "privateLabelAvailable": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

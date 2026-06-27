@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "industry_facts",
+  "info": {
+    "singularName": "industry-fact",
+    "pluralName": "industry-facts",
+    "displayName": "IndustryFact",
+    "description": "Lookup-only industry fact. ProductFact relations map to industryIds."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "factId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^ind_[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "description": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    }
+  }
+}

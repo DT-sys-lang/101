@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_facts_connection_set_facts",
+  "info": {
+    "displayName": "ConnectionSetFact",
+    "description": "Process and electrical connection facts."
+  },
+  "attributes": {
+    "processKind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["thread", "flange", "clamp", "submersible-cable", "probe", "remote", "none"]
+    },
+    "processValue": {
+      "type": "string",
+      "required": true
+    },
+    "processMaterial": {
+      "type": "string"
+    },
+    "electricalKind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["cable", "m12", "din43650", "terminal-head", "connector", "wireless", "custom"]
+    },
+    "electricalValue": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_facts_specification_value_facts",
+  "info": {
+    "displayName": "SpecificationValueFact",
+    "description": "Single factual specification value."
+  },
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "json",
+      "required": true
+    },
+    "unit": {
+      "type": "enumeration",
+      "enum": ["pa", "kpa", "mpa", "bar", "mbar", "psi", "mh2o", "mm", "m", "c", "f", "k", "ma", "v", "mv", "hz", "percent", "ph", "us_cm", "cycle", "custom"]
+    },
+    "display": {
+      "type": "string",
+      "required": true
+    },
+    "sourceRefs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "facts.source-ref"
+    }
+  }
+}
