@@ -180,7 +180,7 @@ export function ProductDetailPageView({
           <SectionTitle icon={FileText} title={data.seoContent.title} />
           <div className="space-y-4 text-sm leading-7 text-ink-700">
             {data.seoContent.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+              <p key={`${index}-${paragraph}`}>{paragraph}</p>
             ))}
           </div>
         </div>
