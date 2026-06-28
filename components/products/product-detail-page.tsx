@@ -179,8 +179,8 @@ export function ProductDetailPageView({
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
           <SectionTitle icon={FileText} title={data.seoContent.title} />
           <div className="space-y-4 text-sm leading-7 text-ink-700">
-            {data.seoContent.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+            {data.seoContent.paragraphs.map((paragraph, index) => (
+              <p key={`${index}-${paragraph}`}>{paragraph}</p>
             ))}
           </div>
         </div>
