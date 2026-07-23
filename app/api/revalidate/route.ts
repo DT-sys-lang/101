@@ -1,4 +1,3 @@
-import { revalidatePath } from 'next/cache'
 import { jsonContract, jsonContractError, isRuntimeLocale } from '@/lib/api/contracts'
 import { calculateRevalidationImpact, type RevalidationInput, type RevalidationScope } from '@/lib/api/revalidation'
 import type { CategoryId, ProductId } from '@/lib/domain'
@@ -12,22 +11,13 @@ export async function GET(request: Request) {
   return jsonContract('revalidate', calculateRevalidationImpact(input))
 }
 
-export async function POST(request: Request) {
-  try {
-    const input = normalizeInput(await request.json())
-    const impact = calculateRevalidationImpact(input)
-
-    for (const path of impact.paths) {
-      revalidatePath(path)
-    }
-
-    return jsonContract('revalidate', {
-      ...impact,
-      revalidated: true,
-    })
-  } catch (error) {
-    return jsonContractError('revalidate', 'invalid-revalidate-request', getErrorMessage(error), 400)
-  }
+export function POST() {
+  return jsonContractError(
+    'revalidate',
+    'revalidate-endpoint-disabled',
+    'Use the signed CMS revalidation endpoint instead.',
+    405,
+  )
 }
 
 function parseInputFromUrl(request: Request): RevalidationInput {
@@ -66,8 +56,4 @@ function normalizeInput(value: unknown): RevalidationInput {
     productId,
     categoryId,
   }
-}
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'Unknown revalidation error.'
 }

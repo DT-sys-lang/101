@@ -7,7 +7,7 @@ import {
   type ProductId,
   type ProductRecord,
 } from '@/lib/domain'
-import { getRuntimeDomainProductCatalog, getRuntimeDomainProductRecords } from '@/lib/runtime/domain-products'
+import { getRuntimeDomainProductCatalog, getRuntimeDomainProductRecords, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 
 export type RevalidationScope = 'all' | 'product' | 'category' | 'geo' | 'feed' | 'static'
 
@@ -28,7 +28,18 @@ export interface RevalidationImpact {
 }
 
 const staticPaths = ['/sitemap.xml', '/robots.txt', '/llms.txt'] as const
-const localizedStaticPaths = ['', '/products', '/industries', '/applications', '/oem', '/resources', '/contact'] as const
+const localizedStaticPaths = [
+  '',
+  '/products',
+  '/industries',
+  '/applications',
+  '/oem',
+  '/resources',
+  '/resources/blog',
+  '/resources/cases',
+  '/resources/manuals',
+  '/contact',
+] as const
 const apiPaths = ['/api/cms/status', '/api/product-feed', '/api/geo/index', '/api/geo/products', '/api/geo/answers'] as const
 
 export function calculateRevalidationImpact(input: RevalidationInput = {}): RevalidationImpact {
@@ -43,6 +54,9 @@ export function calculateRevalidationImpact(input: RevalidationInput = {}): Reva
     addStaticPaths(paths, locales)
     tags.add('static-pages')
     tags.add('entry-pages')
+    tags.add('cms-resources')
+    tags.add('industry-ecosystem')
+    tags.add('resource-pages')
   }
 
   if (scope === 'all' || scope === 'feed' || scope === 'geo') {
@@ -118,7 +132,7 @@ function addEntryPagePaths(paths: Set<string>, locales: readonly Locale[]) {
       paths.add(`/${locale}${entry.href}`)
     }
 
-    for (const entry of getApplicationEntryPageViewModel(locale).entries) {
+    for (const entry of getApplicationEntryPageViewModel(locale, runtimeProductViewModelSource).entries) {
       paths.add(`/${locale}${entry.href}`)
     }
   }

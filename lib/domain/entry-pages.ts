@@ -1,4 +1,11 @@
-import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, type EntryCardViewModel, type EntryPageViewModel } from './page-view-models'
+import {
+  getApplicationEntryPageViewModel,
+  getIndustryEntryPageViewModel,
+  type EntryCardViewModel,
+  type EntryEcosystemContentInput,
+  type EntryPageViewModel,
+  type ProductViewModelSource,
+} from './page-view-models'
 import type { LocaleCode } from './primitives'
 
 export interface EntryPageSeoBreadcrumbItem {
@@ -38,9 +45,9 @@ const sectionLabels = {
     applications: 'Applications',
   },
   zh: {
-    home: 'Home',
-    industries: 'Industries',
-    applications: 'Applications',
+    home: '首页',
+    industries: '行业',
+    applications: '应用',
   },
 } as const satisfies Record<LocaleCode, Record<'home' | 'industries' | 'applications', string>>
 
@@ -67,8 +74,11 @@ export function buildIndustryHubPageResolution(locale: LocaleCode): EntryPageRes
   }
 }
 
-export function buildApplicationHubPageResolution(locale: LocaleCode): EntryPageResolution {
-  const page = getApplicationEntryPageViewModel(locale)
+export function buildApplicationHubPageResolution(
+  locale: LocaleCode,
+  source?: ProductViewModelSource,
+): EntryPageResolution {
+  const page = getApplicationEntryPageViewModel(locale, source)
 
   return {
     page,
@@ -90,8 +100,13 @@ export function buildApplicationHubPageResolution(locale: LocaleCode): EntryPage
   }
 }
 
-export function resolveIndustryDetailPage(locale: LocaleCode, slug: readonly string[]): EntryPageResolution | null {
-  const page = getIndustryEntryPageViewModel(locale)
+export function resolveIndustryDetailPage(
+  locale: LocaleCode,
+  slug: readonly string[],
+  source?: ProductViewModelSource,
+  ecosystemContent: readonly EntryEcosystemContentInput[] = [],
+): EntryPageResolution | null {
+  const page = getIndustryEntryPageViewModel(locale, source, ecosystemContent)
   const entry = findEntry(page, '/industries', slug)
 
   if (!entry) {
@@ -104,8 +119,12 @@ export function resolveIndustryDetailPage(locale: LocaleCode, slug: readonly str
   }
 }
 
-export function resolveApplicationDetailPage(locale: LocaleCode, slug: readonly string[]): EntryPageResolution | null {
-  const page = getApplicationEntryPageViewModel(locale)
+export function resolveApplicationDetailPage(
+  locale: LocaleCode,
+  slug: readonly string[],
+  source?: ProductViewModelSource,
+): EntryPageResolution | null {
+  const page = getApplicationEntryPageViewModel(locale, source)
   const entry = findEntry(page, '/applications', slug)
 
   if (!entry) {
@@ -127,9 +146,12 @@ export function getIndustryEntryStaticParams(locales: readonly LocaleCode[]) {
   )
 }
 
-export function getApplicationEntryStaticParams(locales: readonly LocaleCode[]) {
+export function getApplicationEntryStaticParams(
+  locales: readonly LocaleCode[],
+  source?: ProductViewModelSource,
+) {
   return locales.flatMap((locale) =>
-    getApplicationEntryPageViewModel(locale).entries.map((entry) => ({
+    getApplicationEntryPageViewModel(locale, source).entries.map((entry) => ({
       locale,
       slug: entry.href.replace(/^\/applications\//, '').split('/').filter(Boolean),
     })),

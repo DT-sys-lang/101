@@ -1,14 +1,27 @@
 import { architectureFreezeV1 } from './architecture-freeze-v1'
-import { industrialSensorCategoryTree, type CategoryNode } from './category'
+import { industrialSensorCategoryTree, type CategoryNode, type CategoryTree } from './category'
 import type { ProductListItem, ProductListResult } from './product-catalog'
 import type { CategoryId, LocaleCode, LocalizedText } from './primitives'
 
+const siteOrigin = normalizeSiteOrigin(process.env.NEXT_PUBLIC_SITE_ORIGIN, 'https://www.yufavor.example')
+
 export const industrialSiteConfig = {
-  origin: 'https://www.heiyu-industrial.example',
-  websiteId: 'https://www.heiyu-industrial.example/#website',
-  organizationId: 'https://www.heiyu-industrial.example/#organization',
-  brandName: 'HEIYU Industrial',
+  origin: siteOrigin,
+  websiteId: `${siteOrigin}/#website`,
+  organizationId: `${siteOrigin}/#organization`,
+  brandName: 'YUFAVOR',
 } as const
+
+function normalizeSiteOrigin(value: string | undefined, fallback: string) {
+  const candidate = value?.trim() || fallback
+
+  try {
+    const url = new URL(candidate)
+    return url.origin
+  } catch {
+    return fallback
+  }
+}
 
 export type IndustrialIconKey =
   | 'pressure'
@@ -30,6 +43,11 @@ export interface SiteNavigationItem {
   readonly href: string
 }
 
+export interface SiteSearchGroup {
+  readonly title: string
+  readonly items: readonly SiteNavigationItem[]
+}
+
 export interface SiteLayoutProjection {
   readonly architectureVersion: typeof architectureFreezeV1.version
   readonly brand: {
@@ -48,9 +66,24 @@ export interface SiteLayoutProjection {
     readonly currentLabel: string
     readonly alternateLabel: string
   }
+  readonly search: {
+    readonly label: string
+    readonly placeholder: string
+    readonly submitLabel: string
+    readonly actionPath: string
+    readonly groups: readonly SiteSearchGroup[]
+  }
   readonly footer: {
     readonly summary: string
     readonly badges: readonly string[]
+    readonly contact: {
+      readonly title: string
+      readonly companyName: string
+      readonly phoneLabel: string
+      readonly phone: string
+      readonly emailLabel: string
+      readonly email: string
+    }
     readonly columns: readonly {
       readonly title: string
       readonly links: readonly SiteNavigationItem[]
@@ -82,6 +115,21 @@ export interface HomepageProjection {
     readonly primary: string
     readonly secondary: string
     readonly imageAlt: string
+    readonly media: {
+      readonly ariaLabel: string
+      readonly previousLabel: string
+      readonly nextLabel: string
+      readonly slides: readonly {
+        readonly kind: 'image' | 'video'
+        readonly title: string
+        readonly description: string
+        readonly imageSrc: string
+        readonly imageAlt: string
+        readonly videoSrc?: string
+        readonly posterSrc?: string
+        readonly href?: string
+      }[]
+    }
     readonly metrics: readonly { readonly value: string; readonly label: string }[]
     readonly entries: readonly { readonly label: string; readonly description: string; readonly href: string }[]
   }
@@ -96,7 +144,7 @@ export interface HomepageProjection {
     readonly eyebrow: string
     readonly title: string
     readonly body: string
-    readonly items: readonly { readonly label: string; readonly value: string }[]
+    readonly items: readonly { readonly label: string; readonly value: string; readonly href: string }[]
   }
   readonly categories: {
     readonly eyebrow: string
@@ -116,6 +164,13 @@ export interface HomepageProjection {
   }
   readonly industries: GatewaySectionProjection
   readonly applications: GatewaySectionProjection
+  readonly resources: {
+    readonly eyebrow: string
+    readonly title: string
+    readonly body: string
+    readonly linkLabel: string
+    readonly items: readonly HomepageCategoryProjection[]
+  }
   readonly modules: {
     readonly eyebrow: string
     readonly title: string
@@ -153,12 +208,13 @@ interface GatewayItem {
 
 const siteText = {
   zh: {
-    brand: { name: 'HEIYU Industrial', descriptor: '工业测量与 OEM 传感器' },
+    brand: { name: 'YUFAVOR', descriptor: '工业传感器与阀门' },
     navigation: {
-      products: '产品中心',
-      industries: '行业方案',
-      oem: 'OEM 定制',
-      resources: '资源中心',
+      products: '产品',
+      industries: '行业',
+      oem: 'OEM 方案',
+      company: '公司',
+      resources: '资料中心',
       contact: '联系',
     },
     actions: {
@@ -170,19 +226,29 @@ const siteText = {
     },
     language: { currentLabel: '中文', alternateLabel: 'EN' },
     footer: {
-      summary: '面向流体、机械、能源与自动化系统的工业测量产品和 OEM 传感器平台。',
-      products: '产品',
-      industries: '行业',
-      services: '服务',
-      badges: ['ISO 9001', 'OEM', 'Global Delivery'],
+      summary: '面向海外 OEM、设备制造和工业现场的传感器与阀门产品中心，支持按型号、工况、行业和资料路径快速选型。',
+      products: '产品中心',
+      industries: '行业方案',
+      resources: '资料中心',
+      services: '关于我们',
+      badges: ['ISO 9001', 'OEM 配套', '全球交付'],
+      contact: {
+        title: '联系我们',
+        companyName: '上海域丰传感仪器有限公司',
+        phoneLabel: '电话',
+        phone: '+86 21 61318500',
+        emailLabel: '邮箱',
+        email: 'sales@yufavor.com',
+      },
     },
   },
   en: {
-    brand: { name: 'HEIYU Industrial', descriptor: 'Industrial measurement and OEM sensors' },
+    brand: { name: 'YUFAVOR', descriptor: 'Industrial sensors and valves' },
     navigation: {
       products: 'Products',
       industries: 'Industries',
-      oem: 'OEM',
+      oem: 'OEM Solutions',
+      company: 'Company',
       resources: 'Resources',
       contact: 'Contact',
     },
@@ -193,26 +259,37 @@ const siteText = {
       viewAll: 'View All',
       datasheet: 'Datasheet',
     },
-    language: { currentLabel: 'EN', alternateLabel: '中文' },
+    language: { currentLabel: 'EN', alternateLabel: 'Chinese' },
     footer: {
-      summary: 'Industrial measurement products and OEM sensor systems for fluid, machinery, energy, and automation applications.',
+      summary: 'A product center for sensors and valves serving overseas OEMs, machine builders, and industrial projects, with clear paths by model, operating condition, industry, and resource.',
       products: 'Products',
       industries: 'Industries',
-      services: 'Services',
+      resources: 'Resources',
+      services: 'About Us',
       badges: ['ISO 9001', 'OEM', 'Global Delivery'],
+      contact: {
+        title: 'Contact Us',
+        companyName: 'Shanghai Yufavor Sensor Instrument Co., Ltd.',
+        phoneLabel: 'Tel',
+        phone: '+86 21 61318500',
+        emailLabel: 'Email',
+        email: 'sales@yufavor.com',
+      },
     },
   },
 } as const satisfies Record<LocaleCode, {
   readonly brand: { readonly name: string; readonly descriptor: string }
-  readonly navigation: Record<'products' | 'industries' | 'oem' | 'resources' | 'contact', string>
+  readonly navigation: Record<'products' | 'industries' | 'oem' | 'resources' | 'company' | 'contact', string>
   readonly actions: SiteLayoutProjection['actions']
   readonly language: SiteLayoutProjection['language']
   readonly footer: {
     readonly summary: string
     readonly products: string
     readonly industries: string
+    readonly resources: string
     readonly services: string
     readonly badges: readonly string[]
+    readonly contact: SiteLayoutProjection['footer']['contact']
   }
 }>
 
@@ -258,148 +335,223 @@ const categoryCopy: Partial<Record<CategoryId, CategoryDisplayCopy>> = {
 const homepageText = {
   zh: {
     hero: {
-      eyebrow: '工业测量与 OEM 传感器平台',
-      title: '面向机械、流体与能源系统的测量产品官网',
-      body: '以压力、液位、温度和工业开关为核心，帮助采购、工程与 OEM 团队按产品、行业和应用场景快速进入选型路径。',
+      eyebrow: '工业传感器 + 阀门产品中心',
+      title: '面向 OEM 与工业现场的传感器和阀门选型入口',
+      body: '覆盖压力变送器、工业阀门与配套应用，帮助海外 OEM、设备制造和工业采购从产品、行业、工况和资料快速进入可询价路径。',
       primary: '浏览产品中心',
       secondary: '查看行业方案',
       imageAlt: '安装在金属工艺管路上的工业压力仪表与传感器',
+      media: {
+        ariaLabel: '首页产品与应用媒体轮播',
+        previousLabel: '上一张',
+        nextLabel: '下一张',
+        slides: [
+          {
+            kind: 'image',
+            title: '压力测量产品',
+            description: '压力传感器、变送器与管路测量场景。',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: '工业压力仪表与压力传感器安装示意',
+            href: '/products?family=sensor&search=pressure',
+          },
+          {
+            kind: 'image',
+            title: '工业阀门与气路控制',
+            description: '按压力等级、连接、材质、介质和尺寸进入阀门选型。',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: '工业阀门与气路控制产品展示',
+            href: '/products?family=valve',
+          },
+          {
+            kind: 'image',
+            title: 'OEM 传感器 + 阀门配套',
+            description: '围绕接口、信号、外壳、包装和批量交付组织项目需求。',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: 'OEM 传感器与阀门配套应用展示',
+            href: '/oem',
+          },
+        ],
+      },
       metrics: [
-        { value: '1000+', label: '产品目录容量' },
-        { value: '5', label: '重点行业入口' },
-        { value: '48h', label: '选型响应窗口' },
+        { value: '2', label: '核心产品族' },
+        { value: '5', label: '行业方案入口' },
+        { value: '48h', label: 'RFQ 响应窗口' },
       ],
       entries: [
-        { label: '按产品类型', description: '压力、液位、温度、开关', href: industrialSensorCategoryTree.root.canonicalPath },
-        { label: '按行业场景', description: '油气、水处理、自动化、能源、制造', href: '/industries' },
-        { label: '按 OEM 需求', description: '信号、接口、外壳、贴牌', href: '/oem' },
+        { label: '压力传感器/变送器', description: '量程、输出、接口、介质', href: '/products?family=sensor&search=pressure' },
+        { label: '工业阀门', description: '压力等级、连接、材质、尺寸', href: '/products?family=valve' },
+        { label: 'OEM 配套', description: '传感器、阀门、接口和批量供货', href: '/oem' },
       ],
     },
     categories: {
-      eyebrow: '产品入口',
-      title: '按工业买家的选型习惯组织产品',
-      body: '从压力、液位、温度和工业开关进入目录，型号、量程、输出和供货状态全部来自 Domain 产品索引，适合扩展到千级产品列表。',
-      linkLabel: '进入分类',
+      eyebrow: '产品快速入口',
+      title: '先按产品族和分类进入目录',
+      body: '产品中心保留分类、行业、应用、族别和关键词筛选；传感器与阀门使用同一 Domain 产品索引，适合继续扩展到千级目录。',
+      linkLabel: '进入目录',
     },
     trust: {
-      eyebrow: '品牌信任体系',
-      title: '用工程证据、批量交付和 OEM 配套建立采购信任',
-      body: '面向长期供货、重复设备项目和跨区域采购，首页优先呈现认证、数据手册、选型响应、质保和批量交付能力。',
+      eyebrow: '质量与交付',
+      title: '用工程证据、数据手册和批量交付建立采购信任',
+      body: '面向长期供货、重复设备项目和跨区域采购，页面优先呈现认证准备、数据手册、选型响应、质保和 OEM 配套能力。',
     },
     applicationProof: {
-      eyebrow: '应用路径',
-      title: '把测量任务转成可报价的产品需求',
-      body: '应用入口围绕工况、介质、量程、输出、连接和交付窗口组织，便于工程与采购团队形成 RFQ。',
+      eyebrow: '按工况筛选',
+      title: '从介质、应用和行业缩小选型范围',
+      body: '采购和工程团队可以先按介质、应用场景或行业系统进入，再结合量程、输出、连接、材质和数量形成 RFQ。',
       items: [
-        { label: '高压测量', value: '液压站 / 泵 / 压缩机' },
-        { label: '管线监测', value: '压力 / 差压 / 温度' },
-        { label: 'OEM 集成', value: '信号 / 接口 / 贴牌' },
+        { label: '介质', value: '气体 / 液体 / 天然气', href: '/products?search=media' },
+        { label: '应用', value: '高压 / 管线 / OEM', href: '/applications' },
+        { label: '行业', value: '油气 / 水处理 / 自动化', href: '/industries' },
       ],
     },
     products: {
-      eyebrow: '产品卡片系统',
-      title: '面向大规模目录的稳定卡片结构',
-      body: '卡片只承载列表索引信息：型号、类别、关键参数和单一操作，便于服务器分页、缓存和批量渲染。',
+      eyebrow: '精选产品',
+      title: '先看可询价的传感器与阀门型号',
+      body: '产品卡统一展示型号、产品族、分类、关键参数、图片和资料入口，方便工程与采购快速判断是否进入详情页。',
     },
     industries: {
-      eyebrow: '行业入口',
-      title: '先定位行业系统，再进入可选产品',
-      body: '行业入口按石油与天然气、水处理、工业自动化、能源和制造业组织，让采购与工程团队先建立工况上下文，再进入产品选型。',
-      linkLabel: '查看方案',
+      eyebrow: '行业方案',
+      title: '先看行业系统，再进入产品和资料',
+      body: '行业页承接典型工况、相关产品、行业资讯和传感器 + 阀门生态搭配，帮助客户从系统场景进入选型。',
+      linkLabel: '查看行业',
     },
     applications: {
-      eyebrow: '应用场景入口',
-      title: '按测量任务连接产品、参数和 RFQ 路径',
-      body: '高压测量、工业管线监测和 OEM 传感器集成是工程选型最常见的任务入口。',
+      eyebrow: '应用场景',
+      title: '行业页内承接应用场景',
+      body: '应用页保留长尾入口，但不作为主导航；首页只提供高频任务入口，帮助客户进入产品或行业路径。',
       linkLabel: '查看应用',
     },
+    resources: {
+      eyebrow: '资料中心',
+      title: '把文章、案例和手册放到采购路径上',
+      body: '资料中心保持轻量结构：博客用于选型知识，案例用于场景证明，产品手册用于下载和规格核对。',
+      linkLabel: '进入资料',
+    },
     modules: {
-      eyebrow: 'Section system',
-      title: '可复用的工业官网模块',
-      body: '每个 section 都是独立 RSC 模块，接收纯 props，便于后续接入 CMS、MDX 或产品索引。',
+      eyebrow: 'OEM 定制能力',
+      title: '把传感器、阀门和接口要求变成批量交付方案',
+      body: 'OEM 页面承接信号输出、连接器、外壳、贴牌、包装、MOQ 和交付窗口，适合设备制造商建立长期配套。',
     },
     cta: {
-      title: '从产品目录、行业方案或 OEM 需求开始',
-      body: '提交介质、量程、输出、连接、数量和交付窗口，销售与工程团队可按产品、行业或应用路径快速回复。',
+      title: '准备询价或确认选型？',
+      body: '提交介质、压力范围、输出、连接、材质、数量和交付窗口，销售与工程团队可按产品、行业或应用路径回复。',
       primary: '进入产品中心',
-      secondary: '提交选型需求',
+      secondary: '提交 RFQ',
     },
   },
   en: {
     hero: {
-      eyebrow: 'Industrial measurement and OEM sensor platform',
-      title: 'Measurement products for machinery, fluid, and energy systems',
-      body: 'A product-discovery surface built around pressure, level, temperature, and industrial switch categories, with direct paths for buyers, engineers, and OEM teams.',
-      primary: 'Explore Products',
-      secondary: 'View Industries',
+      eyebrow: 'Industrial sensors + valves product center',
+      title: 'Selection entry for OEM and industrial sensor-valve projects',
+      body: 'Pressure transmitters, industrial valves, and application pairings for overseas OEMs, machine builders, and industrial buyers who need a clear path from product, industry, operating condition, and resource to RFQ.',
+      primary: 'Open Product Center',
+      secondary: 'View Industry Solutions',
       imageAlt: 'Industrial pressure instruments and sensors installed on metal process piping',
+      media: {
+        ariaLabel: 'Homepage product and application media carousel',
+        previousLabel: 'Previous slide',
+        nextLabel: 'Next slide',
+        slides: [
+          {
+            kind: 'image',
+            title: 'Pressure measurement products',
+            description: 'Pressure sensors, transmitters, and pipeline measurement use cases.',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: 'Industrial pressure gauge and pressure sensor application',
+            href: '/products?family=sensor&search=pressure',
+          },
+          {
+            kind: 'image',
+            title: 'Industrial valves and gas control',
+            description: 'Select by pressure rating, connection, material, media, and size.',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: 'Industrial valve and gas-line control product display',
+            href: '/products?family=valve',
+          },
+          {
+            kind: 'image',
+            title: 'OEM sensor + valve pairing',
+            description: 'Project paths for interface, signal, housing, packaging, and repeat supply.',
+            imageSrc: '/images/hero/industrial-instrumentation.png',
+            imageAlt: 'OEM sensor and valve pairing application display',
+            href: '/oem',
+          },
+        ],
+      },
       metrics: [
-        { value: '1000+', label: 'catalog capacity' },
-        { value: '5', label: 'priority industry gateways' },
-        { value: '48h', label: 'selection response window' },
+        { value: '2', label: 'core product families' },
+        { value: '5', label: 'industry solution paths' },
+        { value: '48h', label: 'RFQ response window' },
       ],
       entries: [
-        { label: 'By product type', description: 'Pressure, level, temperature, switches', href: industrialSensorCategoryTree.root.canonicalPath },
-        { label: 'By industry', description: 'Oil, water, automation, energy, manufacturing', href: '/industries' },
-        { label: 'By OEM need', description: 'Signal, connector, housing, label', href: '/oem' },
+        { label: 'Pressure sensors / transmitters', description: 'Range, output, connection, media', href: '/products?family=sensor&search=pressure' },
+        { label: 'Industrial valves', description: 'Pressure rating, connection, material, size', href: '/products?family=valve' },
+        { label: 'OEM pairing', description: 'Sensors, valves, interfaces, repeat supply', href: '/oem' },
       ],
     },
     categories: {
-      eyebrow: 'Product entry points',
-      title: 'Organized around how industrial buyers select products',
-      body: 'The homepage exposes categories and application boundaries while detailed model data stays in the product center for large catalog growth.',
-      linkLabel: 'Open category',
+      eyebrow: 'Product quick entry',
+      title: 'Start by product family and category',
+      body: 'The product center keeps category, industry, application, family, and keyword filters visible while sensors and valves stay on the same Domain product index.',
+      linkLabel: 'Open catalog',
     },
     trust: {
-      eyebrow: 'Industrial trust system',
-      title: 'Build buyer confidence with evidence, supply reliability, and OEM readiness',
-      body: 'For repeat machine builds and long-term procurement, the homepage highlights certification, datasheets, selection response, and batch delivery capability.',
+      eyebrow: 'Quality and delivery',
+      title: 'Build buyer confidence with evidence, datasheets, and batch delivery readiness',
+      body: 'For repeat machine builds and long-term procurement, the page highlights certification readiness, datasheets, selection response, warranty, and OEM support capability.',
     },
     applicationProof: {
-      eyebrow: 'Application paths',
-      title: 'Translate operating conditions into quote-ready requirements',
-      body: 'Application gateways organize media, range, output, connection, quantity, and delivery windows so engineering and purchasing teams can form an RFQ.',
+      eyebrow: 'Filter by operating condition',
+      title: 'Narrow selection by media, application, and industry',
+      body: 'Engineering and purchasing teams can start from media, application scenario, or industry system before confirming range, output, connection, material, quantity, and delivery window.',
       items: [
-        { label: 'High pressure', value: 'Hydraulics / pumps / compressors' },
-        { label: 'Pipeline monitoring', value: 'Pressure / DP / temperature' },
-        { label: 'OEM integration', value: 'Signal / connector / label' },
+        { label: 'Media', value: 'Gas / liquid / natural gas', href: '/products?search=media' },
+        { label: 'Application', value: 'High pressure / pipeline / OEM', href: '/applications' },
+        { label: 'Industry', value: 'Oil & gas / water / automation', href: '/industries' },
       ],
     },
     products: {
-      eyebrow: 'Product card system',
-      title: 'Stable cards for high-volume catalogs',
-      body: 'Cards carry only listing-index data: model, category, key specs, and one clear action, keeping pagination and cache strategy straightforward.',
+      eyebrow: 'Featured products',
+      title: 'Start with quote-ready sensor and valve models',
+      body: 'Product cards show model, family, category, key specs, image, and material entry in a consistent layout so buyers can decide whether to open the detail page.',
     },
     industries: {
-      eyebrow: 'Industry gateways',
-      title: 'Help customers find their system before the product',
-      body: 'Industrial websites are not just product shelves. Industry paths create context for procurement and engineering teams.',
-      linkLabel: 'View solution',
+      eyebrow: 'Industry solutions',
+      title: 'Find the industry system before selecting products',
+      body: 'Industry pages connect operating conditions, related products, industry content, and curated sensor + valve pairings so customers can enter selection from the system context.',
+      linkLabel: 'View industry',
     },
     applications: {
-      eyebrow: 'Application gateways',
-      title: 'Connect measurement tasks to products, parameters, and RFQ paths',
-      body: 'High pressure measurement, pipeline monitoring, and OEM integration are common engineering entry points for sensor selection.',
+      eyebrow: 'Application scenarios',
+      title: 'Applications are carried inside industry and product paths',
+      body: 'Application pages remain available for long-tail discovery, while the homepage keeps the most common tasks as practical entry points.',
       linkLabel: 'View application',
     },
+    resources: {
+      eyebrow: 'Resources',
+      title: 'Put articles, cases, and manuals into the buyer path',
+      body: 'Resources stay simple: blog posts for selection knowledge, cases for application evidence, and product manuals for downloads and specification checks.',
+      linkLabel: 'Open resource',
+    },
     modules: {
-      eyebrow: 'Section system',
-      title: 'Reusable modules for industrial websites',
-      body: 'Each section is an isolated Server Component that accepts plain props, ready for later CMS, MDX, or product-index integration.',
+      eyebrow: 'OEM customization capability',
+      title: 'Turn sensor, valve, and interface requirements into repeatable supply programs',
+      body: 'The OEM path collects signal output, connector, housing, labeling, packaging, MOQ, and delivery-window requirements for machine builders.',
     },
     cta: {
-      title: 'Start from catalog, industry, or OEM requirements',
-      body: 'Send media, range, output, connection, quantity, and delivery window so sales and engineering can reply by product, industry, or application path.',
+      title: 'Ready to quote or confirm a selection?',
+      body: 'Send media, pressure range, output, connection, material, quantity, and delivery window so sales and engineering can reply by product, industry, or application path.',
       primary: 'Open Product Center',
-      secondary: 'Send Requirements',
+      secondary: 'Send RFQ',
     },
   },
-} as const satisfies Record<LocaleCode, Omit<HomepageProjection, 'architectureVersion' | 'trust' | 'categories' | 'products' | 'industries' | 'applications' | 'modules'> & {
+} as const satisfies Record<LocaleCode, Omit<HomepageProjection, 'architectureVersion' | 'trust' | 'categories' | 'products' | 'industries' | 'applications' | 'resources' | 'modules'> & {
   readonly categories: Omit<HomepageProjection['categories'], 'items'>
   readonly trust: Pick<HomepageProjection['trust'], 'eyebrow' | 'title' | 'body'>
   readonly products: Pick<HomepageProjection['products'], 'eyebrow' | 'title' | 'body'>
   readonly industries: Omit<GatewaySectionProjection, 'items'>
   readonly applications: Omit<GatewaySectionProjection, 'items'>
+  readonly resources: Omit<HomepageProjection['resources'], 'items'>
   readonly modules: Pick<HomepageProjection['modules'], 'eyebrow' | 'title' | 'body'>
 }>
 
@@ -435,23 +587,36 @@ const applicationItems = {
 
 const moduleItems = {
   zh: [
-    { icon: 'catalog', title: '产品发现模块', description: '分类入口、精选产品、参数摘要和规格标签。', points: ['分类网格', '产品卡片', '参数条'] },
-    { icon: 'quality', title: '信任证明模块', description: '认证、测试、质保和批量交付能力。', points: ['ISO / CE / RoHS', '校准能力', '交付承诺'] },
-    { icon: 'oem', title: 'OEM 转化模块', description: '围绕信号、结构、连接器、贴牌和 MOQ 组织。', points: ['信号定制', '外壳定制', '品牌贴牌'] },
+    { icon: 'oem', title: '传感器接口定制', description: '围绕量程、输出、电气连接、过程接口和外壳结构确认 OEM 配套要求。', points: ['信号输出', '连接器', '外壳结构'] },
+    { icon: 'pipeline', title: '阀门组合配套', description: '结合压力等级、连接方式、材质、介质和尺寸，为气路、管线和设备系统配套。', points: ['压力等级', '材质/介质', '尺寸/连接'] },
+    { icon: 'quality', title: '批量供货协同', description: '围绕样品确认、数据手册、包装标签、MOQ 和交付窗口建立长期采购节奏。', points: ['样品确认', '资料归档', '批量交付'] },
   ],
   en: [
-    { icon: 'catalog', title: 'Product Discovery', description: 'Category entries, featured products, parameter summaries, and spec tags.', points: ['Category grid', 'Product cards', 'Spec strips'] },
-    { icon: 'quality', title: 'Proof and Quality', description: 'Certification, testing, warranty, and batch delivery confidence.', points: ['ISO / CE / RoHS', 'Calibration', 'Delivery commitments'] },
-    { icon: 'oem', title: 'OEM Conversion', description: 'Structured around signals, housing, connectors, labeling, and MOQ.', points: ['Signal design', 'Housing design', 'Private label'] },
+    { icon: 'oem', title: 'Sensor interface customization', description: 'Confirm OEM requirements around range, output, electrical connection, process interface, and housing structure.', points: ['Signal output', 'Connector', 'Housing'] },
+    { icon: 'pipeline', title: 'Valve pairing support', description: 'Match pressure rating, connection, material, media, and size for gas lines, pipelines, and equipment systems.', points: ['Pressure rating', 'Material/media', 'Size/connection'] },
+    { icon: 'quality', title: 'Repeat supply coordination', description: 'Build long-term procurement rhythm around sample approval, datasheets, packaging labels, MOQ, and delivery windows.', points: ['Sample approval', 'Material records', 'Batch delivery'] },
   ],
 } as const satisfies Record<LocaleCode, HomepageProjection['modules']['items']>
+
+const resourceItems = {
+  zh: [
+    { icon: 'catalog', title: '博客', description: '选型方法、工况解释和行业观察，帮助客户理解传感器与阀门应用边界。', meta: '选型知识', href: '/resources/blog' },
+    { icon: 'factory', title: '案例', description: '项目背景、应用场景和产品组合入口，用于承接后续公开案例内容。', meta: '应用证明', href: '/resources/cases' },
+    { icon: 'quality', title: '产品手册/下载', description: '数据手册、产品手册和证书下载入口，用于规格核对和采购归档。', meta: '资料下载', href: '/resources/manuals' },
+  ],
+  en: [
+    { icon: 'catalog', title: 'Blog', description: 'Selection methods, operating-condition notes, and industry observations that clarify sensor and valve application boundaries.', meta: 'Selection knowledge', href: '/resources/blog' },
+    { icon: 'factory', title: 'Case studies', description: 'Project context, application scenarios, and product pairing entries prepared for future public case content.', meta: 'Application proof', href: '/resources/cases' },
+    { icon: 'quality', title: 'Product manuals / downloads', description: 'Datasheets, product manuals, and certificate entries for specification checks and procurement records.', meta: 'Downloads', href: '/resources/manuals' },
+  ],
+} as const satisfies Record<LocaleCode, HomepageProjection['resources']['items']>
 
 function localize(text: LocalizedText, locale: LocaleCode) {
   return text[locale] ?? text.en
 }
 
-function getPrimaryCategories() {
-  return [...(industrialSensorCategoryTree.root.children ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)
+function getPrimaryCategories(categoryTree: CategoryTree = industrialSensorCategoryTree) {
+  return [...(categoryTree.root.children ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
 function getCategoryCopy(node: CategoryNode, locale: LocaleCode) {
@@ -473,25 +638,66 @@ function getProductTotalLabel(locale: LocaleCode, productList: ProductListResult
   return `${productList.pageInfo.total} public products indexed, showing ${productList.items.length}`
 }
 
-export function getIndustrialSiteLayout(locale: LocaleCode): SiteLayoutProjection {
+function getSiteSearchProjection(locale: LocaleCode): SiteLayoutProjection['search'] {
+  return {
+    label: locale === 'zh' ? '全站搜索' : 'Site search',
+    placeholder: locale === 'zh' ? '搜索产品、行业、应用场景或资料' : 'Search products, industries, applications, or resources',
+    submitLabel: locale === 'zh' ? '搜索' : 'Search',
+    actionPath: '/products',
+    groups: [
+      {
+        title: locale === 'zh' ? '产品与场景' : 'Products & scenarios',
+        items: [
+          { label: locale === 'zh' ? '压力变送器' : 'Pressure transmitters', href: toProductSearchHref('pressure transmitter') },
+          { label: applicationItems[locale][0].title, href: toProductSearchHref(applicationItems.en[0].title) },
+          { label: applicationItems[locale][1].title, href: toProductSearchHref(applicationItems.en[1].title) },
+        ],
+      },
+      {
+        title: locale === 'zh' ? '行业与生态' : 'Industries & ecosystem',
+        items: [
+          ...industryItems[locale].slice(0, 2).map((industry) => ({ label: industry.title, href: industry.href })),
+          { label: locale === 'zh' ? '生态搭配' : 'Ecosystem pairings', href: '/industries#ecosystem' },
+        ],
+      },
+      {
+        title: locale === 'zh' ? '资料中心' : 'Resources',
+        items: [
+          { label: locale === 'zh' ? '博客' : 'Blog', href: '/resources/blog' },
+          { label: locale === 'zh' ? '案例' : 'Case studies', href: '/resources/cases' },
+          { label: locale === 'zh' ? '产品手册/下载' : 'Product manuals / downloads', href: '/resources/manuals' },
+        ],
+      },
+    ],
+  }
+}
+
+function toProductSearchHref(query: string) {
+  return `/products?search=${encodeURIComponent(query)}`
+}
+
+export function getIndustrialSiteLayout(locale: LocaleCode, categoryTree: CategoryTree = industrialSensorCategoryTree): SiteLayoutProjection {
   const copy = siteText[locale]
-  const categories = getPrimaryCategories()
+  const categories = getPrimaryCategories(categoryTree)
 
   return {
     architectureVersion: architectureFreezeV1.version,
     brand: copy.brand,
     navigation: [
-      { label: copy.navigation.products, href: industrialSensorCategoryTree.root.canonicalPath },
+      { label: copy.navigation.products, href: '/products' },
       { label: copy.navigation.industries, href: '/industries' },
       { label: copy.navigation.oem, href: '/oem' },
       { label: copy.navigation.resources, href: '/resources' },
+      { label: copy.navigation.company, href: '/company' },
       { label: copy.navigation.contact, href: '/contact' },
     ],
     actions: copy.actions,
     language: copy.language,
+    search: getSiteSearchProjection(locale),
     footer: {
       summary: copy.footer.summary,
       badges: copy.footer.badges,
+      contact: copy.footer.contact,
       columns: [
         {
           title: copy.footer.products,
@@ -508,11 +714,19 @@ export function getIndustrialSiteLayout(locale: LocaleCode): SiteLayoutProjectio
           })),
         },
         {
+          title: copy.footer.resources,
+          links: resourceItems[locale].map((resource) => ({
+            label: resource.title,
+            href: resource.href,
+          })),
+        },
+        {
           title: copy.footer.services,
           links: [
-            { label: copy.navigation.oem, href: '/oem' },
-            { label: locale === 'zh' ? '品牌贴牌' : 'Private Label', href: '/oem#private-label' },
-            { label: locale === 'zh' ? '批量交付' : 'Batch Delivery', href: '/oem#delivery' },
+            { label: copy.navigation.company, href: '/company' },
+            { label: locale === 'zh' ? '认证' : 'Certification', href: '/resources/manuals/company-materials/quality-certification' },
+            { label: locale === 'zh' ? '制造' : 'Manufacturing', href: '/manufacturing' },
+            { label: 'FAQ', href: '/resources' },
           ],
         },
       ],
@@ -520,16 +734,21 @@ export function getIndustrialSiteLayout(locale: LocaleCode): SiteLayoutProjectio
   }
 }
 
-export function getIndustrialHomepage(locale: LocaleCode, productList: ProductListResult): HomepageProjection {
+export function getIndustrialHomepage(
+  locale: LocaleCode,
+  productList: ProductListResult,
+  categoryTree: CategoryTree = industrialSensorCategoryTree,
+): HomepageProjection {
   const copy = homepageText[locale]
   const site = siteText[locale]
+  const categories = getPrimaryCategories(categoryTree)
 
   return {
     architectureVersion: architectureFreezeV1.version,
     hero: copy.hero,
     categories: {
       ...copy.categories,
-      items: getPrimaryCategories().map((category) => ({
+      items: categories.map((category) => ({
         ...getCategoryCopy(category, locale),
         href: category.canonicalPath,
       })),
@@ -562,6 +781,10 @@ export function getIndustrialHomepage(locale: LocaleCode, productList: ProductLi
     applications: {
       ...copy.applications,
       items: applicationItems[locale],
+    },
+    resources: {
+      ...copy.resources,
+      items: resourceItems[locale],
     },
     modules: {
       ...copy.modules,

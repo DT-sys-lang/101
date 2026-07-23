@@ -62,7 +62,7 @@ export function buildAiReadableIndustrialProduct(
       brand: product.identity.brand,
       manufacturer: product.identity.manufacturer ?? product.identity.brand,
       canonicalPath: seo.slug.canonicalPath,
-      lifecycle: product.identity.lifecycle,
+      family: product.core.family,
       availability: product.identity.availability,
       categoryIds: product.classification.categoryPath,
       industryIds: product.classification.industryIds,

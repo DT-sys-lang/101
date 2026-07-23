@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "inquiry_submissions",
+  "info": {
+    "singularName": "inquiry-submission",
+    "pluralName": "inquiry-submissions",
+    "displayName": "Inquiry Submission",
+    "description": "Website inquiry records submitted through the production inquiry API."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "recordId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "storedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "intent": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["rfq", "email-capture", "oem-cooperation", "distributor-inquiry"]
+    },
+    "nextAction": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["send-email-notification", "sync-crm", "manual-review", "reject-invalid-payload"]
+    },
+    "status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "new",
+      "enum": ["new", "notified", "crm-queued", "closed", "spam", "failed"]
+    },
+    "source": {
+      "type": "json",
+      "required": true
+    },
+    "contact": {
+      "type": "json",
+      "required": true
+    },
+    "payload": {
+      "type": "json",
+      "required": true
+    },
+    "outboundChannels": {
+      "type": "json"
+    },
+    "emailState": {
+      "type": "string"
+    },
+    "crmState": {
+      "type": "string"
+    }
+  }
+}

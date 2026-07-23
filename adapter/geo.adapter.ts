@@ -1,7 +1,5 @@
 import type {
-  CategoryId,
   CategoryNode,
-  DocumentId,
   EvidenceId,
   GeoAiEvidence,
   GeoAiFact,
@@ -14,7 +12,8 @@ import type {
   RevisionString,
   SourceRef,
 } from '@/lib/domain'
-import { localizeFactText, reject, toNonEmptyArray } from './validation'
+import { selectProductClaimTypes } from '@/lib/domain/intent-mapping'
+import { localizeFactText, toNonEmptyArray } from './validation'
 
 export type ProductGeoSource = Omit<ProductRecord, 'geoAi' | 'localizedGeoAi'>
 export type AIReadableIndustrialProduct = ProductGeoAiProfile
@@ -44,7 +43,7 @@ export function buildGeoAiProfile(
       locale,
       lastReviewedAt: product.identity.revisedAt,
       reviewedBy: 'product-engineering',
-      allowedForAiExtraction: product.identity.lifecycle !== 'hidden',
+      allowedForAiExtraction: true,
     },
     entity: {
       productId: product.identity.id,
@@ -62,7 +61,8 @@ export function buildGeoAiProfile(
   }
 }
 
-export function buildFactTable(product: ProductGeoSource, sourceRef: SourceRef): NonEmptyReadonlyArray<GeoAiFact> {
+export function buildFactTable(product: ProductGeoSource, sourceRef: SourceRef | undefined): NonEmptyReadonlyArray<GeoAiFact> {
+  const selectedClaimTypes = new Set(selectProductClaimTypes(product))
   const sourceRefs = toSourceRefs(sourceRef)
   const facts: GeoAiFact[] = [
     {
@@ -108,22 +108,44 @@ export function buildFactTable(product: ProductGeoSource, sourceRef: SourceRef):
       value: output.value,
       sourceRefs,
     })),
-    {
-      id: buildEvidenceId(product.identity.id, 'process-connection'),
-      claimType: 'installation',
-      label: 'Process connection',
-      value: product.connections.process.value,
-      sourceRefs,
-    },
-    {
-      id: buildEvidenceId(product.identity.id, 'electrical-connection'),
-      claimType: 'installation',
-      label: 'Electrical connection',
-      value: product.connections.electrical.value,
-      sourceRefs,
-    },
+    ...(product.connections
+      ? [
+          {
+            id: buildEvidenceId(product.identity.id, 'process-connection'),
+            claimType: 'installation' as const,
+            label: 'Process connection',
+            value: product.connections.process.value,
+            sourceRefs,
+          },
+          {
+            id: buildEvidenceId(product.identity.id, 'electrical-connection'),
+            claimType: 'installation' as const,
+            label: 'Electrical connection',
+            value: product.connections.electrical.value,
+            sourceRefs,
+          },
+        ]
+      : []),
+    ...(product.valveProfile
+      ? [
+          {
+            id: buildEvidenceId(product.identity.id, 'valve-pressure-rating'),
+            claimType: 'limitation' as const,
+            label: 'Pressure rating',
+            value: product.valveProfile.pressureRating,
+            sourceRefs,
+          },
+          {
+            id: buildEvidenceId(product.identity.id, 'valve-connection'),
+            claimType: 'installation' as const,
+            label: 'Connection',
+            value: product.valveProfile.connection,
+            sourceRefs,
+          },
+        ]
+      : []),
     ...buildEnvironmentalFacts(product, sourceRef),
-    ...product.certifications.map((certification) => ({
+    ...(product.certifications ?? []).map((certification) => ({
       id: buildEvidenceId(product.identity.id, `cert-${certification}`),
       claimType: 'compliance' as const,
       label: 'Certification',
@@ -132,7 +154,10 @@ export function buildFactTable(product: ProductGeoSource, sourceRef: SourceRef):
     })),
   ]
 
-  return toNonEmptyArray(facts, `product.${product.identity.id}.geoAi.factTable`)
+  return toNonEmptyArray(
+    facts.filter((fact) => selectedClaimTypes.has(fact.claimType)),
+    `product.${product.identity.id}.geoAi.factTable`,
+  )
 }
 
 export function buildAnswerSummary(
@@ -146,19 +171,29 @@ export function buildAnswerSummary(
   const summary = localizeFactText(product.content.summary, locale)
   const measurements = product.measurements.map((measurement) => measurement.range.display).join(', ')
   const outputs = product.outputs.map((output) => output.value).join(', ')
+  const connectionText = product.connections
+    ? `${product.connections.process.value} process connection and ${product.connections.electrical.value} electrical connection`
+    : product.valveProfile
+      ? `${product.valveProfile.connection} connection, ${product.valveProfile.material} material, and ${product.valveProfile.mode} mode`
+      : 'documented installation requirements'
+  const technicalFacts = [
+    measurements ? `${measurements} measurement coverage` : undefined,
+    outputs ? `${outputs} output options` : undefined,
+    connectionText,
+  ].filter(Boolean).join(', ')
+  const primaryUseCaseText = product.content.applications.length
+    ? product.content.applications.map((item) => localizeFactText(item, locale))
+    : product.content.highlights.map((item) => localizeFactText(item, locale))
   const primaryUseCases = toNonEmptyArray(
-    product.content.applications.length
-      ? product.content.applications.map((item) => localizeFactText(item, locale))
-      : product.content.highlights.map((item) => localizeFactText(item, locale)),
+    primaryUseCaseText.length ? primaryUseCaseText : [`${categoryName} applications`],
     `product.${product.identity.id}.geoAi.answerSummary.primaryUseCases`,
   )
 
   return {
     oneSentence: `${model} is a ${categoryName} for ${primaryUseCases[0]}.`,
     shortParagraph: summary,
-    technicalAbstract: `${productName} combines ${measurements} measurement coverage with ${outputs} output options, ${product.connections.process.value} process connection, and ${product.connections.electrical.value} electrical connection.`,
+    technicalAbstract: `${productName} combines ${technicalFacts}.`,
     primaryUseCases,
-    notRecommendedFor: product.identity.lifecycle === 'active' ? undefined : ['New design-in projects'],
   }
 }
 
@@ -175,74 +210,91 @@ export function buildSelectionGuidance(
     `product.${product.identity.id}.geoAi.selectionGuidance.bestFor`,
   )
   const decisionCriteria = toNonEmptyArray([
-    `Select range from ${product.measurements.map((measurement) => measurement.range.display).join(', ')}.`,
-    `Match output to controller input: ${product.outputs.map((output) => output.value).join(', ')}.`,
-    `Confirm process connection ${product.connections.process.value}.`,
-    `Confirm electrical connection ${product.connections.electrical.value}.`,
+    ...(product.measurements.length ? [`Select range from ${product.measurements.map((measurement) => measurement.range.display).join(', ')}.`] : []),
+    ...(product.outputs.length ? [`Match output to controller input: ${product.outputs.map((output) => output.value).join(', ')}.`] : []),
+    ...(product.connections ? [`Confirm process connection ${product.connections.process.value}.`, `Confirm electrical connection ${product.connections.electrical.value}.`] : []),
+    ...(product.valveProfile ? [`Confirm pressure rating ${product.valveProfile.pressureRating}.`, `Confirm valve size ${product.valveProfile.size}.`] : []),
   ], `product.${product.identity.id}.geoAi.selectionGuidance.decisionCriteria`)
+  const installationNotes = [
+    ...(product.connections ? [`Process connection: ${product.connections.process.value}`, `Electrical connection: ${product.connections.electrical.value}`] : []),
+    ...(product.valveProfile ? [`Valve connection: ${product.valveProfile.connection}`, `Valve mode: ${product.valveProfile.mode}`] : []),
+  ]
 
   return {
     bestFor,
     decisionCriteria,
     compatibleMedia: product.environmentalLimits.compatibleMedia,
-    installationNotes: [
-      `Process connection: ${product.connections.process.value}`,
-      `Electrical connection: ${product.connections.electrical.value}`,
-    ],
+    installationNotes,
     requiredOptions: product.variants.length ? product.variants.map((variant) => variant.orderCode) : undefined,
   }
 }
 
-export function buildEvidence(product: ProductGeoSource): NonEmptyReadonlyArray<GeoAiEvidence> {
-  return toNonEmptyArray(
-    product.documents.map((document) => ({
-      id: buildEvidenceId(product.identity.id, document.id),
-      title: document.title,
-      sourceType: mapDocumentKindToEvidenceSourceType(document.kind),
-      href: document.href,
-      revision: toRevisionString(document.revision),
-      updatedAt: product.identity.revisedAt,
-    })),
-    `product.${product.identity.id}.geoAi.evidence`,
-  )
+export function buildEvidence(product: ProductGeoSource): readonly GeoAiEvidence[] {
+  return (product.documents ?? []).map((document) => ({
+    id: buildEvidenceId(product.identity.id, document.id),
+    title: document.title,
+    sourceType: mapDocumentKindToEvidenceSourceType(document.kind),
+    href: document.href,
+    revision: toRevisionString(document.revision),
+    updatedAt: product.identity.revisedAt,
+  }))
 }
 
-function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef, locale: LocaleCode): readonly GeoAiFaqItem[] {
+function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef | undefined, locale: LocaleCode): readonly GeoAiFaqItem[] {
   const sourceRefs = toSourceRefs(sourceRef)
   const model = product.identity.model
-  const ranges = product.measurements.map((measurement) => measurement.range.display).join(', ')
-  const outputs = product.outputs.map((output) => output.value).join(', ')
-  const media = product.environmentalLimits.compatibleMedia?.join(', ') || product.environmentalLimits.wettedMaterials.join(', ')
-
-  return [
+  const items: GeoAiFaqItem[] = [
     {
-      question: locale === 'zh' ? `${model} 鐢ㄤ簬浠€涔堝満鏅紵` : `What is ${model} used for?`,
-      answer: product.content.summary[locale],
+      question: `What is ${model} used for?`,
+      answer: product.content.summary[locale] ?? product.content.summary.en,
       audience: 'engineer',
-      sourceRefs,
-    },
-    {
-      question: locale === 'zh' ? `${model} 鏀寔浠€涔堟祴閲忚寖鍥达紵` : `What measurement range does ${model} support?`,
-      answer: `${model} supports ${ranges}.`,
-      audience: 'engineer',
-      sourceRefs,
-    },
-    {
-      question: locale === 'zh' ? `${model} 鎻愪緵浠€涔堣緭鍑轰俊鍙凤紵` : `What output signal does ${model} provide?`,
-      answer: `${model} provides ${outputs}.`,
-      audience: 'buyer',
-      sourceRefs,
-    },
-    {
-      question: locale === 'zh' ? `${model} 閫傜敤浜庡摢浜涗粙璐紵` : `Which media is ${model} suitable for?`,
-      answer: `${model} is listed for compatible media including ${media}.`,
-      audience: 'buyer',
       sourceRefs,
     },
   ]
+
+  const ranges = product.measurements.map((measurement) => measurement.range.display).join(', ')
+  if (ranges) {
+    items.push({
+      question: `What measurement range does ${model} support?`,
+      answer: `${model} supports ${ranges}.`,
+      audience: 'engineer',
+      sourceRefs,
+    })
+  }
+
+  const outputs = product.outputs.map((output) => output.value).join(', ')
+  if (outputs) {
+    items.push({
+      question: `What output signal does ${model} provide?`,
+      answer: `${model} provides ${outputs}.`,
+      audience: 'buyer',
+      sourceRefs,
+    })
+  }
+
+  if (product.valveProfile) {
+    items.push({
+      question: `What pressure rating does ${model} support?`,
+      answer: `${model} is specified with ${product.valveProfile.pressureRating} pressure rating, ${product.valveProfile.connection} connection, and ${product.valveProfile.size} size.`,
+      audience: 'engineer',
+      sourceRefs,
+    })
+  }
+
+  const media = product.environmentalLimits.compatibleMedia?.join(', ') || product.environmentalLimits.wettedMaterials.join(', ')
+  if (media) {
+    items.push({
+      question: `Which media is ${model} suitable for?`,
+      answer: `${model} is listed for compatible media including ${media}.`,
+      audience: 'buyer',
+      sourceRefs,
+    })
+  }
+
+  return items
 }
 
-function buildEnvironmentalFacts(product: ProductGeoSource, sourceRef: SourceRef): readonly GeoAiFact[] {
+function buildEnvironmentalFacts(product: ProductGeoSource, sourceRef: SourceRef | undefined): readonly GeoAiFact[] {
   const sourceRefs = toSourceRefs(sourceRef)
 
   return [
@@ -287,15 +339,16 @@ function buildEnvironmentalFacts(product: ProductGeoSource, sourceRef: SourceRef
   ]
 }
 
-function toSourceRefs(sourceRef: SourceRef): NonEmptyReadonlyArray<SourceRef> {
-  return [sourceRef]
+function toSourceRefs(sourceRef: SourceRef | undefined): readonly SourceRef[] {
+  return sourceRef ? [sourceRef] : []
 }
 
-function buildPrimarySourceRef(product: ProductGeoSource): SourceRef {
-  const primaryDocument = product.documents.find((document) => document.kind === 'datasheet') ?? product.documents[0]
+function buildPrimarySourceRef(product: ProductGeoSource): SourceRef | undefined {
+  const documents = product.documents ?? []
+  const primaryDocument = documents.find((document) => document.kind === 'datasheet') ?? documents[0]
 
   if (!primaryDocument) {
-    reject(`product.${product.identity.id}.geoAi.evidence`, 'at least one document is required to build GEO evidence refs')
+    return undefined
   }
 
   return {
@@ -310,7 +363,7 @@ function buildEvidenceId(productId: string, key: string): EvidenceId {
   return `evidence_${productId}_${key}` as EvidenceId
 }
 
-function mapDocumentKindToEvidenceSourceType(kind: ProductRecord['documents'][number]['kind']): GeoAiEvidence['sourceType'] {
+function mapDocumentKindToEvidenceSourceType(kind: NonNullable<ProductRecord['documents']>[number]['kind']): GeoAiEvidence['sourceType'] {
   switch (kind) {
     case 'manual':
       return 'manual'

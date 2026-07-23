@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_facts_valve_profile_facts",
+  "info": {
+    "displayName": "ValveProfileFact",
+    "description": "Valve-specific product facts. Do not store generated role, function, SEO, GEO, or route fields."
+  },
+  "attributes": {
+    "pressureRating": {
+      "type": "string",
+      "required": true
+    },
+    "connection": {
+      "type": "string",
+      "required": true
+    },
+    "material": {
+      "type": "string",
+      "required": true
+    },
+    "mode": {
+      "type": "string",
+      "required": true
+    },
+    "compatibleMedia": {
+      "type": "json",
+      "required": true
+    },
+    "size": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

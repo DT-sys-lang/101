@@ -82,8 +82,8 @@ Result:
 - Pass
 - Contract: `seo-runtime-contract-v1`
 - Runtime products: `2`
-- Sitemap entries: `34`
-- Expected sitemap entries: `34`
+- Sitemap entries: `36`
+- Expected sitemap entries: `36`
 - Hreflang keys: `zh-CN`, `en`, `x-default`
 - JSON-LD graph contracts remained stable for Product, FAQPage, CollectionPage, and ItemList
 - SEO boundary checked `17` files with no forbidden CMS/raw/Strapi imports
@@ -150,6 +150,19 @@ npm run typecheck
 ```
 
 For real facts replay, run `validate:seo` and `validate:geo` with `CMS_SOURCE_MODE=env-facts-json`, `CMS_FACTS_JSON` set from the exported facts file, and `-- --scale false`.
+
+## 2026-07-02 QA / Scale Follow-Up
+
+Thread 05 reran the release gates after the SEO/GEO closure:
+
+- `npm run lint`, `npm run validate:boundaries`, `npm run typecheck`, `npm run validate:domain`, `npm run validate:cms-facts`, and `npm run build` passed.
+- `npm run validate:seo` passed with `300` products, `632` sitemap entries, and `632` expected entries.
+- `npm run validate:geo` passed with `300` products, `1,206` expected answer blocks per locale, and `6` application answer blocks per locale.
+- `npm run validate:scale-300` passed with `632` sitemap entries and `1,206` GEO answer blocks per locale.
+- `npm run validate:scale-1000` passed with `2,032` sitemap entries and `4,006` GEO answer blocks per locale.
+- Real CMS export replay from `tmp/real-cms-export.facts.json` passed SEO with `2` products and `36` sitemap entries, and passed GEO with `14` expected answer blocks per locale.
+
+The sitemap baseline changed because the current site structure has `7` localized static entry paths, including `/company`.
 
 ## Final Statement
 

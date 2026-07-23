@@ -86,21 +86,33 @@ export function buildProductFaqItems(data: ProductDetailPageData): readonly Prod
     })
   }
 
-  addUniqueFaq(items, {
-    question: copy.installationQuestion(model),
-    answer: copy.installationAnswer(model, data.product.connections.process.value, data.product.connections.electrical.value),
-    audience: 'engineer',
-    source: 'installation',
-    sourceRefs: getFactSourceRefs(data, 'installation'),
-  })
+  if (data.product.connections) {
+    addUniqueFaq(items, {
+      question: copy.installationQuestion(model),
+      answer: copy.installationAnswer(model, data.product.connections.process.value, data.product.connections.electrical.value),
+      audience: 'engineer',
+      source: 'installation',
+      sourceRefs: getFactSourceRefs(data, 'installation'),
+    })
+  } else if (data.product.valveProfile) {
+    addUniqueFaq(items, {
+      question: copy.installationQuestion(model),
+      answer: `${model} uses ${data.product.valveProfile.connection} connection with ${data.product.valveProfile.mode} mode.`,
+      audience: 'engineer',
+      source: 'installation',
+      sourceRefs: getFactSourceRefs(data, 'installation'),
+    })
+  }
 
-  const commercialTerms = [
-    data.product.commercialTerms.minimumOrderQuantity ? `MOQ ${data.product.commercialTerms.minimumOrderQuantity}` : null,
-    data.product.commercialTerms.standardLeadTime ? `lead time ${data.product.commercialTerms.standardLeadTime}` : null,
-    data.product.commercialTerms.warranty ? `warranty ${data.product.commercialTerms.warranty}` : null,
-    data.product.commercialTerms.oemCustomizable ? 'OEM customizable' : null,
-    data.product.commercialTerms.privateLabelAvailable ? 'private label available' : null,
-  ].filter(isString).join(', ')
+  const commercialTerms = data.product.commercialTerms
+    ? [
+        data.product.commercialTerms.minimumOrderQuantity ? `MOQ ${data.product.commercialTerms.minimumOrderQuantity}` : null,
+        data.product.commercialTerms.standardLeadTime ? `lead time ${data.product.commercialTerms.standardLeadTime}` : null,
+        data.product.commercialTerms.warranty ? `warranty ${data.product.commercialTerms.warranty}` : null,
+        data.product.commercialTerms.oemCustomizable ? 'OEM customizable' : null,
+        data.product.commercialTerms.privateLabelAvailable ? 'private label available' : null,
+      ].filter(isString).join(', ')
+    : ''
 
   if (commercialTerms) {
     addUniqueFaq(items, {

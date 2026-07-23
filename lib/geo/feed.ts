@@ -55,7 +55,7 @@ function buildGeoProductFeedItem(product: ProductRecord, locale: Locale): GeoPro
     summary: localizeText(product.content.summary, locale),
     categoryPath: seo.slug.categoryPath,
     keySpecs: getFeedSpecs(product),
-    datasheets: product.documents
+    datasheets: (product.documents ?? [])
       .filter((document) => document.kind === 'datasheet')
       .map((document) => getAbsoluteUrl(document.href)),
     geoEndpoint: getProductGeoEndpoint(locale, product),

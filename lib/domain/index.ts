@@ -18,6 +18,7 @@ import {
 import { productDetailDataFlow } from './product-detail-flow'
 import type { LocaleCode } from './primitives'
 import { seoSlugStrategy } from './seo'
+import { searchIntentMappingContract } from './intent-mapping'
 
 const productRecords = getDomainProductRecords()
 const productSource = getDomainProductSource()
@@ -31,6 +32,7 @@ export interface IndustrialSensorDomain {
     readonly geoAiSchema: typeof productGeoAiSchema
     readonly productDetailFlow: typeof productDetailDataFlow
     readonly specificationRegistry: typeof defaultSpecificationRegistry
+    readonly searchIntentMapping: typeof searchIntentMappingContract
   }
   readonly product: {
     readonly records: typeof productRecords
@@ -46,6 +48,7 @@ export interface IndustrialSensorDomain {
   }
   readonly seo: {
     readonly slugStrategy: typeof seoSlugStrategy
+    readonly intentMapping: typeof searchIntentMappingContract
   }
   readonly geo: {
     readonly schema: typeof productGeoAiSchema
@@ -74,6 +77,7 @@ export const domain = {
     geoAiSchema: productGeoAiSchema,
     productDetailFlow: productDetailDataFlow,
     specificationRegistry: defaultSpecificationRegistry,
+    searchIntentMapping: searchIntentMappingContract,
   },
   product: {
     records: productRecords,
@@ -89,6 +93,7 @@ export const domain = {
   },
   seo: {
     slugStrategy: seoSlugStrategy,
+    intentMapping: searchIntentMappingContract,
   },
   geo: {
     schema: productGeoAiSchema,
@@ -112,6 +117,7 @@ export * from './application'
 export * from './category'
 export * from './geo-ai'
 export * from './industry'
+export * from './intent-mapping'
 export * from './inquiry'
 export * from './primitives'
 export * from './product'
@@ -119,6 +125,7 @@ export * from './product-catalog'
 export * from './product-source'
 export * from './page-view-models'
 export * from './product-detail-flow'
+export * from './product-navigation'
 export * from './seo'
 export * from './specification'
 export * from './site'

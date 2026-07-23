@@ -1,6 +1,9 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { industrialSensorCategoryTree, type CategoryNode, type ProductRecord } from '@/lib/domain'
 import { mockProducts, mockProductSource } from '@/lib/domain/mock-products'
 import { flattenCategoryNodes, normalizeCmsFactInput, type CmsFactInput } from './adapter'
+import { normalizeCmsFactsBusinessLocale } from './business-locale'
 
 export type CmsProductSourceMode = 'mock-domain' | 'env-facts-json' | 'cms-facts-api'
 export type CmsProductSourceFallbackReason = 'not-requested' | 'not-configured' | 'fetch-disabled' | 'not-implemented' | 'invalid-env-json' | 'timeout' | 'network-error' | 'http-error' | 'invalid-response' | 'validation-error'
@@ -126,7 +129,7 @@ export function readCmsProductSourceConfig(): CmsProductSourceConfig {
 
 export function readCmsProductSource(): CmsProductSourceResult {
   const config = readCmsProductSourceConfig()
-  const factsJsonResolution = readCmsFactsJsonResolution(process.env.CMS_FACTS_JSON?.trim())
+  const factsJsonResolution = readCmsFactsJsonResolution(process.env.CMS_FACTS_JSON?.trim(), process.env.CMS_FACTS_JSON_FILE?.trim())
   const source = resolveCmsProductSource(config, factsJsonResolution)
 
   return {
@@ -139,7 +142,7 @@ export function readCmsProductSource(): CmsProductSourceResult {
 
 export async function readCmsProductSourceAsync(): Promise<CmsProductSourceResult> {
   const config = readCmsProductSourceConfig()
-  const factsJsonResolution = readCmsFactsJsonResolution(process.env.CMS_FACTS_JSON?.trim())
+  const factsJsonResolution = readCmsFactsJsonResolution(process.env.CMS_FACTS_JSON?.trim(), process.env.CMS_FACTS_JSON_FILE?.trim())
   const source = await resolveCmsProductSourceAsync(config, factsJsonResolution)
 
   return {
@@ -422,9 +425,10 @@ function normalizeCmsFactsApiResponse(value: unknown): CmsProductFactsApiRespons
     throw new CmsFactsApiFetchError('invalid-response', 'CMS facts API response must be direct CmsFactInput without wrappers or Strapi envelopes.')
   }
 
-  rejectForbiddenCmsFactsApiFields(raw, 'cmsFacts')
+  const businessLocaleNormalization = normalizeCmsFactsBusinessLocale(raw)
+  rejectForbiddenCmsFactsApiFields(businessLocaleNormalization.cmsFacts, 'cmsFacts')
 
-  const cmsFacts = normalizeCmsFactInput(raw)
+  const cmsFacts = normalizeCmsFactInput(businessLocaleNormalization.cmsFacts)
 
   return cmsFacts
 }
@@ -505,8 +509,10 @@ function resolveCmsFactsApiFallbackReason(config: CmsProductSourceConfig): CmsPr
   return 'not-implemented'
 }
 
-function readCmsFactsJsonResolution(envFactsJson: string | undefined): CmsFactsJsonResolution {
-  if (!envFactsJson) {
+function readCmsFactsJsonResolution(envFactsJson: string | undefined, envFactsJsonFile: string | undefined): CmsFactsJsonResolution {
+  const factsJson = envFactsJson || readCmsFactsJsonFile(envFactsJsonFile)
+
+  if (!factsJson) {
     return {
       configured: false,
       valid: false,
@@ -519,7 +525,7 @@ function readCmsFactsJsonResolution(envFactsJson: string | undefined): CmsFactsJ
       valid: true,
       source: {
         sourceVersion: 'cms-facts-json-env-v1',
-        cmsFacts: normalizeCmsFactInput(JSON.parse(envFactsJson) as unknown),
+        cmsFacts: normalizeCmsFactInput(normalizeCmsFactsBusinessLocale(JSON.parse(factsJson) as unknown).cmsFacts),
       },
     }
   } catch {
@@ -527,6 +533,23 @@ function readCmsFactsJsonResolution(envFactsJson: string | undefined): CmsFactsJ
       configured: true,
       valid: false,
     }
+  }
+}
+
+function readCmsFactsJsonFile(filePath: string | undefined): string | undefined {
+  const trimmedPath = readTrimmedValue(filePath)
+
+  if (!trimmedPath) {
+    return undefined
+  }
+
+  try {
+    const resolvedPath = path.isAbsolute(trimmedPath)
+      ? trimmedPath
+      : path.join(process.cwd(), 'outputs', path.basename(trimmedPath))
+    return readFileSync(resolvedPath, 'utf8')
+  } catch {
+    return ''
   }
 }
 
@@ -563,12 +586,15 @@ function toCategoryFact(category: CategoryNode): CmsFactInput['categoryFacts'][n
 function toProductFact(product: ProductRecord): CmsFactInput['productFacts'][number] {
   return {
     id: product.identity.id,
+    family: product.core.family,
+    core: product.core,
+    sensorProfile: product.sensorProfile,
+    valveProfile: product.valveProfile,
     sku: product.identity.sku,
     model: product.identity.model,
     seriesId: product.identity.seriesId,
     brand: product.identity.brand,
     manufacturer: product.identity.manufacturer,
-    lifecycle: product.identity.lifecycle,
     availability: product.identity.availability,
     releasedAt: product.identity.releasedAt,
     revisedAt: product.identity.revisedAt,

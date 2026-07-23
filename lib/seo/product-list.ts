@@ -14,13 +14,13 @@ import { buildProductListJsonLd } from './jsonld/item-list'
 
 const copy = {
   en: {
-    rootTitle: 'Industrial Sensor Product Center | HEIYU Industrial',
-    rootDescription: 'Browse pressure, level, temperature, and industrial switch products by category, measurement range, output, and availability.',
+    rootTitle: 'Product Center | YUFAVOR',
+    rootDescription: 'Browse valves, pressure sensors, temperature sensors, pressure switches, level sensors, pressure gauges, and wireless transmitters by category and basic parameters.',
     listingSuffix: 'products',
   },
   zh: {
-    rootTitle: '工业传感器产品中心 | HEIYU Industrial',
-    rootDescription: '按分类、量程、输出和供货状态浏览压力、液位、温度和工业开关产品。',
+    rootTitle: '产品中心 | YUFAVOR',
+    rootDescription: '按分类和基础参数浏览阀、压力传感器、温度传感器、压力开关、液位传感器、压力表和无线传输变送器。',
     listingSuffix: '款产品',
   },
 } as const
@@ -37,8 +37,9 @@ export interface ProductListPageData {
 
 export function resolveProductListPage(locale: Locale, slug: readonly string[] = []): ProductListPageData | null {
   const index = getRuntimeDomainProductCatalog(locale)
-  const categorySlugPath = (slug.length ? slug.join('/') : industrialSensorCategoryTree.root.slugPath) as SeoSlugPath
-  const category = index.categoryBySlugPath.get(categorySlugPath)
+  const rootCategory = resolveCatalogRootCategory(index) ?? industrialSensorCategoryTree.root
+  const categorySlugPath = (slug.length ? slug.join('/') : rootCategory.slugPath) as SeoSlugPath
+  const category = resolveCategoryBySlugPath(index, categorySlugPath)
 
   if (!category) {
     return null
@@ -55,10 +56,11 @@ export function resolveProductListPage(locale: Locale, slug: readonly string[] =
 
   const label = localizeText(category.name, locale)
   const baseCopy = copy[locale]
-  const title = category.id === industrialSensorCategoryTree.root.id
+  const isRootCategory = category.id === rootCategory.id
+  const title = isRootCategory
     ? baseCopy.rootTitle
-    : `${label} | HEIYU Industrial`
-  const description = category.id === industrialSensorCategoryTree.root.id
+    : `${label} | ${industrialSiteConfig.brandName}`
+  const description = isRootCategory
     ? baseCopy.rootDescription
     : localizeText(category.description, locale)
 
@@ -110,6 +112,61 @@ export function buildProductListMetadata(data: ProductListPageData): Metadata {
 
 export { buildProductListJsonLd }
 
+function resolveCatalogRootCategory(index: ReturnType<typeof getRuntimeDomainProductCatalog>) {
+  for (const path of index.categoryPathById.values()) {
+    if (path.length === 1) {
+      return path[0]
+    }
+  }
+
+  return undefined
+}
+
+function resolveCategoryBySlugPath(index: ReturnType<typeof getRuntimeDomainProductCatalog>, slugPath: SeoSlugPath) {
+  const exact = index.categoryBySlugPath.get(slugPath)
+
+  if (exact) {
+    return exact
+  }
+
+  const legacyPath = findStaticCategoryPathBySlugPath(industrialSensorCategoryTree.root, slugPath)
+
+
+  if (legacyPath) {
+    for (const legacyCategory of [...legacyPath].reverse()) {
+      const currentCategory = index.categoryById.get(legacyCategory.id)
+
+      if (currentCategory) {
+        return currentCategory
+      }
+    }
+  }
+
+  return [...index.categoryBySlugPath.entries()].find(([currentSlugPath]) => currentSlugPath.endsWith(`/${slugPath}`))?.[1]
+}
+
+function findStaticCategoryPathBySlugPath(
+  category: CategoryNode,
+  slugPath: SeoSlugPath,
+  ancestors: readonly CategoryNode[] = [],
+): readonly CategoryNode[] | undefined {
+  const path = [...ancestors, category]
+
+  if (category.slugPath === slugPath) {
+    return path
+  }
+
+  for (const child of category.children ?? []) {
+    const match = findStaticCategoryPathBySlugPath(child, slugPath, path)
+
+    if (match) {
+      return match
+    }
+  }
+
+  return undefined
+}
+
 export function getProductListCountLabel(data: ProductListPageData) {
   const suffix = copy[data.locale].listingSuffix
   return data.locale === 'zh'
@@ -132,9 +189,11 @@ function emptyProductList(locale: Locale): ProductListResult {
     },
     facets: {
       categories: [],
+      families: [],
       measurementKinds: [],
       availability: [],
       outputKinds: [],
+      accuracies: [],
       certifications: [],
     },
   }

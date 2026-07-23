@@ -1,3 +1,4 @@
+import { industrialSiteConfig } from '@/lib/domain'
 import type {
   CategoryId,
   CategoryNode,
@@ -45,6 +46,7 @@ import {
   isProductFact,
   normalizeAdapterConfig,
   normalizeCmsFactInput,
+  normalizeProductFact,
   normalizeSlug,
   productSystemGeneratedFields,
   reject,
@@ -113,7 +115,7 @@ export function buildProductRecordFromFact(
   const config = normalizeAdapterConfig(options)
   const categoryContext = normalizeCategoryContext(categorySource, options)
 
-  assertProductFact(fact, path, config.locales)
+  fact = normalizeSiteBrand(normalizeProductFact(fact, path, config.locales))
 
   const primaryCategoryPath = categoryContext.pathById.get(fact.primaryCategoryId)
 
@@ -152,22 +154,53 @@ export function buildProductRecordFromFact(
   }
 }
 
+function normalizeSiteBrand(fact: ProductFact): ProductFact {
+  const brand = industrialSiteConfig.brandName
+  return {
+    ...fact,
+    core: { ...fact.core, brand },
+    brand,
+    manufacturer: brand,
+  }
+}
+
 function buildProductCoreRecord(
   fact: ProductFact,
   categoryPath: NonEmptyReadonlyArray<CategoryNode>,
   path: string,
 ): Omit<ProductRecord, 'seo' | 'localizedSeo' | 'geoAi' | 'localizedGeoAi'> {
   const categoryPathIds = toNonEmptyArray(categoryPath.map((category) => category.id), `${path}.classification.categoryPath`)
+  const measurements = fact.sensorProfile ? [...fact.sensorProfile.measurements] : []
+  const outputs = fact.sensorProfile ? [...fact.sensorProfile.outputs] : []
+  const connections = fact.sensorProfile?.connections ?? fact.connections
+  const sensorEnvironmentalLimits = fact.sensorProfile?.environmentalLimits ?? fact.environmentalLimits
+  const environmentalLimits = fact.environmentalLimits ?? sensorEnvironmentalLimits ?? {
+    wettedMaterials: fact.valveProfile ? [fact.valveProfile.material] : [],
+    compatibleMedia: fact.valveProfile?.compatibleMedia ?? [],
+  }
+  const sensorProfile = fact.sensorProfile
+    ? {
+        measurements: fact.sensorProfile.measurements,
+        outputs: fact.sensorProfile.outputs,
+        connections,
+        environmentalLimits: sensorEnvironmentalLimits,
+      }
+    : undefined
+  const core = fact.core
 
   return {
+    id: fact.id,
+    core,
+    sensorProfile,
+    valveProfile: fact.valveProfile,
     identity: {
       id: fact.id,
       sku: fact.sku,
       model: fact.model,
+      family: core.family,
       seriesId: fact.seriesId,
       brand: fact.brand,
       manufacturer: fact.manufacturer,
-      lifecycle: fact.lifecycle,
       availability: fact.availability,
       releasedAt: fact.releasedAt,
       revisedAt: fact.revisedAt,
@@ -178,24 +211,24 @@ function buildProductCoreRecord(
       additionalCategoryIds: fact.additionalCategoryIds?.length ? [...fact.additionalCategoryIds] : undefined,
       industryIds: [...fact.industryIds],
       applicationIds: [...fact.applicationIds],
-      measurementKinds: toNonEmptyArray(fact.measurementKinds, `${path}.measurementKinds`),
+      measurementKinds: [...fact.measurementKinds],
     },
     content: {
       name: fact.name,
       shortName: fact.shortName,
       summary: fact.summary,
-      highlights: toNonEmptyArray(fact.highlights, `${path}.highlights`),
+      highlights: [...fact.highlights],
       applications: [...fact.applications],
     },
-    measurements: toNonEmptyArray(fact.measurements, `${path}.measurements`),
-    outputs: toNonEmptyArray(fact.outputs, `${path}.outputs`),
-    connections: fact.connections,
-    environmentalLimits: fact.environmentalLimits,
+    measurements,
+    outputs,
+    connections,
+    environmentalLimits,
     specificationGroups: toNonEmptyArray(fact.specificationGroups, `${path}.specificationGroups`),
     variants: fact.variants ? [...fact.variants] : [],
-    certifications: fact.certifications ? [...fact.certifications] : [],
-    documents: [...fact.documents],
-    assets: fact.assets ? [...fact.assets] : [],
+    certifications: fact.certifications ? [...fact.certifications] : undefined,
+    documents: fact.documents ? [...fact.documents] : undefined,
+    assets: fact.assets ? [...fact.assets] : undefined,
     commercialTerms: fact.commercialTerms,
   }
 }
@@ -320,7 +353,7 @@ function validateGeneratedProductRecord(
       reject(`${path}.localizedGeoAi.${locale}.answerSummary`, 'localized GEO summary is incomplete')
     }
 
-    if (!localizedGeoAi.factTable.length || !localizedGeoAi.evidence.length || !localizedGeoAi.faq.length) {
+    if (!localizedGeoAi.factTable.length || !localizedGeoAi.faq.length) {
       reject(`${path}.localizedGeoAi.${locale}`, 'localized GEO profile is incomplete')
     }
   }

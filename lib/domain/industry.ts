@@ -16,6 +16,7 @@ export type IndustryKey =
   | 'industrial-automation'
   | 'energy'
   | 'manufacturing'
+  | 'chemical-processing'
 
 export interface IndustrySeoContract {
   readonly locale: LocaleCode
@@ -49,6 +50,7 @@ export const targetIndustryKeys = [
   'industrial-automation',
   'energy',
   'manufacturing',
+  'chemical-processing',
 ] as const satisfies readonly IndustryKey[]
 
 export const industrySystemContract = {

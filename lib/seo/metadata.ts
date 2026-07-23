@@ -6,7 +6,7 @@ import { buildProductHrefLangs } from './hreflang'
 
 export function buildProductMetadata(data: ProductDetailPageData): Metadata {
   const canonicalUrl = getLocalizedProductUrl(data.locale, data.seo.slug.canonicalPath)
-  const primaryImage = data.product.assets[0]
+  const primaryImage = data.product.assets?.[0]
   const index = data.seo.indexingPolicy === 'index-follow'
   const follow = data.seo.indexingPolicy !== 'noindex-nofollow'
 

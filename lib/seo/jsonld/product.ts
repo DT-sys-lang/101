@@ -13,7 +13,7 @@ export function buildProductSchemaJsonLd(data: ProductDetailPageData): JsonObjec
       {
         '@type': 'Organization',
         '@id': industrialSiteConfig.organizationId,
-        name: product.identity.manufacturer ?? product.identity.brand,
+        name: industrialSiteConfig.brandName,
         url: industrialSiteConfig.origin,
       },
       {
@@ -62,14 +62,14 @@ export function buildProductSchemaJsonLd(data: ProductDetailPageData): JsonObjec
         model: product.identity.model,
         brand: {
           '@type': 'Brand',
-          name: product.identity.brand,
+          name: industrialSiteConfig.brandName,
         },
         manufacturer: {
           '@id': industrialSiteConfig.organizationId,
         },
         category: data.listItem.categoryLabel,
         url: canonicalUrl,
-        image: product.assets.map((asset) => getAbsoluteUrl(asset.href)),
+        image: product.assets?.map((asset) => getAbsoluteUrl(asset.href)) ?? [],
         material: product.environmentalLimits.wettedMaterials.join(', '),
         additionalProperty: buildProductProperties(data),
         offers: {
@@ -124,18 +124,50 @@ function buildProductProperties(data: ProductDetailPageData): readonly JsonObjec
     })
   }
 
-  properties.push(
-    {
-      '@type': 'PropertyValue',
-      name: 'Process connection',
-      value: data.product.connections.process.value,
-    },
-    {
-      '@type': 'PropertyValue',
-      name: 'Electrical connection',
-      value: data.product.connections.electrical.value,
-    },
-  )
+  if (data.product.connections) {
+    properties.push(
+      {
+        '@type': 'PropertyValue',
+        name: 'Process connection',
+        value: data.product.connections.process.value,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Electrical connection',
+        value: data.product.connections.electrical.value,
+      },
+    )
+  }
+
+  if (data.product.valveProfile) {
+    properties.push(
+      {
+        '@type': 'PropertyValue',
+        name: 'Pressure rating',
+        value: data.product.valveProfile.pressureRating,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve connection',
+        value: data.product.valveProfile.connection,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve material',
+        value: data.product.valveProfile.material,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve mode',
+        value: data.product.valveProfile.mode,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve size',
+        value: data.product.valveProfile.size,
+      },
+    )
+  }
 
   if (data.product.environmentalLimits.ingressProtection) {
     properties.push({
@@ -145,7 +177,7 @@ function buildProductProperties(data: ProductDetailPageData): readonly JsonObjec
     })
   }
 
-  if (data.product.certifications.length > 0) {
+  if (data.product.certifications?.length) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'Certifications',

@@ -1,4 +1,7 @@
 import path from 'node:path'
+import { buildDomainFromCmsFacts } from '../adapter/product.adapter.ts'
+import { sensorValveCmsFactInput } from '../adapter/cms-fact-family.fixture.ts'
+import { validateAiReadableFamilyProfileCoverage } from './geo-family-coverage.mjs'
 import { generateCmsFacts } from './scale-fixtures.mjs'
 import { validateBoundaryRules } from './validate-boundaries.mjs'
 
@@ -28,7 +31,10 @@ const GEO_CONTRACT_SNAPSHOT = {
       'specifications',
       'summary',
     ],
-    productKeys: ['applicationIds', 'availability', 'brand', 'canonicalPath', 'categoryIds', 'id', 'industryIds', 'lifecycle', 'manufacturer', 'model', 'name', 'sku'],
+    productKeys: ['applicationIds', 'availability', 'brand', 'canonicalPath', 'categoryIds', 'family', 'id', 'industryIds', 'manufacturer', 'model', 'name', 'sku'],
+  },
+  profileCoverage: {
+    requiredProfiles: ['sensor', 'valve'],
   },
   feedItemKeys: ['brand', 'canonicalUrl', 'categoryPath', 'datasheets', 'geoEndpoint', 'id', 'keySpecs', 'locale', 'model', 'sku', 'summary', 'title'],
   indexEndpointKeys: ['allProducts', 'applications', 'industries', 'llmsTxt', 'perProductPattern', 'productAnswers', 'productFeed'],
@@ -49,6 +55,14 @@ if (useScale) {
 
 const { routing } = await import('../i18n/routing.ts')
 const {
+  createProductCatalogIndex,
+  filterProductCatalog,
+} = await import('../lib/domain/product-catalog.ts')
+const {
+  searchIntentMappingContract,
+  validateIntentPhrasebook,
+} = await import('../lib/domain/intent-mapping.ts')
+const {
   buildApplicationGeoAnswerBlocksDocument,
   buildGeoAnswerBlocksDocument,
   buildGeoIndex,
@@ -63,6 +77,9 @@ const source = getRuntimeDomainProductRecords()
 const runtimeSource = getRuntimeDomainProductSource()
 const errors = []
 const boundary = await validateGeoBoundary(errors)
+validateIntentMappingContract(errors)
+validateSemanticSearchFamilyCoverage(errors)
+const familyCoverage = validateAiReadableFamilyProfileCoverage(errors)
 
 if (useScale && source.length !== count) {
   errors.push(`scale CMS facts did not reach runtime facade: expected ${count} products, received ${source.length}`)
@@ -112,6 +129,7 @@ console.log(JSON.stringify({
   runtimeSource,
   productRecords: source.length,
   locales: routing.locales,
+  familyCoverage,
   expectedAnswersPerLocale: geoBreakdown.totalAnswerBlocks,
   expectedApplicationAnswersPerLocale: geoBreakdown.applicationAnswerBlocks,
   payloadBudgets: budgets,
@@ -148,6 +166,40 @@ function validateGeoContractSnapshot(locale, documents, errors) {
 function validateRuntimeSourceContract(errors) {
   assertEqual('runtime source kind', runtimeSource.sourceKind, GEO_CONTRACT_SNAPSHOT.aiReadable.sourceKind, errors)
   assertEqual('runtime product count', runtimeSource.productCount, source.length, errors)
+}
+
+function validateIntentMappingContract(errors) {
+  assertEqual('intent mapping version', searchIntentMappingContract.version, 'search-intent-mapping-v1', errors)
+
+  for (const error of validateIntentPhrasebook()) {
+    errors.push(`intent phrasebook: ${error}`)
+  }
+}
+
+function validateSemanticSearchFamilyCoverage(errors) {
+  const domain = buildDomainFromCmsFacts(sensorValveCmsFactInput)
+  const productIdsByFamily = new Map(domain.products.map((product) => [product.core.family, product.identity.id]))
+
+  for (const locale of routing.locales) {
+    const index = createProductCatalogIndex({ locale, products: domain.products, categoryTree: domain.categoryTree })
+    const sensorResult = filterProductCatalog(index, { search: locale === 'zh' ? '工业传感器' : 'industrial sensor' })
+    const valveResult = filterProductCatalog(index, { search: locale === 'zh' ? '工业阀门' : 'industrial valve' })
+    const pairedResult = filterProductCatalog(index, { search: locale === 'zh' ? '传感器阀门搭配' : 'sensor valve pairing' })
+    const sensorId = productIdsByFamily.get('sensor')
+    const valveId = productIdsByFamily.get('valve')
+
+    if (!sensorId || !sensorResult.matchedProductIds.includes(sensorId)) {
+      errors.push(`${locale}: semantic search does not return sensor family product for controlled sensor intent`)
+    }
+
+    if (!valveId || !valveResult.matchedProductIds.includes(valveId)) {
+      errors.push(`${locale}: semantic search does not return valve family product for controlled valve intent`)
+    }
+
+    if (!sensorId || !valveId || !pairedResult.matchedProductIds.includes(sensorId) || !pairedResult.matchedProductIds.includes(valveId)) {
+      errors.push(`${locale}: semantic search does not return sensor + valve products for controlled pairing intent`)
+    }
+  }
 }
 
 function validateLlmsTxtContract(locale, llmsTxt, errors) {
@@ -280,6 +332,8 @@ function validateAnswers(locale, source, document, applicationDocument, geoBreak
     errors.push(`${locale}: expected ${geoBreakdown.totalAnswerBlocks} answer blocks, received ${document.answers.length}`)
   }
 
+  const sourceById = new Map(source.map((product) => [product.identity.id, product]))
+
   if (applicationDocument.version !== GEO_CONTRACT_SNAPSHOT.applicationAnswersVersion || applicationDocument.locale !== locale) {
     errors.push(`${locale}: application answer blocks contract mismatch`)
   }
@@ -289,7 +343,7 @@ function validateAnswers(locale, source, document, applicationDocument, geoBreak
   }
 
   for (const answer of document.answers) {
-    validateAnswerBlock(locale, answer, errors)
+    validateAnswerBlock(locale, answer, sourceById, errors)
   }
 
   for (const answer of applicationDocument.answers) {
@@ -297,9 +351,9 @@ function validateAnswers(locale, source, document, applicationDocument, geoBreak
   }
 }
 
-function validateAnswerBlock(locale, answer, errors) {
+function validateAnswerBlock(locale, answer, sourceById, errors) {
   if (answer.kind === 'product') {
-    validateProductAnswerBlock(locale, answer, errors)
+    validateProductAnswerBlock(locale, answer, sourceById, errors)
     return
   }
 
@@ -311,9 +365,28 @@ function validateAnswerBlock(locale, answer, errors) {
   errors.push(`${locale}:${answer.id}: unknown answer block kind`)
 }
 
-function validateProductAnswerBlock(locale, answer, errors) {
-  if (!answer.question || !answer.answer || !answer.productId || !answer.productUrl || !answer.sourceRefs.length) {
+function validateProductAnswerBlock(locale, answer, sourceById, errors) {
+  if (!answer.question || !answer.answer || !answer.productId || !answer.productUrl || !Array.isArray(answer.sourceRefs)) {
     errors.push(`${locale}:${answer.id}: incomplete product answer block`)
+    return
+  }
+
+  const sourceProduct = sourceById.get(answer.productId)
+
+  if (!sourceProduct) {
+    errors.push(`${locale}:${answer.id}: product answer references unknown product ${answer.productId}`)
+    return
+  }
+
+  const hasEvidenceDocuments = Boolean(sourceProduct.documents?.length)
+  const hasSourceBackedRefs = answer.sourceRefs.some((sourceRef) => sourceRef?.confidence === 'source-backed')
+
+  if (hasEvidenceDocuments && answer.sourceRefs.length === 0) {
+    errors.push(`${locale}:${answer.id}: documented product answer should expose sourceRefs`)
+  }
+
+  if (!hasEvidenceDocuments && hasSourceBackedRefs) {
+    errors.push(`${locale}:${answer.id}: product answer must not fabricate source-backed refs without documents`)
   }
 }
 
@@ -328,18 +401,57 @@ function validateAllProducts(locale, source, document, errors) {
     errors.push(`${locale}: all-products endpoint count mismatch`)
   }
 
+  const sourceById = new Map(source.map((product) => [product.identity.id, product]))
+
   for (const product of document.products) {
     if (product['@type'] !== GEO_CONTRACT_SNAPSHOT.aiReadable.type) {
       errors.push(`${locale}: AI-readable product type mismatch`)
+    }
+
+    if (typeof product.product.family !== 'string' || !product.product.family.trim()) {
+      errors.push(`${locale}:${product.product.id}: missing AI-readable family`)
+    }
+
+    if ('lifecycle' in product.product) {
+      errors.push(`${locale}:${product.product.id}: lifecycle must not appear in AI-readable product output`)
+    }
+
+    const sourceProduct = sourceById.get(product.product.id)
+    if (!sourceProduct) {
+      errors.push(`${locale}:${product.product.id}: AI-readable product not found in source records`)
+    } else if (product.product.family !== sourceProduct.core.family) {
+      errors.push(`${locale}:${product.product.id}: AI-readable family mismatch`)
+    }
+
+    if (sourceProduct) {
+      validateAiReadableEvidenceFallback(locale, product, sourceProduct, errors)
     }
 
     if (!product.hreflang['zh-CN'] || !product.hreflang.en || !product.hreflang['x-default']) {
       errors.push(`${locale}:${product.product.id}: missing AI product hreflang`)
     }
 
-    if (!product.facts.length || !product.evidence.length || !product.faq.length) {
-      errors.push(`${locale}:${product.product.id}: missing facts, evidence, or faq`)
+    if (!product.facts.length || !product.faq.length) {
+      errors.push(`${locale}:${product.product.id}: missing facts or faq`)
     }
+  }
+}
+
+function validateAiReadableEvidenceFallback(locale, readableProduct, sourceProduct, errors) {
+  const hasEvidenceDocuments = Boolean(sourceProduct.documents?.length)
+  const sourceRefs = [
+    ...readableProduct.facts.flatMap((fact) => fact.sourceRefs ?? []),
+    ...readableProduct.faq.flatMap((faq) => faq.sourceRefs ?? []),
+    ...readableProduct.specifications.flatMap((group) => group.values?.flatMap((value) => value.sourceRefs ?? []) ?? []),
+  ]
+  const hasSourceBackedRefs = sourceRefs.some((sourceRef) => sourceRef?.confidence === 'source-backed')
+
+  if (hasEvidenceDocuments && !readableProduct.evidence.length) {
+    errors.push(`${locale}:${sourceProduct.identity.id}: AI-readable evidence is missing for documented product`)
+  }
+
+  if (!hasEvidenceDocuments && hasSourceBackedRefs) {
+    errors.push(`${locale}:${sourceProduct.identity.id}: AI-readable output must not fabricate source-backed refs without documents`)
   }
 }
 

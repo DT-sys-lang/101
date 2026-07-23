@@ -7,16 +7,14 @@ import type {
   ProductAvailabilityStatus,
   ProductCanonicalPath,
   ProductJsonLd,
-  ProductLifecycleStatus,
   ProductPropertyValueJsonLd,
   ProductRecord,
   ProductSeoFields,
-  SearchIntent,
   SeoBreadcrumbItem,
   SeoOpenGraphFields,
   SlugSegment,
 } from '@/lib/domain'
-import { industrialSiteConfig, selectProductSeo } from '@/lib/domain'
+import { industrialSiteConfig, selectProductSearchIntents, selectProductSeo } from '@/lib/domain'
 import { getAbsoluteUrl, getLocalizedPath, getLocalizedProductUrl } from '@/lib/seo/canonical'
 import { buildCategoryBreadcrumb, type CategoryContext } from './category.adapter'
 import { localizeFactText, reject, toNonEmptyArray, type ProductFact } from './validation'
@@ -67,8 +65,8 @@ export function buildProductSeoFields(source: ProductSeoSource, locale: LocaleCo
     title,
     metaDescription,
     h1,
-    indexingPolicy: getProductIndexingPolicy(source.fact.lifecycle),
-    searchIntent: buildSearchIntent(source),
+    indexingPolicy: 'index-follow',
+    searchIntent: toNonEmptyArray(selectProductSearchIntents(source.fact), `productFacts.${source.fact.id}.searchIntent`),
     breadcrumb,
     alternates,
     openGraph: buildProductOpenGraphMetadata(source, locale),
@@ -111,7 +109,7 @@ export function buildProductJsonLd(source: ProductSeoSource, locale: LocaleCode)
     mpn: source.fact.model,
     brand: {
       '@type': 'Brand',
-      name: source.fact.brand,
+      name: industrialSiteConfig.brandName,
     },
     category: primaryCategoryName,
     description,
@@ -238,8 +236,8 @@ function buildProductHeading(source: ProductSeoSource, locale: LocaleCode) {
 
 function buildProductDescription(source: ProductSeoSource, locale: LocaleCode) {
   const summary = localizeFactText(source.fact.summary, locale)
-  const measurement = source.fact.measurements[0]?.range.display
-  const output = source.fact.outputs[0]?.value
+  const measurement = source.fact.measurements?.[0]?.range.display
+  const output = source.fact.outputs?.[0]?.value
   const parts = [summary]
 
   if (measurement) {
@@ -283,23 +281,10 @@ function buildProductAliasPaths(source: ProductSeoSource): readonly ProductCanon
   return aliases.length ? aliases : undefined
 }
 
-function buildSearchIntent(source: ProductSeoSource): NonEmptyReadonlyArray<SearchIntent> {
-  const searchIntents = uniqueStrings([
-    'model-lookup',
-    'technical-comparison',
-    'application-selection',
-    'datasheet-download',
-    'quote-request',
-    ...(source.fact.applicationIds.length ? ['application-selection'] : []),
-  ]) as SearchIntent[]
-
-  return toNonEmptyArray(searchIntents.length ? searchIntents : ['model-lookup'], `productFacts.${source.fact.id}.searchIntent`)
-}
-
 function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode): readonly ProductPropertyValueJsonLd[] {
   const properties: ProductPropertyValueJsonLd[] = []
 
-  for (const measurement of source.fact.measurements) {
+  for (const measurement of source.fact.measurements ?? []) {
     properties.push({
       '@type': 'PropertyValue',
       name: `${measurement.kind} range`,
@@ -317,7 +302,7 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
     }
   }
 
-  for (const output of source.fact.outputs) {
+  for (const output of source.fact.outputs ?? []) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'Output signal',
@@ -325,20 +310,52 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
     })
   }
 
-  properties.push(
-    {
-      '@type': 'PropertyValue',
-      name: 'Process connection',
-      value: source.fact.connections.process.value,
-    },
-    {
-      '@type': 'PropertyValue',
-      name: 'Electrical connection',
-      value: source.fact.connections.electrical.value,
-    },
-  )
+  if (source.fact.connections) {
+    properties.push(
+      {
+        '@type': 'PropertyValue',
+        name: 'Process connection',
+        value: source.fact.connections.process.value,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Electrical connection',
+        value: source.fact.connections.electrical.value,
+      },
+    )
+  }
 
-  if (source.fact.environmentalLimits.ingressProtection) {
+  if (source.fact.valveProfile) {
+    properties.push(
+      {
+        '@type': 'PropertyValue',
+        name: 'Pressure rating',
+        value: source.fact.valveProfile.pressureRating,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve connection',
+        value: source.fact.valveProfile.connection,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve material',
+        value: source.fact.valveProfile.material,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve mode',
+        value: source.fact.valveProfile.mode,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Valve size',
+        value: source.fact.valveProfile.size,
+      },
+    )
+  }
+
+  if (source.fact.environmentalLimits?.ingressProtection) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'Ingress protection',
@@ -346,7 +363,7 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
     })
   }
 
-  if (source.fact.environmentalLimits.mediaTemperature) {
+  if (source.fact.environmentalLimits?.mediaTemperature) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'Media temperature',
@@ -355,7 +372,7 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
     })
   }
 
-  if (source.fact.environmentalLimits.ambientTemperature) {
+  if (source.fact.environmentalLimits?.ambientTemperature) {
     properties.push({
       '@type': 'PropertyValue',
       name: 'Ambient temperature',
@@ -389,8 +406,8 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
 function buildProductFaqItems(source: ProductSeoSource, locale: LocaleCode) {
   const productName = buildProductHeading(source, locale)
   const summary = localizeFactText(source.fact.summary, locale)
-  const measurement = source.fact.measurements[0]?.range.display
-  const output = source.fact.outputs[0]?.value
+  const measurement = source.fact.measurements?.[0]?.range.display
+  const output = source.fact.outputs?.[0]?.value
   const primaryCategory = localizeFactText(source.primaryCategory.name, locale)
 
   return [
@@ -424,10 +441,6 @@ function mapAvailabilityToSchema(availability: ProductAvailabilityStatus) {
   }
 
   return availabilityMap[availability]
-}
-
-function getProductIndexingPolicy(lifecycle: ProductLifecycleStatus): ProductSeoFields['indexingPolicy'] {
-  return lifecycle === 'draft' || lifecycle === 'hidden' ? 'noindex-follow' : 'index-follow'
 }
 
 function uniqueStrings<T extends string>(values: readonly T[]) {

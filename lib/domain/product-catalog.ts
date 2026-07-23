@@ -8,19 +8,28 @@ import type {
   ProductId,
   SeoSlugPath,
   SlugSegment,
+  UnitCode,
 } from './primitives'
 import type {
   CertificationCode,
   MeasurementKind,
+  ProductAsset,
   ProductAvailabilityStatus,
   ProductDetailProjection,
-  ProductLifecycleStatus,
+  ProductFamily,
   ProductRecord,
   ProductVariant,
   SignalOutputKind,
 } from './product'
 import type { ProductDetailLookupResult, ProductRouteKey } from './product-detail-flow'
 import type { ProductSeoFields } from './seo'
+import {
+  buildControlledProductSearchTerms,
+  matchIntentPhrasebook,
+  searchRoutePriority,
+  type IntentPhrasebookEntry,
+} from './intent-mapping'
+import { localizeTechnicalValue } from './localization'
 
 export type ProductListSort = 'relevance' | 'model-asc' | 'name-asc' | 'updated-desc' | 'category-sort'
 
@@ -33,11 +42,24 @@ export interface ProductListSpec {
   readonly value: string
 }
 
+export interface ProductListImage {
+  readonly kind: ProductAsset['kind']
+  readonly href: string
+  readonly alt: string
+}
+
+export interface ProductListMedia {
+  readonly primaryImage?: ProductListImage
+  readonly galleryImages: readonly ProductListImage[]
+}
+
 export interface ProductListItem {
   readonly id: ProductId
   readonly locale: LocaleCode
   readonly model: string
   readonly sku: string
+  readonly family: ProductFamily
+  readonly familyLabel: string
   readonly title: string
   readonly summary: string
   readonly href: ProductCanonicalPath
@@ -49,8 +71,8 @@ export interface ProductListItem {
   readonly measurementKinds: readonly MeasurementKind[]
   readonly availability: ProductAvailabilityStatus
   readonly availabilityLabel: string
-  readonly lifecycle: ProductLifecycleStatus
   readonly keySpecs: readonly ProductListSpec[]
+  readonly media: ProductListMedia
   readonly seoTitle: string
   readonly seoDescription: string
   readonly sortText: string
@@ -72,22 +94,28 @@ export interface ProductFacetBucket<TKey extends string = string> {
 
 export interface ProductFilterFacets {
   readonly categories: readonly ProductFacetBucket<CategoryId>[]
+  readonly families: readonly ProductFacetBucket<ProductFamily>[]
   readonly measurementKinds: readonly ProductFacetBucket<MeasurementKind>[]
   readonly availability: readonly ProductFacetBucket<ProductAvailabilityStatus>[]
   readonly outputKinds: readonly ProductFacetBucket<SignalOutputKind>[]
+  readonly accuracies: readonly ProductFacetBucket<string>[]
   readonly certifications: readonly ProductFacetBucket<CertificationCode>[]
 }
 
 export interface ProductFilterQuery {
   readonly categoryId?: CategoryId
+  readonly categoryIds?: readonly CategoryId[]
   readonly categoryMode?: CategoryFilterMode
+  readonly families?: readonly ProductFamily[]
   readonly measurementKinds?: readonly MeasurementKind[]
   readonly availability?: readonly ProductAvailabilityStatus[]
-  readonly lifecycleStatuses?: readonly ProductLifecycleStatus[]
   readonly industryIds?: readonly IndustryId[]
   readonly applicationIds?: readonly ApplicationId[]
   readonly outputKinds?: readonly SignalOutputKind[]
+  readonly accuracyValues?: readonly string[]
   readonly certifications?: readonly CertificationCode[]
+  readonly rangeMinBar?: number
+  readonly rangeMaxBar?: number
   readonly search?: string
   readonly includeNonPublic?: boolean
   readonly sort?: ProductListSort
@@ -125,12 +153,13 @@ export interface ProductCatalogIndex {
   readonly categoryPathById: ReadonlyMap<CategoryId, readonly CategoryNode[]>
   readonly descendantCategoryIdsById: ReadonlyMap<CategoryId, ReadonlySet<CategoryId>>
   readonly productIdsByCategoryId: ReadonlyMap<CategoryId, ReadonlySet<ProductId>>
+  readonly productIdsByFamily: ReadonlyMap<ProductFamily, ReadonlySet<ProductId>>
   readonly productIdsByMeasurementKind: ReadonlyMap<MeasurementKind, ReadonlySet<ProductId>>
   readonly productIdsByAvailability: ReadonlyMap<ProductAvailabilityStatus, ReadonlySet<ProductId>>
-  readonly productIdsByLifecycle: ReadonlyMap<ProductLifecycleStatus, ReadonlySet<ProductId>>
   readonly productIdsByIndustryId: ReadonlyMap<IndustryId, ReadonlySet<ProductId>>
   readonly productIdsByApplicationId: ReadonlyMap<ApplicationId, ReadonlySet<ProductId>>
   readonly productIdsByOutputKind: ReadonlyMap<SignalOutputKind, ReadonlySet<ProductId>>
+  readonly productIdsByAccuracy: ReadonlyMap<string, ReadonlySet<ProductId>>
   readonly productIdsByCertification: ReadonlyMap<CertificationCode, ReadonlySet<ProductId>>
   readonly searchTokenIndex: ReadonlyMap<string, ReadonlySet<ProductId>>
 }
@@ -184,7 +213,6 @@ export type ProductDetailPageResult =
     }
 
 const supportedLocales = ['en', 'zh'] as const satisfies readonly LocaleCode[]
-const defaultPublicLifecycleStatuses = new Set<ProductLifecycleStatus>(['active', 'phase-out'])
 const defaultPageLimit = 24
 const maxPageLimit = 200
 
@@ -205,12 +233,13 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
   const productRouteByPath = new Map<ProductCanonicalPath, ProductRouteIndexEntry>()
   const productIdByModelSlug = new Map<SlugSegment, ProductId>()
   const productIdsByCategoryId = new Map<CategoryId, Set<ProductId>>()
+  const productIdsByFamily = new Map<ProductFamily, Set<ProductId>>()
   const productIdsByMeasurementKind = new Map<MeasurementKind, Set<ProductId>>()
   const productIdsByAvailability = new Map<ProductAvailabilityStatus, Set<ProductId>>()
-  const productIdsByLifecycle = new Map<ProductLifecycleStatus, Set<ProductId>>()
   const productIdsByIndustryId = new Map<IndustryId, Set<ProductId>>()
   const productIdsByApplicationId = new Map<ApplicationId, Set<ProductId>>()
   const productIdsByOutputKind = new Map<SignalOutputKind, Set<ProductId>>()
+  const productIdsByAccuracy = new Map<string, Set<ProductId>>()
   const productIdsByCertification = new Map<CertificationCode, Set<ProductId>>()
   const searchTokenIndex = new Map<string, Set<ProductId>>()
   const productIds: ProductId[] = []
@@ -238,12 +267,13 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
       addToSetMap(productIdsByCategoryId, categoryId, productId)
     }
 
+    addToSetMap(productIdsByFamily, product.identity.family, productId)
+
     for (const measurementKind of getProductMeasurementKinds(product)) {
       addToSetMap(productIdsByMeasurementKind, measurementKind, productId)
     }
 
     addToSetMap(productIdsByAvailability, product.identity.availability, productId)
-    addToSetMap(productIdsByLifecycle, product.identity.lifecycle, productId)
 
     for (const industryId of product.classification.industryIds) {
       addToSetMap(productIdsByIndustryId, industryId, productId)
@@ -257,11 +287,15 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
       addToSetMap(productIdsByOutputKind, output.kind, productId)
     }
 
-    for (const certification of product.certifications) {
+    for (const accuracy of getProductAccuracyValues(product)) {
+      addToSetMap(productIdsByAccuracy, accuracy, productId)
+    }
+
+    for (const certification of product.certifications ?? []) {
       addToSetMap(productIdsByCertification, certification, productId)
     }
 
-    for (const token of tokenizeSearchText(getProductSearchText(product, listItem))) {
+    for (const token of tokenizeSearchText(getProductSearchText(product, listItem, locale))) {
       addToSetMap(searchTokenIndex, token, productId)
     }
   }
@@ -281,12 +315,13 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
     categoryPathById,
     descendantCategoryIdsById,
     productIdsByCategoryId,
+    productIdsByFamily,
     productIdsByMeasurementKind,
     productIdsByAvailability,
-    productIdsByLifecycle,
     productIdsByIndustryId,
     productIdsByApplicationId,
     productIdsByOutputKind,
+    productIdsByAccuracy,
     productIdsByCertification,
     searchTokenIndex,
   }
@@ -295,21 +330,26 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
 export function filterProductCatalog(index: ProductCatalogIndex, query: ProductFilterQuery = {}): ProductListResult {
   let candidateIds = new Set(index.productIds)
 
-  if (!query.includeNonPublic && !query.lifecycleStatuses?.length) {
-    candidateIds = intersectSets(candidateIds, unionIndexedSets(index.productIdsByLifecycle, [...defaultPublicLifecycleStatuses]))
-  }
-
   if (query.categoryId) {
     candidateIds = intersectSets(candidateIds, getCategoryFilterProductIds(index, query.categoryId, query.categoryMode ?? 'with-descendants'))
   }
 
+  if (query.categoryIds?.length) {
+    candidateIds = intersectSets(candidateIds, getCategoryIdsFilterProductIds(index, query.categoryIds, query.categoryMode ?? 'with-descendants'))
+  }
+
+  candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByFamily, query.families)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByMeasurementKind, query.measurementKinds)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByAvailability, query.availability)
-  candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByLifecycle, query.lifecycleStatuses)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByIndustryId, query.industryIds)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByApplicationId, query.applicationIds)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByOutputKind, query.outputKinds)
+  candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByAccuracy, query.accuracyValues)
   candidateIds = intersectByOptionalValues(candidateIds, index.productIdsByCertification, query.certifications)
+
+  if (hasBarRangeFilter(query.rangeMinBar, query.rangeMaxBar)) {
+    candidateIds = intersectSets(candidateIds, getBarRangeProductIds(index, query.rangeMinBar, query.rangeMaxBar))
+  }
 
   if (query.search?.trim()) {
     candidateIds = intersectSets(candidateIds, getSearchProductIds(index, query.search))
@@ -356,14 +396,6 @@ export function resolveProductDetailPage(index: ProductCatalogIndex, input: Prod
     return {
       status: 'not-found',
       reason: 'Route matched an index entry but the product record is missing.',
-      requestPath: routeResolution.requestPath,
-    }
-  }
-
-  if (!input.includeNonPublic && !defaultPublicLifecycleStatuses.has(product.identity.lifecycle)) {
-    return {
-      status: 'not-public',
-      reason: `Product lifecycle '${product.identity.lifecycle}' is not public.`,
       requestPath: routeResolution.requestPath,
     }
   }
@@ -483,6 +515,8 @@ export function toProductListItem(
     locale,
     model: product.identity.model,
     sku: product.identity.sku,
+    family: product.identity.family,
+    familyLabel: getFamilyLabel(product.identity.family, locale),
     title,
     summary,
     href: seo.slug.canonicalPath,
@@ -494,8 +528,8 @@ export function toProductListItem(
     measurementKinds: product.classification.measurementKinds,
     availability: product.identity.availability,
     availabilityLabel: getAvailabilityLabel(product.identity.availability, locale),
-    lifecycle: product.identity.lifecycle,
     keySpecs,
+    media: getProductListMedia(product, title),
     seoTitle: seo.title,
     seoDescription: seo.metaDescription,
     sortText: normalizeSearchText(`${title} ${summary} ${product.identity.model} ${product.identity.sku}`),
@@ -512,6 +546,46 @@ export function selectProductGeoAi(product: ProductRecord, locale: LocaleCode): 
 
 export function localizeText(text: Readonly<Record<LocaleCode, string> & Partial<Record<string, string>>>, locale: LocaleCode) {
   return text[locale] ?? text.en
+}
+
+function getFamilyLabel(family: ProductFamily, locale: LocaleCode) {
+  const labels: Record<LocaleCode, Record<ProductFamily, string>> = {
+    zh: {
+      sensor: '传感器',
+      valve: '阀门',
+    },
+    en: {
+      sensor: 'Sensor',
+      valve: 'Valve',
+    },
+  }
+
+  return labels[locale][family]
+}
+
+function getProductListMedia(product: ProductRecord, fallbackAlt: string): ProductListMedia {
+  const visualAssets = (product.assets ?? []).filter(isProductVisualAsset)
+  const primaryImage = visualAssets.find((asset) => asset.kind === 'primary-image') ?? visualAssets[0]
+  const galleryImages = visualAssets
+    .filter((asset) => asset.id !== primaryImage?.id)
+    .map((asset) => toProductListImage(asset, fallbackAlt))
+
+  return {
+    primaryImage: primaryImage ? toProductListImage(primaryImage, fallbackAlt) : undefined,
+    galleryImages,
+  }
+}
+
+function toProductListImage(asset: ProductAsset, fallbackAlt: string): ProductListImage {
+  return {
+    kind: asset.kind,
+    href: asset.href,
+    alt: asset.alt || fallbackAlt,
+  }
+}
+
+function isProductVisualAsset(asset: ProductAsset) {
+  return asset.kind === 'primary-image' || asset.kind === 'gallery-image' || asset.kind === 'installation-photo' || asset.kind === 'diagram' || asset.kind === 'dimension-drawing'
 }
 
 function getAvailabilityLabel(availability: ProductAvailabilityStatus, locale: LocaleCode) {
@@ -538,13 +612,11 @@ function getAvailabilityLabel(availability: ProductAvailabilityStatus, locale: L
 }
 
 function resolveProductVariants(product: ProductRecord, selectedOptions?: Readonly<Record<string, string>>) {
-  const publicVariants = product.variants.filter((variant) => defaultPublicLifecycleStatuses.has(variant.lifecycle))
-
   if (!selectedOptions || Object.keys(selectedOptions).length === 0) {
-    return publicVariants
+    return product.variants
   }
 
-  return publicVariants.filter((variant) =>
+  return product.variants.filter((variant) =>
     Object.entries(selectedOptions).every(([optionKey, value]) =>
       variant.optionValues.some((option) => option.optionKey === optionKey && option.value === value),
     ),
@@ -625,31 +697,34 @@ function getProductMeasurementKinds(product: ProductRecord) {
   ])
 }
 
-function getProductListSpecs(product: ProductRecord, locale: LocaleCode) {
-  const explicitSpecs = product.specificationGroups.flatMap((group) =>
-    group.values.map((value) => ({
-      label: localizeSpecLabel(value.label, locale),
-      value: value.display,
-    })),
-  )
+function getProductAccuracyValues(product: ProductRecord) {
+  return uniqueValues(product.measurements
+    .map((measurement) => measurement.accuracy?.trim())
+    .filter((accuracy): accuracy is string => Boolean(accuracy)))
+}
 
-  if (explicitSpecs.length > 0) {
-    return explicitSpecs.slice(0, 4)
+function getProductListSpecs(product: ProductRecord, locale: LocaleCode) {
+  if (product.identity.family === 'valve' && product.valveProfile) {
+    return [
+      { label: localizeSpecLabel('pressureRating', locale), value: product.valveProfile.pressureRating },
+      { label: localizeSpecLabel('connection', locale), value: localizeTechnicalValue(product.valveProfile.connection, locale) },
+      { label: localizeSpecLabel('material', locale), value: localizeTechnicalValue(product.valveProfile.material, locale) },
+      { label: localizeSpecLabel('media', locale), value: localizeTechnicalValue(product.valveProfile.compatibleMedia.join(' / '), locale) },
+      { label: localizeSpecLabel('size', locale), value: localizeTechnicalValue(product.valveProfile.size, locale) },
+    ]
   }
 
-  return [
-    ...product.measurements.map((measurement) => ({
-      label: localizeSpecLabel(measurement.kind, locale),
-      value: measurement.range.display,
-    })),
-    ...product.outputs.map((output) => ({
-      label: localizeSpecLabel(output.kind, locale),
-      value: output.value,
-    })),
-    ...(product.environmentalLimits.ingressProtection
-      ? [{ label: localizeSpecLabel('ingressProtection', locale), value: product.environmentalLimits.ingressProtection }]
-      : []),
-  ].slice(0, 4)
+  if (product.sensorProfile) {
+    return [
+      { label: localizeSpecLabel('measurement', locale), value: product.sensorProfile.measurements.map((measurement) => measurement.range.display).join(' / ') },
+      { label: localizeSpecLabel('output', locale), value: product.sensorProfile.outputs.map((output) => output.value).join(' / ') },
+      { label: localizeSpecLabel('media', locale), value: localizeTechnicalValue(product.sensorProfile.environmentalLimits?.compatibleMedia?.join(' / ') ?? product.environmentalLimits.compatibleMedia?.join(' / ') ?? '-', locale) },
+    ]
+  }
+
+  return product.specificationGroups
+    .flatMap((group) => group.values.map((value) => ({ label: localizeSpecLabel(value.label, locale), value: localizeTechnicalValue(value.display, locale) })))
+    .slice(0, 4)
 }
 
 function localizeSpecLabel(label: string, locale: LocaleCode) {
@@ -661,6 +736,13 @@ function localizeSpecLabel(label: string, locale: LocaleCode) {
     Range: '量程',
     Output: '输出',
     Feature: '特性',
+    measurement: '测量',
+    output: '输出',
+    media: '介质',
+    pressureRating: '压力等级',
+    connection: '连接',
+    material: '材质',
+    size: '尺寸',
     pressure: '压力',
     'differential-pressure': '差压',
     level: '液位',
@@ -766,7 +848,35 @@ function getCategoryFilterProductIds(index: ProductCatalogIndex, categoryId: Cat
   return unionIndexedSets(index.productIdsByCategoryId, [...categoryIds])
 }
 
+function getCategoryIdsFilterProductIds(index: ProductCatalogIndex, categoryIds: readonly CategoryId[], mode: CategoryFilterMode) {
+  const result = new Set<ProductId>()
+
+  for (const categoryId of categoryIds) {
+    for (const productId of getCategoryFilterProductIds(index, categoryId, mode)) {
+      result.add(productId)
+    }
+  }
+
+  return result
+}
+
 function getSearchProductIds(index: ProductCatalogIndex, search: string) {
+  const tokenMatches = getTokenSearchProductIds(index, search)
+  const intentMatches = getIntentSearchProductIds(index, search)
+
+  if (intentMatches.size === 0) {
+    return tokenMatches
+  }
+
+  if (tokenMatches.size === 0) {
+    return intentMatches
+  }
+
+  const combinedMatches = intersectSets(tokenMatches, intentMatches)
+  return combinedMatches.size ? combinedMatches : tokenMatches
+}
+
+function getTokenSearchProductIds(index: ProductCatalogIndex, search: string) {
   const tokens = tokenizeSearchText(search)
 
   if (tokens.length === 0) {
@@ -788,15 +898,104 @@ function getSearchProductIds(index: ProductCatalogIndex, search: string) {
   return result
 }
 
+function getIntentSearchProductIds(index: ProductCatalogIndex, search: string) {
+  const matches = matchIntentPhrasebook(index.locale, search)
+  const groupedSets = new Map<(typeof searchRoutePriority)[number], Set<ProductId>[]>()
+
+  for (const match of matches) {
+    const productIds = getIntentTargetProductIds(index, match)
+
+    if (productIds.size === 0) {
+      continue
+    }
+
+    const existingSets = groupedSets.get(match.targetType) ?? []
+    existingSets.push(productIds)
+    groupedSets.set(match.targetType, existingSets)
+  }
+
+  if (matches.some((match) => match.targetId === 'ecosystem:sensor-valve-pairing')) {
+    const ecosystemIds = unionProductSets(groupedSets.get('ecosystem') ?? [])
+
+    if (ecosystemIds.size > 0) {
+      return ecosystemIds
+    }
+  }
+
+  let candidateIds: Set<ProductId> | null = null
+
+  for (const targetType of searchRoutePriority) {
+    const sets = groupedSets.get(targetType)
+
+    if (!sets?.length) {
+      continue
+    }
+
+    const routeIds = unionProductSets(sets)
+
+    if (!candidateIds) {
+      candidateIds = routeIds
+      continue
+    }
+
+    const narrowedIds = intersectSets(candidateIds, routeIds)
+
+    if (narrowedIds.size > 0) {
+      candidateIds = narrowedIds
+    }
+  }
+
+  return candidateIds ?? new Set<ProductId>()
+}
+
+function getIntentTargetProductIds(index: ProductCatalogIndex, entry: IntentPhrasebookEntry) {
+  const targetId = entry.targetId
+
+  if (entry.targetType === 'industry' && targetId.startsWith('ind_')) {
+    return new Set(index.productIdsByIndustryId.get(targetId as IndustryId) ?? [])
+  }
+
+  if (entry.targetType === 'ecosystem') {
+    if (targetId.startsWith('app_')) {
+      return new Set(index.productIdsByApplicationId.get(targetId as ApplicationId) ?? [])
+    }
+
+    if (targetId === 'ecosystem:sensor-valve-pairing') {
+      return unionProductSets([
+        new Set(index.productIdsByFamily.get('sensor') ?? []),
+        new Set(index.productIdsByFamily.get('valve') ?? []),
+      ])
+    }
+  }
+
+  if (entry.targetType === 'product') {
+    if (targetId === 'family:sensor') {
+      return new Set(index.productIdsByFamily.get('sensor') ?? [])
+    }
+
+    if (targetId === 'family:valve') {
+      return new Set(index.productIdsByFamily.get('valve') ?? [])
+    }
+
+    if (targetId.startsWith('prd_') && index.byId.has(targetId as ProductId)) {
+      return new Set<ProductId>([targetId as ProductId])
+    }
+  }
+
+  return new Set<ProductId>()
+}
+
 function buildProductFilterFacets(index: ProductCatalogIndex, candidateIds: ReadonlySet<ProductId>): ProductFilterFacets {
   return {
     categories: countFacetBuckets(index.productIdsByCategoryId, candidateIds, (categoryId) => {
       const category = index.categoryById.get(categoryId)
       return category ? localizeText(category.name, index.locale) : categoryId
     }),
+    families: countFacetBuckets(index.productIdsByFamily, candidateIds, (family) => getFamilyLabel(family, index.locale)),
     measurementKinds: countFacetBuckets(index.productIdsByMeasurementKind, candidateIds),
     availability: countFacetBuckets(index.productIdsByAvailability, candidateIds),
     outputKinds: countFacetBuckets(index.productIdsByOutputKind, candidateIds),
+    accuracies: countFacetBuckets(index.productIdsByAccuracy, candidateIds),
     certifications: countFacetBuckets(index.productIdsByCertification, candidateIds),
   }
 }
@@ -864,18 +1063,27 @@ function sortProductIds(index: ProductCatalogIndex, productIds: readonly Product
   })
 }
 
-function getProductSearchText(product: ProductRecord, listItem: ProductListItem) {
-  return [
-    product.identity.id,
-    product.identity.sku,
-    product.identity.model,
-    listItem.title,
-    listItem.summary,
-    listItem.categoryLabel,
-    ...listItem.categoryPathLabels,
-    ...listItem.measurementKinds,
-    ...listItem.keySpecs.flatMap((spec) => [spec.label, spec.value]),
-  ].join(' ')
+function getProductSearchText(product: ProductRecord, listItem: ProductListItem, locale: LocaleCode) {
+  return buildControlledProductSearchTerms(product, {
+    locale,
+    title: listItem.title,
+    summary: listItem.summary,
+    categoryLabel: listItem.categoryLabel,
+    categoryPathLabels: listItem.categoryPathLabels,
+    keySpecs: listItem.keySpecs,
+  }).join(' ')
+}
+
+function unionProductSets(sets: readonly ReadonlySet<ProductId>[]) {
+  const result = new Set<ProductId>()
+
+  for (const set of sets) {
+    for (const productId of set) {
+      result.add(productId)
+    }
+  }
+
+  return result
 }
 
 function tokenizeSearchText(value: string) {
@@ -940,6 +1148,95 @@ function intersectByOptionalValues<TKey extends string>(
   }
 
   return intersectSets(candidateIds, unionIndexedSets(index, values))
+}
+
+const unitToBarFactor: Partial<Record<UnitCode, number>> = {
+  pa: 0.00001,
+  kpa: 0.01,
+  mpa: 10,
+  bar: 1,
+  mbar: 0.001,
+  psi: 0.0689476,
+  mh2o: 0.0980665,
+}
+
+function hasBarRangeFilter(rangeMinBar?: number, rangeMaxBar?: number) {
+  return (typeof rangeMinBar === 'number' && Number.isFinite(rangeMinBar))
+    || (typeof rangeMaxBar === 'number' && Number.isFinite(rangeMaxBar))
+}
+
+function getBarRangeProductIds(index: ProductCatalogIndex, rangeMinBar?: number, rangeMaxBar?: number) {
+  const min = typeof rangeMinBar === 'number' && Number.isFinite(rangeMinBar) ? rangeMinBar : undefined
+  const max = typeof rangeMaxBar === 'number' && Number.isFinite(rangeMaxBar) ? rangeMaxBar : undefined
+  const result = new Set<ProductId>()
+
+  for (const product of index.products) {
+    if (productMatchesBarRangeFilter(product, min, max)) {
+      result.add(product.id)
+    }
+  }
+
+  return result
+}
+
+export function productMatchesBarRangeFilter(
+  product: ProductRecord,
+  rangeMinBar?: number,
+  rangeMaxBar?: number,
+) {
+  return product.measurements.some((measurement) => measurementRangeMatchesBarFilter(measurement.range, rangeMinBar, rangeMaxBar))
+    || pressureRatingMatchesBarFilter(product.valveProfile?.pressureRating, rangeMinBar, rangeMaxBar)
+}
+
+function measurementRangeMatchesBarFilter(
+  range: { readonly min: number; readonly max: number; readonly unit: UnitCode },
+  rangeMinBar?: number,
+  rangeMaxBar?: number,
+) {
+  const factor = unitToBarFactor[range.unit]
+
+  if (!factor) {
+    return false
+  }
+
+  const productMaxBar = Math.max(range.min, range.max) * factor
+
+  return barMaxMatchesFilter(productMaxBar, rangeMinBar, rangeMaxBar)
+}
+
+function pressureRatingMatchesBarFilter(
+  pressureRating: string | undefined,
+  rangeMinBar?: number,
+  rangeMaxBar?: number,
+) {
+  const productMaxBar = parsePressureRatingMaxBar(pressureRating)
+
+  return productMaxBar === undefined ? false : barMaxMatchesFilter(productMaxBar, rangeMinBar, rangeMaxBar)
+}
+
+function parsePressureRatingMaxBar(pressureRating: string | undefined) {
+  const normalized = pressureRating?.toLowerCase().replace(/,/g, '')
+
+  if (!normalized) {
+    return undefined
+  }
+
+  const unit = normalized.match(/\b(mpa|kpa|mbar|bar|psi|pa)\b/)?.[1] as UnitCode | undefined
+  const factor = unit ? unitToBarFactor[unit] : undefined
+  const values = [...normalized.matchAll(/-?\d+(?:\.\d+)?/g)]
+    .map((match) => Number(match[0]))
+    .filter((value) => Number.isFinite(value))
+
+  if (!factor || values.length === 0) {
+    return undefined
+  }
+
+  return Math.max(...values) * factor
+}
+
+function barMaxMatchesFilter(productMaxBar: number, rangeMinBar?: number, rangeMaxBar?: number) {
+  return (rangeMinBar === undefined || productMaxBar > rangeMinBar)
+    && (rangeMaxBar === undefined || productMaxBar <= rangeMaxBar)
 }
 
 function unionIndexedSets<TKey extends string>(index: ReadonlyMap<TKey, ReadonlySet<ProductId>>, keys: readonly TKey[]) {

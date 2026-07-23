@@ -5,6 +5,7 @@ import { isLocale, type Locale, routing } from '@/i18n/routing'
 import { getApplicationEntryStaticParams, resolveApplicationDetailPage } from '@/lib/domain/entry-pages'
 import { buildApplicationPageMetadata } from '@/lib/seo/application'
 import { EntryPageStructuredData } from '@/lib/seo/structured-data'
+import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 
 export const revalidate = 3600
 
@@ -15,20 +16,23 @@ interface ApplicationDetailPageProps {
   }>
 }
 
-export function generateStaticParams() {
-  return getApplicationEntryStaticParams(routing.locales)
+export async function generateStaticParams() {
+  await preloadRuntimeDomainProducts()
+  return getApplicationEntryStaticParams(routing.locales, runtimeProductViewModelSource)
 }
 
-export function generateMetadata({ params }: ApplicationDetailPageProps) {
-  return params.then(({ locale, slug }) => {
-    if (!isLocale(locale)) {
-      return {}
-    }
+export async function generateMetadata({ params }: ApplicationDetailPageProps) {
+  const { locale, slug } = await params
 
-    const resolution = resolveApplicationDetailPage(locale as Locale, slug)
+  if (!isLocale(locale)) {
+    return {}
+  }
 
-    return resolution ? buildApplicationPageMetadata(resolution.seo) : {}
-  })
+  await preloadRuntimeDomainProducts()
+
+  const resolution = resolveApplicationDetailPage(locale as Locale, slug, runtimeProductViewModelSource)
+
+  return resolution ? buildApplicationPageMetadata(resolution.seo) : {}
 }
 
 export default async function ApplicationDetailPage({ params }: ApplicationDetailPageProps) {
@@ -40,8 +44,10 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
 
   setRequestLocale(locale)
 
+  await preloadRuntimeDomainProducts()
+
   const typedLocale = locale as Locale
-  const resolution = resolveApplicationDetailPage(typedLocale, slug)
+  const resolution = resolveApplicationDetailPage(typedLocale, slug, runtimeProductViewModelSource)
 
   if (!resolution) {
     notFound()

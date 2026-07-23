@@ -1,7 +1,7 @@
 import { routing } from '../i18n/routing.ts'
 import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel } from '../lib/domain/page-view-models.ts'
 
-export const staticLocalizedEntryPaths = ['/products', '/industries', '/applications', '/oem', '/resources', '/contact']
+export const staticLocalizedEntryPaths = ['/products', '/industries', '/applications', '/oem', '/company', '/resources', '/contact']
 
 export function getSiteStructureCounts(locale = routing.defaultLocale) {
   return {

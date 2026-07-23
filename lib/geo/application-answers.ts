@@ -1,7 +1,7 @@
 import { type Locale } from '@/i18n/routing'
 import { type GeoAiAudience, type SourceRef } from '@/lib/domain'
 import { getApplicationEntryPageViewModel, type EntryCardViewModel } from '@/lib/domain/page-view-models'
-import { getRuntimeDomainProductRecords } from '@/lib/runtime/domain-products'
+import { getRuntimeDomainProductRecords, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import type { ProductRecord } from '@/lib/domain/product'
 
 export interface GeoApplicationAnswerBlock {
@@ -33,7 +33,7 @@ export function buildApplicationGeoAnswerBlocksDocument(locale: Locale): Applica
 }
 
 export function buildApplicationGeoAnswerBlocks(locale: Locale): readonly GeoApplicationAnswerBlock[] {
-  const page = getApplicationEntryPageViewModel(locale)
+  const page = getApplicationEntryPageViewModel(locale, runtimeProductViewModelSource)
   const productById = new Map(getRuntimeDomainProductRecords().map((product) => [product.identity.id, product]))
 
   return page.entries.flatMap((entry) => buildApplicationBlocksForEntry(locale, entry, page.rfq.body, productById))

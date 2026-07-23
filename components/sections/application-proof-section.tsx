@@ -1,9 +1,21 @@
+import Link from 'next/link'
 import { Route, Settings2, Workflow } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Locale } from '@/i18n/routing'
 import type { HomepageProjection } from '@/lib/domain'
 
-export function ApplicationProofSection({ data }: { data: HomepageProjection['applicationProof'] }) {
+function localizedHref(locale: Locale, href: string) {
+  return `/${locale}${href}`
+}
+
+export function ApplicationProofSection({
+  locale,
+  data,
+}: {
+  locale: Locale
+  data: HomepageProjection['applicationProof']
+}) {
   const icons = [Route, Workflow, Settings2]
 
   return (
@@ -19,7 +31,7 @@ export function ApplicationProofSection({ data }: { data: HomepageProjection['ap
           const Icon = icons[index] ?? Route
 
           return (
-            <Card key={item.label} className="bg-panel">
+            <Card key={item.label} className="group bg-panel transition-shadow duration-200 hover:shadow-industrial">
               <CardHeader>
                 <span className="grid size-11 place-items-center rounded-md border border-border bg-ink-50 text-steel-900">
                   <Icon className="size-5" aria-hidden="true" />
@@ -27,9 +39,10 @@ export function ApplicationProofSection({ data }: { data: HomepageProjection['ap
                 <CardTitle className="pt-3 text-lg">{item.label}</CardTitle>
               </CardHeader>
               <CardContent>
-                <Badge variant="outline" className="font-mono">
-                  {item.value}
-                </Badge>
+                <Badge variant="outline" className="font-mono">{item.value}</Badge>
+                <Link href={localizedHref(locale, item.href)} className="mt-5 inline-flex text-sm font-semibold text-steel-900">
+                  {locale === 'zh' ? '查看入口' : 'Open path'}
+                </Link>
               </CardContent>
             </Card>
           )

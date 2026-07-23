@@ -34,7 +34,7 @@ import type {
 import type { ProductSeoFields, SearchIntent, SeoBreadcrumbItem } from './seo'
 import type { SpecificationKey } from './specification'
 
-const brandName = 'HEIYU Industrial'
+const brandName = 'YUFAVOR'
 const productReviewDate = '2026-06-17'
 const documentRevision: RevisionString = 'v1'
 
@@ -846,14 +846,40 @@ function toProductRecord(seed: MockProductSeed): ProductRecord {
   const geoZh = toProductGeo(seed, 'zh', seoZh)
 
   return {
+    id: seed.id,
+    core: {
+      family: 'sensor',
+      sku: seed.sku,
+      model: seed.model,
+      brand: brandName,
+      primaryCategory: seed.primaryCategoryId,
+      name: seed.name,
+      shortName: seed.shortName,
+      summary: seed.summary,
+    },
+    sensorProfile: {
+      measurements: [seed.measurement],
+      outputs: [seed.output],
+      connections: {
+        process: seed.processConnection,
+        electrical: seed.electricalConnection,
+      },
+      environmentalLimits: {
+        ingressProtection: seed.ingressProtection,
+        ambientTemperature: range(-20, 85, 'c', '-20-85 C'),
+        mediaTemperature: range(-20, 120, 'c', '-20-120 C'),
+        wettedMaterials: seed.wettedMaterials,
+        compatibleMedia: seed.compatibleMedia,
+      },
+    },
     identity: {
       id: seed.id,
       sku: seed.sku,
       model: seed.model,
+      family: 'sensor',
       seriesId: seed.seriesId,
       brand: brandName,
       manufacturer: brandName,
-      lifecycle: 'active',
       availability: seed.availability,
       releasedAt: '2026-01-10',
       revisedAt: '2026-06-17',
@@ -903,7 +929,6 @@ function toProductRecord(seed: MockProductSeed): ProductRecord {
         measurements: [seed.measurement],
         outputs: [seed.output],
         availability: seed.availability,
-        lifecycle: 'active',
       },
     ],
     certifications: seed.certifications,
@@ -913,7 +938,7 @@ function toProductRecord(seed: MockProductSeed): ProductRecord {
         title: `${seed.model} datasheet`,
         kind: 'datasheet',
         href: `/documents/${seed.key}-datasheet.pdf`,
-        locale: 'en',
+        contentLocale: 'en',
         revision: documentRevision,
       },
     ],

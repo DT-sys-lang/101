@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "intent_phrases",
+  "info": {
+    "singularName": "intent-phrase",
+    "pluralName": "intent-phrases",
+    "displayName": "IntentPhrase",
+    "description": "Shared search, SEO, and GEO intent phrase library. Stores phrases only, not generated metadata."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "phraseId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^intent_[a-z0-9_]+$"
+    },
+    "phrase": {
+      "type": "string",
+      "required": true
+    },
+    "contentLocale": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["en", "zh", "ru", "es"]
+    },
+    "intentType": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["informational", "commercial", "comparison", "troubleshooting", "navigation", "specification", "manual", "case", "brand"]
+    },
+    "usageSurfaces": {
+      "type": "json",
+      "required": true
+    },
+    "priority": {
+      "type": "integer",
+      "default": 100
+    },
+    "source": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["editorial", "search-log", "sales", "customer-support", "partner", "imported"]
+    },
+    "phraseStatus": {
+      "type": "enumeration",
+      "required": true,
+      "default": "active",
+      "enum": ["active", "candidate", "deprecated"]
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category-fact.category-fact"
+    },
+    "industries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}

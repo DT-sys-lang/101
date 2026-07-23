@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_manuals",
+  "info": {
+    "singularName": "product-manual",
+    "pluralName": "product-manuals",
+    "displayName": "ProductManual",
+    "description": "Structured product manual mapping products to document assets."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "manualId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^manual_[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "manualKind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["installation", "operation", "maintenance", "calibration", "wiring", "software", "safety", "custom"]
+    },
+    "contentLocale": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["en", "zh", "ru", "es", "multi"]
+    },
+    "revision": {
+      "type": "string",
+      "required": true
+    },
+    "effectiveDate": {
+      "type": "date"
+    },
+    "document": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::document-asset.document-asset"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "relatedCategories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category-fact.category-fact"
+    },
+    "intentPhrases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::intent-phrase.intent-phrase"
+    },
+    "notes": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    }
+  }
+}

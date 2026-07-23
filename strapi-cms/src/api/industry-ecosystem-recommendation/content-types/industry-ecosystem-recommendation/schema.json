@@ -1,0 +1,77 @@
+{
+  "kind": "collectionType",
+  "collectionName": "industry_ecosystem_recommendations",
+  "info": {
+    "singularName": "industry-ecosystem-recommendation",
+    "pluralName": "industry-ecosystem-recommendations",
+    "displayName": "IndustryEcosystemRecommendation",
+    "description": "Manually curated product ecosystem recommendations by industry/application context."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "recommendationId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^eco_[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "rationale": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "industry": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    },
+    "anchorProduct": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product-fact.product-fact"
+    },
+    "recommendedProducts": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "recommendationOrder": {
+      "type": "json",
+      "required": true
+    },
+    "curationNotes": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "curatedBy": {
+      "type": "string"
+    },
+    "reviewedAt": {
+      "type": "datetime"
+    },
+    "intentPhrases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::intent-phrase.intent-phrase"
+    }
+  }
+}

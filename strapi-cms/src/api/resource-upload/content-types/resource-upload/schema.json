@@ -1,0 +1,99 @@
+{
+  "kind": "collectionType",
+  "collectionName": "resource_uploads",
+  "info": {
+    "singularName": "resource-upload",
+    "pluralName": "resource-uploads",
+    "displayName": "资料中心内容",
+    "description": "资料中心固定板块的简单上传入口。"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "uploadId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^upload_[a-z0-9_]+$"
+    },
+    "section": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "product-manuals",
+        "iot-application-cases",
+        "oem-cases",
+        "technical-knowledge",
+        "company-materials",
+        "company-brochure",
+        "quality-certification",
+        "engineering-blog"
+      ]
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "summary": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "body": {
+      "type": "json"
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "attachment": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["files", "images"]
+    },
+    "video": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["videos"]
+    },
+    "externalUrl": {
+      "type": "string"
+    },
+    "ctaLabel": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "publishedOn": {
+      "type": "date"
+    },
+    "priority": {
+      "type": "integer",
+      "default": 100
+    },
+    "relatedProducts": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "relatedIndustries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "relatedApplications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    }
+  }
+}

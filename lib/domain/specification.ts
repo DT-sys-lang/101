@@ -105,20 +105,59 @@ export const specificationUnitFamilyUnits = {
   custom: ['custom'],
 } as const satisfies Record<SpecificationUnitFamily, readonly UnitCode[]>
 
-const allIndustrialSensorCategories = ['cat_industrial_sensors'] as const satisfies readonly CategoryId[]
-const measurementCategories = [
+const allIndustrialSensorCategories = [
   'cat_industrial_sensors',
+  'cat_industrial_valves',
+  'cat_solenoid_valves',
+  'cat_proportional_valves',
+  'cat_pressure_regulating_valves',
+  'cat_safety_valves',
+  'cat_valve_manifolds_protection',
   'cat_pressure_sensors',
   'cat_pressure_transmitters',
   'cat_differential_pressure',
-  'cat_level_sensors',
-  'cat_submersible_level',
+  'cat_high_pressure_sensors',
+  'cat_low_pressure_sensors',
+  'cat_explosion_proof_pressure_sensors',
+  'cat_temperature_sensors',
   'cat_temperature_measurement',
   'cat_temperature_transmitters',
-  'cat_industrial_switches',
+  'cat_rtd_sensors',
+  'cat_thermocouples',
+  'cat_explosion_proof_temperature_sensors',
   'cat_pressure_switches',
+  'cat_industrial_switches',
+  'cat_electronic_pressure_switches',
+  'cat_differential_pressure_switches',
+  'cat_adjustable_pressure_switches',
+  'cat_level_sensors',
+  'cat_submersible_level',
+  'cat_pressure_gauges',
+  'cat_mechanical_pressure_gauges',
+  'cat_digital_pressure_gauges',
+  'cat_differential_pressure_gauges',
+  'cat_wireless_transmitters',
+  'cat_wireless_pressure_transmitters',
+  'cat_wireless_temperature_transmitters',
+  'cat_wireless_level_transmitters',
 ] as const satisfies readonly CategoryId[]
-const electricalCategories = ['cat_industrial_sensors'] as const satisfies readonly CategoryId[]
+const measurementCategories = [
+  ...allIndustrialSensorCategories,
+] as const satisfies readonly CategoryId[]
+const electricalCategories = [
+  'cat_industrial_sensors',
+  'cat_industrial_valves',
+  'cat_solenoid_valves',
+  'cat_proportional_valves',
+  'cat_pressure_sensors',
+  'cat_pressure_transmitters',
+  'cat_temperature_sensors',
+  'cat_temperature_measurement',
+  'cat_temperature_transmitters',
+  'cat_pressure_switches',
+  'cat_electronic_pressure_switches',
+  'cat_wireless_transmitters',
+] as const satisfies readonly CategoryId[]
 
 export const defaultSpecificationDefinitions = [
   definition({

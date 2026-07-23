@@ -1,7 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound, redirect } from 'next/navigation'
-import { ProductDetailPageView } from '@/components/products/product-detail-page'
-import { ProductListPageView } from '@/components/products/product-list-page'
+import { StitchNativePage } from '@/components/stitch/stitch-native-pages'
 import { isLocale, type Locale, routing } from '@/i18n/routing'
 import {
   getProductListStaticParams,
@@ -13,6 +12,7 @@ import { buildProductMetadata } from '@/lib/seo/metadata'
 import { resolveDomainProductDetail } from '@/lib/seo/product-detail'
 import { buildProductListMetadata, resolveProductListPage } from '@/lib/seo/product-list'
 import { ProductDetailStructuredData, ProductListStructuredData } from '@/lib/seo/structured-data'
+import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 
 export const revalidate = 3600
 
@@ -23,27 +23,29 @@ interface ProductDetailRouteProps {
   }>
 }
 
-export function generateStaticParams() {
-  return getProductListStaticParams(routing.locales)
+export async function generateStaticParams() {
+  await preloadRuntimeDomainProducts()
+  return getProductListStaticParams(routing.locales, runtimeProductViewModelSource)
 }
 
-export function generateMetadata({ params }: ProductDetailRouteProps) {
-  return params.then(({ locale, slug }) => {
-    if (!isLocale(locale)) {
-      return {}
-    }
+export async function generateMetadata({ params }: ProductDetailRouteProps) {
+  const { locale, slug } = await params
 
-    const typedLocale = locale as Locale
-    const detailResult = resolveDomainProductDetail(typedLocale, slug)
+  if (!isLocale(locale)) {
+    return {}
+  }
 
-    if (detailResult.status === 'found') {
-      return buildProductMetadata(detailResult.data)
-    }
+  await preloadRuntimeDomainProducts()
+  const typedLocale = locale as Locale
+  const detailResult = resolveDomainProductDetail(typedLocale, slug)
 
-    const listData = resolveProductListPage(typedLocale, slug)
+  if (detailResult.status === 'found') {
+    return buildProductMetadata(detailResult.data)
+  }
 
-    return listData ? buildProductListMetadata(listData) : {}
-  })
+  const listData = resolveProductListPage(typedLocale, slug)
+
+  return listData ? buildProductListMetadata(listData) : {}
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailRouteProps) {
@@ -55,11 +57,22 @@ export default async function ProductDetailPage({ params }: ProductDetailRoutePr
 
   setRequestLocale(locale)
 
+  await preloadRuntimeDomainProducts()
   const typedLocale = locale as Locale
-  const viewModelResult = resolveProductDetailViewModel(typedLocale, slug)
+  const viewModelResult = resolveProductDetailViewModel(typedLocale, slug, runtimeProductViewModelSource)
+  const canonicalDetailResult = resolveDomainProductDetail(typedLocale, slug)
+
+  if (canonicalDetailResult.status === 'found') {
+    return (
+      <>
+        <ProductDetailStructuredData data={canonicalDetailResult.data} />
+        <StitchNativePage locale={typedLocale} screen="productDetail" productDetailData={viewModelResult.status === 'found' ? viewModelResult.data : undefined} />
+      </>
+    )
+  }
 
   if (viewModelResult.status !== 'found') {
-    const viewListData = resolveProductListViewModel(typedLocale, slug)
+    const viewListData = resolveProductListViewModel(typedLocale, slug, {}, runtimeProductViewModelSource)
     const seoListData = resolveProductListPage(typedLocale, slug)
 
     if (!viewListData || !seoListData) {
@@ -69,7 +82,7 @@ export default async function ProductDetailPage({ params }: ProductDetailRoutePr
     return (
       <>
         <ProductListStructuredData data={seoListData} />
-        <ProductListPageView locale={typedLocale} data={viewListData} />
+        <StitchNativePage locale={typedLocale} screen="products" productListData={viewListData} />
       </>
     )
   }
@@ -87,7 +100,7 @@ export default async function ProductDetailPage({ params }: ProductDetailRoutePr
   return (
     <>
       <ProductDetailStructuredData data={detailResult.data} />
-      <ProductDetailPageView locale={typedLocale} data={viewModelResult.data} />
+      <StitchNativePage locale={typedLocale} screen="productDetail" productDetailData={viewModelResult.data} />
     </>
   )
 }

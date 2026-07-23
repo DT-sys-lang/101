@@ -8,13 +8,17 @@ import type {
 import {
   createInquiryOutboundAdapters,
   createJsonlInquiryPersistenceAdapter,
+  createStrapiInquiryPersistenceAdapter,
   planInquiryOutboundChannels,
 } from './adapters'
-import { getInquiryStoreConfig } from './store'
+import { getInquiryStoreConfig, getResendEmailConfig, getStrapiInquiryConfig } from './store'
 
 const inquiryStoreConfig = getInquiryStoreConfig()
-const inquiryPersistenceAdapter = createJsonlInquiryPersistenceAdapter(inquiryStoreConfig)
-const inquiryOutboundAdapters = createInquiryOutboundAdapters(inquiryStoreConfig)
+const strapiInquiryConfig = getStrapiInquiryConfig()
+const inquiryPersistenceAdapter = strapiInquiryConfig
+  ? createStrapiInquiryPersistenceAdapter(strapiInquiryConfig)
+  : createJsonlInquiryPersistenceAdapter(inquiryStoreConfig)
+const inquiryOutboundAdapters = createInquiryOutboundAdapters(inquiryStoreConfig, getResendEmailConfig())
 
 export async function submitInquiry(input: unknown): Promise<InquiryApiResult> {
   const normalized = normalizeInquiryPayload(input)
@@ -72,7 +76,7 @@ async function dispatchInquiryOutboundJobs(
     return {
       channel,
       state: 'failed',
-      adapter: 'jsonl-outbox',
+      adapter: channel === 'email-notification' ? 'resend-email' : 'jsonl-outbox',
       note: result.reason instanceof Error ? result.reason.message : 'Unknown outbound error.',
     }
   })

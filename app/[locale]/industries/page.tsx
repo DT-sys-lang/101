@@ -1,8 +1,7 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { EntryHubPage } from '@/components/sections/entry-hub-page'
+import { StitchNativePage } from '@/components/stitch/stitch-native-pages'
 import { isLocale, type Locale } from '@/i18n/routing'
-import { getIndustryEntryPageViewModel } from '@/lib/domain'
 import { buildIndustryHubPageResolution } from '@/lib/domain/entry-pages'
 import { buildIndustryPageMetadata } from '@/lib/seo/industry'
 import { EntryPageStructuredData } from '@/lib/seo/structured-data'
@@ -33,13 +32,12 @@ export default async function IndustriesPage({
   setRequestLocale(locale)
 
   const typedLocale = locale as Locale
-  const data = getIndustryEntryPageViewModel(typedLocale)
   const resolution = buildIndustryHubPageResolution(typedLocale)
 
   return (
     <>
       <EntryPageStructuredData data={resolution.seo} id="industry-jsonld" />
-      <EntryHubPage locale={typedLocale} data={data} />
+      <StitchNativePage locale={typedLocale} screen="industries" />
     </>
   )
 }

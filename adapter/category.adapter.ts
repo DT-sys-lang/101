@@ -13,7 +13,7 @@ import type {
   SeoSlugPath,
   SlugSegment,
 } from '@/lib/domain'
-import { localizeText } from '@/lib/domain'
+import { industrialSiteConfig, localizeText } from '@/lib/domain'
 import {
   localizeFactText,
   normalizeAdapterConfig,
@@ -159,7 +159,7 @@ function buildCategoryNode(
     seo: {
       indexable: true,
       canonicalPath,
-      titlePattern: '{category} | HEIYU Industrial',
+      titlePattern: `{category} | ${industrialSiteConfig.brandName}`,
       descriptionPattern: `Browse ${defaultLabel} by measurement type, connection, and application.`,
     },
   }
@@ -187,15 +187,22 @@ function buildLocalizedNames(name: LocalizedText, locales: readonly LocaleCode[]
 }
 
 function buildCategoryDescription(localizedNames: Record<LocaleCode, string>, depth: number): LocalizedText {
-  const suffix = depth === 0
-    ? 'product catalog and selection hub.'
-    : depth === 1
-      ? 'products for industrial measurement and OEM selection.'
-      : 'models and technical variants for comparison and specification review.'
+  const suffix = {
+    en: depth === 0
+      ? 'product catalog and selection hub.'
+      : depth === 1
+        ? 'products for industrial measurement and OEM selection.'
+        : 'models and technical variants for comparison and specification review.',
+    zh: depth === 0
+      ? '产品目录与选型入口。'
+      : depth === 1
+        ? '面向工业测量与 OEM 选型的产品系列。'
+        : '用于对比、规格确认和选型审查的型号与技术变体。',
+  } as const
 
   return {
-    en: `${localizedNames.en} ${suffix}`,
-    zh: `${localizedNames.zh} ${suffix}`,
+    en: `${localizedNames.en} ${suffix.en}`,
+    zh: `${localizedNames.zh} ${suffix.zh}`,
   }
 }
 

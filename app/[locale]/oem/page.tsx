@@ -1,6 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { StaticInfoPage } from '@/components/sections/static-info-page'
+import { StitchNativePage } from '@/components/stitch/stitch-native-pages'
 import { isLocale, type Locale } from '@/i18n/routing'
 import { getStaticInfoPageViewModel } from '@/lib/domain'
 import { buildStaticInfoPageMetadata } from '@/lib/seo/static-info'
@@ -40,7 +40,7 @@ export default async function OemPage({
   return (
     <>
       <StaticInfoPageStructuredData locale={typedLocale} kind="oem" data={data} />
-      <StaticInfoPage locale={typedLocale} data={data} />
+      <StitchNativePage locale={typedLocale} screen="oem" />
     </>
   )
 }

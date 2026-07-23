@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { routing } from '@/i18n/routing'
 import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, selectProductSeo, type ProductRecord } from '@/lib/domain'
-import { getRuntimeDomainProductRecords } from '@/lib/runtime/domain-products'
+import { getRuntimeDomainProductRecords, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { getAbsoluteUrl, getLocalizedProductUrl } from './canonical'
 import { buildHomeHrefLangs, buildProductHrefLangs, buildStaticPathHrefLangs } from './hreflang'
 
@@ -20,7 +20,7 @@ export function buildSitemapForProducts(products: readonly ProductRecord[]): Met
     },
   }))
 
-  const staticEntryPaths = ['/', '/products', '/industries', '/applications', '/oem', '/resources', '/contact']
+  const staticEntryPaths = ['/', '/products', '/industries', '/applications', '/oem', '/company', '/resources', '/contact']
   const staticEntries: MetadataRoute.Sitemap = staticEntryPaths.flatMap((path) =>
     routing.locales.map((locale) => ({
       url: getAbsoluteUrl(path === '/' ? `/${locale}` : `/${locale}${path}`),
@@ -46,7 +46,7 @@ export function buildSitemapForProducts(products: readonly ProductRecord[]): Met
   )
 
   const applicationEntries: MetadataRoute.Sitemap = routing.locales.flatMap((locale) =>
-    getApplicationEntryPageViewModel(locale).entries.map((entry) => ({
+    getApplicationEntryPageViewModel(locale, runtimeProductViewModelSource).entries.map((entry) => ({
       url: getAbsoluteUrl(`/${locale}${entry.href}`),
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
@@ -71,7 +71,7 @@ export function buildSitemapForProducts(products: readonly ProductRecord[]): Met
         alternates: {
           languages,
         },
-        images: product.assets.map((asset) => getAbsoluteUrl(asset.href)),
+        images: product.assets?.map((asset) => getAbsoluteUrl(asset.href)) ?? [],
       }
     })
   })

@@ -1,6 +1,6 @@
 import { routing, type Locale } from '@/i18n/routing'
 import { finalGrowthSystemTarget, getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, industrialSiteConfig } from '@/lib/domain'
-import { getRuntimeDomainProductRecords, getRuntimeDomainProductSource } from '@/lib/runtime/domain-products'
+import { getRuntimeDomainProductRecords, getRuntimeDomainProductSource, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { getAbsoluteUrl } from '@/lib/seo/canonical'
 import { buildGeoProductFeedItems, type GeoProductFeedItem } from './feed'
 
@@ -43,7 +43,7 @@ export interface GeoIndexDocument {
 export function buildGeoIndex(locale: Locale = routing.defaultLocale): GeoIndexDocument {
   const source = getRuntimeDomainProductSource()
   const industries = getIndustryEntryPageViewModel(locale).entries
-  const applications = getApplicationEntryPageViewModel(locale).entries
+  const applications = getApplicationEntryPageViewModel(locale, runtimeProductViewModelSource).entries
 
   return {
     version: 'geo-index-v2',

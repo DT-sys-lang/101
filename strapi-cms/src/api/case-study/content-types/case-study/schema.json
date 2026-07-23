@@ -1,0 +1,96 @@
+{
+  "kind": "collectionType",
+  "collectionName": "case_studies",
+  "info": {
+    "singularName": "case-study",
+    "pluralName": "case-studies",
+    "displayName": "CaseStudy",
+    "description": "Light customer/application story linked to facts by relation only."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "caseId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^case_[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "summary": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "challenge": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "solution": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "outcome": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "body": {
+      "type": "json"
+    },
+    "region": {
+      "type": "string"
+    },
+    "projectYear": {
+      "type": "integer"
+    },
+    "isPublic": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "industries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    },
+    "supportingDocuments": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::document-asset.document-asset"
+    },
+    "intentPhrases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::intent-phrase.intent-phrase"
+    }
+  }
+}

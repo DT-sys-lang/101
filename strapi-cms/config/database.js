@@ -1,6 +1,20 @@
 'use strict'
 
 module.exports = ({ env }) => {
+  const client = env('DATABASE_CLIENT', 'postgres')
+
+  if (client === 'sqlite') {
+    return {
+      connection: {
+        client: 'sqlite',
+        connection: {
+          filename: env('DATABASE_FILENAME', '.tmp/data.db'),
+        },
+        useNullAsDefault: true,
+      },
+    }
+  }
+
   const connectionString = env('DATABASE_URL', '')
   const ssl = env.bool('DATABASE_SSL', false)
 

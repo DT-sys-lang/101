@@ -3,6 +3,7 @@ import { isLocale, type Locale } from '@/i18n/routing'
 import { jsonContract } from '@/lib/api/contracts'
 import { buildAiReadableIndustrialProduct } from '@/lib/geo'
 import { buildProductFaqItems, resolveDomainProductDetail } from '@/lib/seo/product-detail'
+import { preloadRuntimeDomainProducts } from '@/lib/runtime/domain-products'
 
 export const revalidate = 3600
 
@@ -20,6 +21,7 @@ export async function GET(_request: Request, { params }: GeoProductRouteProps) {
     notFound()
   }
 
+  await preloadRuntimeDomainProducts()
   const result = resolveDomainProductDetail(locale as Locale, slug)
 
   if (result.status !== 'found') {

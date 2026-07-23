@@ -6,8 +6,11 @@ import { buildStaticPathHrefLangs } from './hreflang'
 
 const pagePathByKind = {
   oem: '/oem',
+  company: '/company',
   resources: '/resources',
   contact: '/contact',
+  quality: '/resources/manuals/company-materials/quality-certification',
+  manufacturing: '/manufacturing',
 } as const satisfies Record<StaticInfoPageKind, string>
 
 export function buildStaticInfoPageMetadata(locale: Locale, kind: StaticInfoPageKind, data: StaticInfoPageViewModel): Metadata {

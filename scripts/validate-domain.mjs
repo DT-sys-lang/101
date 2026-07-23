@@ -1,4 +1,6 @@
 import { buildDomainFromCmsFacts } from '../adapter/product.adapter.ts'
+import { readFile } from 'node:fs/promises'
+import { sensorValveCmsFactInput } from '../adapter/cms-fact-family.fixture.ts'
 import {
   defaultSpecificationRegistry,
   validateSpecificationDefinitionRegistry,
@@ -9,7 +11,13 @@ import { mockProducts } from '../lib/domain/mock-products.ts'
 import { createProductCatalogIndex } from '../lib/domain/product-catalog.ts'
 
 const domain = await loadDomainInput()
-const errors = validateDomain(domain)
+const familyFixtureDomain = buildDomainFromCmsFacts(sensorValveCmsFactInput)
+const errors = [
+  ...validateDomain(domain),
+  ...validateDomain(familyFixtureDomain, { labelPrefix: 'sensor-valve-fixture' }),
+]
+
+validateOptionalFieldFixture(familyFixtureDomain, errors)
 
 if (errors.length) {
   console.error(JSON.stringify({ ok: false, errors }, null, 2))
@@ -18,10 +26,12 @@ if (errors.length) {
 
 console.log(JSON.stringify({
   ok: true,
-  source: process.env.CMS_FACTS_JSON?.trim() ? 'CMS_FACTS_JSON' : 'mock-domain',
+  source: process.env.CMS_FACTS_JSON?.trim() ? 'CMS_FACTS_JSON' : process.env.CMS_FACTS_JSON_FILE?.trim() ? 'CMS_FACTS_JSON_FILE' : 'mock-domain',
   categoryTreeVersion: domain.categoryTree.version,
   maxDepth: domain.categoryTree.maxDepth,
   productRecords: domain.products.length,
+  familyFixtureRecords: familyFixtureDomain.products.length,
+  familyFixtureFamilies: countProductFamilies(familyFixtureDomain.products),
   enIndexProducts: createProductCatalogIndex({ locale: 'en', products: domain.products, categoryTree: domain.categoryTree }).productIds.length,
   zhIndexProducts: createProductCatalogIndex({ locale: 'zh', products: domain.products, categoryTree: domain.categoryTree }).productIds.length,
 }, null, 2))
@@ -31,13 +41,17 @@ async function loadDomainInput() {
     return buildDomainFromCmsFacts(JSON.parse(process.env.CMS_FACTS_JSON))
   }
 
+  if (process.env.CMS_FACTS_JSON_FILE?.trim()) {
+    return buildDomainFromCmsFacts(JSON.parse(await readFile(process.env.CMS_FACTS_JSON_FILE, 'utf8')))
+  }
+
   return {
     categoryTree: industrialSensorCategoryTree,
     products: mockProducts,
   }
 }
 
-function validateDomain(domain) {
+function validateDomain(domain, options = {}) {
   const errors = []
   const categoryIds = new Set(flattenCategories(domain.categoryTree.root).map((category) => category.id))
   const productIds = new Set()
@@ -58,7 +72,8 @@ function validateDomain(domain) {
   }
 
   for (const product of domain.products) {
-    const label = product.identity?.id ?? 'unknown-product'
+    const productId = product.identity?.id ?? 'unknown-product'
+    const label = options.labelPrefix ? `${options.labelPrefix}:${productId}` : productId
 
     if (productIds.has(product.identity.id)) {
       errors.push(`${label}: duplicate product id`)
@@ -85,12 +100,22 @@ function validateDomain(domain) {
       }
     }
 
-    if (!product.measurements.length || product.measurements.some((measurement) => !measurement.overloadLimit)) {
-      errors.push(`${label}: every product measurement must include overloadLimit`)
+    if (product.core.family === 'sensor') {
+      if (!product.sensorProfile || !product.measurements.length || product.measurements.some((measurement) => !measurement.overloadLimit)) {
+        errors.push(`${label}: sensor products must include measurements with overloadLimit`)
+      }
+
+      if (!product.outputs.length) {
+        errors.push(`${label}: sensor products must include output facts`)
+      }
+
+      if (!product.environmentalLimits.mediaTemperature && !product.environmentalLimits.ambientTemperature) {
+        errors.push(`${label}: sensor products must include environmental temperature limits`)
+      }
     }
 
-    if (!product.environmentalLimits.mediaTemperature && !product.environmentalLimits.ambientTemperature) {
-      errors.push(`${label}: missing environmental temperature limits`)
+    if (product.core.family === 'valve' && !product.valveProfile) {
+      errors.push(`${label}: valve products must include valveProfile`)
     }
 
     if (!product.environmentalLimits.compatibleMedia?.length || !product.environmentalLimits.wettedMaterials.length) {
@@ -103,15 +128,37 @@ function validateDomain(domain) {
 
     validateProductSpecifications(product, label, errors)
 
-    if (!product.documents.length) {
-      errors.push(`${label}: missing evidence documents`)
-    }
 
     validateSeo(product, label, canonicalPaths, errors)
     validateGeo(product, label, errors)
   }
 
   return errors
+}
+
+function validateOptionalFieldFixture(domain, errors) {
+  const sensor = domain.products.find((product) => product.core.family === 'sensor')
+  const valve = domain.products.find((product) => product.core.family === 'valve')
+
+  if (!sensor || !valve) {
+    errors.push('sensor-valve-fixture: expected both sensor and valve products')
+    return
+  }
+
+  if (!sensor.measurements.length || !sensor.outputs.length || !sensor.connections) {
+    errors.push(`${sensor.identity.id}: fixture sensor must include sensor measurement, output, and connection facts`)
+  }
+
+  if (valve.measurements.length || valve.outputs.length || valve.connections) {
+    errors.push(`${valve.identity.id}: fixture valve must not depend on sensor measurement, output, or electrical facts`)
+  }
+}
+
+function countProductFamilies(products) {
+  return products.reduce((families, product) => {
+    families[product.core.family] = (families[product.core.family] ?? 0) + 1
+    return families
+  }, {})
 }
 
 function validateProductSpecifications(product, label, errors) {
@@ -155,7 +202,7 @@ function validateGeo(product, label, errors) {
   const geoRecords = [product.geoAi, ...Object.values(product.localizedGeoAi ?? {})]
 
   for (const geoAi of geoRecords) {
-    if (!geoAi?.entity || !geoAi.factTable.length || !geoAi.evidence.length) {
+    if (!geoAi?.entity || !geoAi.factTable.length) {
       errors.push(`${label}: incomplete generated GEO profile`)
       continue
     }
@@ -167,11 +214,22 @@ function validateGeo(product, label, errors) {
     if (!geoAi.answerSummary.oneSentence || !geoAi.selectionGuidance.bestFor.length) {
       errors.push(`${label}: GEO summary or selection guidance is incomplete`)
     }
+
+    if (!geoAi.evidence.length && getGeoSourceRefs(geoAi).some((sourceRef) => sourceRef.confidence === 'source-backed')) {
+      errors.push(`${label}: GEO source-backed refs require evidence documents`)
+    }
   }
 }
 
 function flattenCategories(root) {
   return [root, ...(root.children ?? []).flatMap((child) => flattenCategories(child))]
+}
+
+function getGeoSourceRefs(geoAi) {
+  return [
+    ...geoAi.factTable.flatMap((fact) => fact.sourceRefs ?? []),
+    ...geoAi.faq.flatMap((faq) => faq.sourceRefs ?? []),
+  ]
 }
 
 function uniqueSeoByCanonicalPath(seoRecords) {

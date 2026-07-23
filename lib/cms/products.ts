@@ -1,6 +1,7 @@
 import {
   createProductCatalogIndex,
   filterProductCatalog,
+  industrialSensorCategoryTree,
   type CategoryTree,
   type LocaleCode,
   type ProductCatalogIndex,
@@ -8,6 +9,7 @@ import {
   type ProductListResult,
   type ProductRecord,
 } from '@/lib/domain'
+import { mockProducts, mockProductSource } from '@/lib/domain/mock-products'
 import { buildDomainFromCmsFacts } from './adapter'
 import {
   readCmsProductSource,
@@ -119,6 +121,7 @@ export function getCmsProductStatus(): CmsProductStatus {
     adapter: 'lib/cms/products',
     acceptedInput: [
       'CMS_FACTS_JSON',
+      'CMS_FACTS_JSON_FILE',
       'CMS_SOURCE_MODE',
       'CMS_FACTS_API_URL',
       'CMS_FACTS_API_TIMEOUT_MS',
@@ -151,7 +154,24 @@ async function hydrateCmsProductSnapshotAsync(): Promise<CmsProductSnapshot> {
 }
 
 function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapshot {
-  const domain = buildDomainFromCmsFacts(source.cmsFacts)
+  let domain: ReturnType<typeof buildDomainFromCmsFacts>
+
+  try {
+    domain = buildDomainFromCmsFacts(source.cmsFacts)
+  } catch (error) {
+    const snapshot = createMockDomainFallbackSnapshot(source)
+
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn(
+        `[cms-products] Falling back to mock-domain products because CMS facts could not be normalized: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+
+    productSnapshotCache = snapshot
+    catalogCache.clear()
+    return snapshot
+  }
+
   const snapshot: CmsProductSnapshot = {
     mode: source.mode,
     sourceVersion: source.sourceVersion,
@@ -163,6 +183,20 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
   productSnapshotCache = snapshot
   catalogCache.clear()
   return snapshot
+}
+
+function createMockDomainFallbackSnapshot(source: CmsProductSourceResult): CmsProductSnapshot {
+  return {
+    mode: 'mock-domain',
+    sourceVersion: `${mockProductSource.version}:fallback-from-${source.sourceVersion}`,
+    sourceMetadata: {
+      ...source.metadata,
+      activeMode: 'mock-domain',
+      fallbackReason: 'validation-error',
+    },
+    records: mockProducts,
+    categoryTree: industrialSensorCategoryTree,
+  }
 }
 
 function shouldRefreshSnapshotWithAsyncSource(snapshot: CmsProductSnapshot) {

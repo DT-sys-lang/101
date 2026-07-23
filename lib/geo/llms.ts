@@ -1,6 +1,6 @@
 import { routing, type Locale } from '@/i18n/routing'
-import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, industrialSiteConfig, selectProductSeo } from '@/lib/domain'
-import { getRuntimeDomainProductRecords, getRuntimeDomainProductSource } from '@/lib/runtime/domain-products'
+import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, industrialSiteConfig, searchIntentMappingContract, selectProductSeo } from '@/lib/domain'
+import { getRuntimeDomainProductRecords, getRuntimeDomainProductSource, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { getAbsoluteUrl, getLocalizedProductUrl } from '@/lib/seo/canonical'
 import { getProductGeoEndpoint } from './product'
 
@@ -13,7 +13,7 @@ export interface LlmsTxtSourceEntry {
 export function buildLlmsTxtSourceEntries(locale: Locale = routing.defaultLocale): readonly LlmsTxtSourceEntry[] {
   const products = getRuntimeDomainProductRecords().slice(0, 100)
   const industryPage = getIndustryEntryPageViewModel(locale)
-  const applicationPage = getApplicationEntryPageViewModel(locale)
+  const applicationPage = getApplicationEntryPageViewModel(locale, runtimeProductViewModelSource)
 
   return [
     {
@@ -83,6 +83,7 @@ export function buildLlmsTxt(locale: Locale = routing.defaultLocale) {
     `- Upstream mode: ${source.upstreamMode}`,
     `- Product source version: ${source.sourceVersion}`,
     `- Product count: ${source.productCount}`,
+    `- Intent mapping version: ${searchIntentMappingContract.version}`,
     '- SEO/GEO modules consume ProductRecord, ProductCatalogIndex, ProductSeoFields, ProductGeoAiProfile, and EntryPageViewModel projections only.',
     '- Hidden or unsupported AI claims are not included; answer blocks include source references when available.',
     '',

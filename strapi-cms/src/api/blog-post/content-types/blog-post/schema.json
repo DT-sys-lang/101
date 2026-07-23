@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "blog_posts",
+  "info": {
+    "singularName": "blog-post",
+    "pluralName": "blog-posts",
+    "displayName": "BlogPost",
+    "description": "Light editorial blog content linked to facts by relation only."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "postId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^blog_[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "excerpt": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "body": {
+      "type": "json",
+      "required": true
+    },
+    "topic": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["technology", "application", "selection-guide", "maintenance", "company", "industry", "custom"]
+    },
+    "authorName": {
+      "type": "string"
+    },
+    "publishedOn": {
+      "type": "date"
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "relatedProducts": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "relatedCategories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category-fact.category-fact"
+    },
+    "relatedIndustries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "relatedApplications": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::application-fact.application-fact"
+    },
+    "intentPhrases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::intent-phrase.intent-phrase"
+    }
+  }
+}

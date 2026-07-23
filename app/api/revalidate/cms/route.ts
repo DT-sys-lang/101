@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { jsonContract, jsonContractError } from '@/lib/api/contracts'
 import {
   CmsWebhookError,
@@ -21,6 +21,10 @@ export async function POST(request: Request) {
 
     for (const path of impact.paths) {
       revalidatePath(path)
+    }
+
+    for (const tag of impact.tags) {
+      revalidateTag(tag, 'default')
     }
 
     return jsonContract('cms-revalidate', {

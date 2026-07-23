@@ -1,10 +1,12 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { EntryHubPage } from '@/components/sections/entry-hub-page'
+import { StitchIndustryDetailPage } from '@/components/stitch/stitch-native-pages'
 import { isLocale, type Locale, routing } from '@/i18n/routing'
 import { getIndustryEntryStaticParams, resolveIndustryDetailPage } from '@/lib/domain/entry-pages'
 import { buildIndustryPageMetadata } from '@/lib/seo/industry'
 import { EntryPageStructuredData } from '@/lib/seo/structured-data'
+import { listRuntimeIndustryEcosystemContent } from '@/lib/runtime/domain-ecosystem'
+import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 
 export const revalidate = 3600
 
@@ -41,7 +43,9 @@ export default async function IndustryDetailPage({ params }: IndustryDetailPageP
   setRequestLocale(locale)
 
   const typedLocale = locale as Locale
-  const resolution = resolveIndustryDetailPage(typedLocale, slug)
+  await preloadRuntimeDomainProducts()
+  const ecosystemContent = await listRuntimeIndustryEcosystemContent(typedLocale)
+  const resolution = resolveIndustryDetailPage(typedLocale, slug, runtimeProductViewModelSource, ecosystemContent)
 
   if (!resolution) {
     notFound()
@@ -50,7 +54,7 @@ export default async function IndustryDetailPage({ params }: IndustryDetailPageP
   return (
     <>
       <EntryPageStructuredData data={resolution.seo} id="industry-detail-jsonld" />
-      <EntryHubPage locale={typedLocale} data={resolution.page} />
+      <StitchIndustryDetailPage locale={typedLocale} resolution={resolution} />
     </>
   )
 }

@@ -45,7 +45,7 @@ export interface GeoAiFact {
   readonly label: string
   readonly value: string
   readonly unit?: string
-  readonly sourceRefs: NonEmptyReadonlyArray<SourceRef>
+  readonly sourceRefs: readonly SourceRef[]
 }
 
 export interface GeoAiSelectionGuidance {
@@ -69,7 +69,7 @@ export interface GeoAiFaqItem {
   readonly question: string
   readonly answer: string
   readonly audience: GeoAiAudience
-  readonly sourceRefs: NonEmptyReadonlyArray<SourceRef>
+  readonly sourceRefs: readonly SourceRef[]
 }
 
 export interface GeoAiGovernance {
@@ -86,6 +86,6 @@ export interface ProductGeoAiProfile {
   readonly answerSummary: GeoAiAnswerSummary
   readonly factTable: NonEmptyReadonlyArray<GeoAiFact>
   readonly selectionGuidance: GeoAiSelectionGuidance
-  readonly evidence: NonEmptyReadonlyArray<GeoAiEvidence>
+  readonly evidence: readonly GeoAiEvidence[]
   readonly faq: readonly GeoAiFaqItem[]
 }

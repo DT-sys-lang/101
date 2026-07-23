@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "company_pages",
+  "info": {
+    "singularName": "company-page",
+    "pluralName": "company-pages",
+    "displayName": "公司页面内容",
+    "description": "公司页面简介、主图和介绍视频的简单上传入口。"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "pageId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^company_[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "component",
+      "repeatable": false,
+      "required": true,
+      "component": "facts.localized-text"
+    },
+    "summary": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.localized-text"
+    },
+    "body": {
+      "type": "json"
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroVideo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["videos"]
+    },
+    "pageKind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["about", "capability", "quality", "service", "contact", "custom"]
+    },
+    "priority": {
+      "type": "integer",
+      "default": 100
+    },
+    "relatedProducts": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-fact.product-fact"
+    },
+    "relatedIndustries": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::industry-fact.industry-fact"
+    },
+    "intentPhrases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::intent-phrase.intent-phrase"
+    }
+  }
+}

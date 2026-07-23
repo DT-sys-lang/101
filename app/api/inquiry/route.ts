@@ -10,7 +10,14 @@ export async function POST(request: Request) {
     const result = await submitInquiry(await request.json())
     return jsonContract('inquiry', result)
   } catch (error) {
-    return jsonContractError('inquiry', 'invalid-inquiry-payload', getErrorMessage(error), 400)
+    const message = getErrorMessage(error)
+    const isInvalidPayload = message.startsWith('Inquiry ')
+    return jsonContractError(
+      'inquiry',
+      isInvalidPayload ? 'invalid-inquiry-payload' : 'inquiry-submit-failed',
+      message,
+      isInvalidPayload ? 400 : 502,
+    )
   }
 }
 

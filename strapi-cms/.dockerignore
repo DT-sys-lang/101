@@ -1,0 +1,17 @@
+node_modules/
+.tmp/
+.cache/
+.git/
+build/
+dist/
+coverage/
+*.log
+*.err.log
+*.out.log
+.env
+.env.*
+!.env.example
+public/uploads/
+.strapi/
+.strapi-updater.json
+types/generated/

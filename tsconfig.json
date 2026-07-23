@@ -33,7 +33,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "tmp/strapi-v5-locale/next-phase3-v5-website-3110/types/**/*.ts",
+    "tmp/strapi-v5-locale/next-phase3-v5-website-3110/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

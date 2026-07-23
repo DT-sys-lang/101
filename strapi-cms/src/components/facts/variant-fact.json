@@ -26,7 +26,6 @@
     },
     "lifecycle": {
       "type": "enumeration",
-      "required": true,
       "enum": ["draft", "active", "phase-out", "discontinued", "hidden"]
     }
   }

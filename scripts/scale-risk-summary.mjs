@@ -3,7 +3,7 @@ export function summarizeScaleRisks(input, domain) {
   const productIdDuplicates = findDuplicates(input.productFacts.map((fact) => fact.id))
   const skuDuplicates = findDuplicates(input.productFacts.map((fact) => fact.sku))
   const modelDuplicates = findDuplicates(input.productFacts.map((fact) => fact.model))
-  const documentIds = input.productFacts.flatMap((fact) => fact.documents.map((document) => document.id))
+  const documentIds = input.productFacts.flatMap((fact) => (fact.documents ?? []).map((document) => document.id))
   const documentDuplicates = findDuplicates(documentIds)
   const overloadLimitRisk = summarizeOverloadLimitRisk(input.productFacts)
   const categoryIds = new Set(domain.categoryTree ? flattenCategories(domain.categoryTree.root).map((category) => category.id) : [])
@@ -39,7 +39,9 @@ function summarizeOverloadLimitRisk(productFacts) {
   let measurementCount = 0
 
   for (const fact of productFacts) {
-    for (const measurement of fact.measurements) {
+    const measurements = fact.sensorProfile?.measurements ?? fact.measurements ?? []
+
+    for (const measurement of measurements) {
       measurementCount += 1
 
       if (!measurement.overloadLimit) {

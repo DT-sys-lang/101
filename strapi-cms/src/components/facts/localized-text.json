@@ -2,7 +2,7 @@
   "collectionName": "components_facts_localized_texts",
   "info": {
     "displayName": "LocalizedText",
-    "description": "Two-locale fact text used by adapter input."
+    "description": "Localized fact text. en/zh are required adapter defaults; ru/es are optional content-entry extensions."
   },
   "attributes": {
     "en": {
@@ -12,6 +12,12 @@
     "zh": {
       "type": "text",
       "required": true
+    },
+    "ru": {
+      "type": "text"
+    },
+    "es": {
+      "type": "text"
     }
   }
 }

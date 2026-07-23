@@ -5,7 +5,7 @@
     "singularName": "product-fact",
     "pluralName": "product-facts",
     "displayName": "ProductFact",
-    "description": "Facts-only product record for adapter-generated ProductRecord output."
+    "description": "Facts-only product record for adapter-generated ProductRecord output. Family-aware for sensor and valve authoring."
   },
   "options": {
     "draftAndPublish": true
@@ -22,6 +22,12 @@
       "unique": true,
       "regex": "^prd_[a-z0-9_]+$"
     },
+    "family": {
+      "type": "enumeration",
+      "required": true,
+      "default": "sensor",
+      "enum": ["sensor", "valve"]
+    },
     "sku": {
       "type": "string",
       "required": true,
@@ -33,7 +39,6 @@
     },
     "seriesId": {
       "type": "string",
-      "required": true,
       "regex": "^ser_[a-z0-9_]+$"
     },
     "brand": {
@@ -45,7 +50,6 @@
     },
     "lifecycle": {
       "type": "enumeration",
-      "required": true,
       "enum": ["draft", "active", "phase-out", "discontinued", "hidden"]
     },
     "availability": {
@@ -81,8 +85,7 @@
       "target": "api::application-fact.application-fact"
     },
     "measurementKinds": {
-      "type": "json",
-      "required": true
+      "type": "json"
     },
     "name": {
       "type": "component",
@@ -105,7 +108,6 @@
     "highlights": {
       "type": "component",
       "repeatable": true,
-      "required": true,
       "component": "facts.localized-text"
     },
     "applicationCopy": {
@@ -116,26 +118,27 @@
     "measurements": {
       "type": "component",
       "repeatable": true,
-      "required": true,
       "component": "facts.measurement-fact"
     },
     "outputs": {
       "type": "component",
       "repeatable": true,
-      "required": true,
       "component": "facts.signal-output-fact"
     },
     "connections": {
       "type": "component",
       "repeatable": false,
-      "required": true,
       "component": "facts.connection-set-fact"
     },
     "environmentalLimits": {
       "type": "component",
       "repeatable": false,
-      "required": true,
       "component": "facts.environmental-limit-fact"
+    },
+    "valveProfile": {
+      "type": "component",
+      "repeatable": false,
+      "component": "facts.valve-profile-fact"
     },
     "specificationGroups": {
       "type": "component",
@@ -166,7 +169,6 @@
     "commercialTerms": {
       "type": "component",
       "repeatable": false,
-      "required": true,
       "component": "facts.commercial-term-fact"
     }
   }

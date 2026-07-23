@@ -1,41 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+@source not "../outputs/stitch";
+@source not "../public/stitch";
+@source not "../tmp";
 
 @theme inline {
-  --color-background: #f7f8f9;
+  --color-background: #f9f9f9;
   --color-panel: #ffffff;
-  --color-ink-950: #111827;
-  --color-ink-900: #1f2933;
-  --color-ink-800: #2f3a45;
-  --color-ink-700: #46525f;
-  --color-ink-600: #64707d;
-  --color-ink-500: #7d8790;
-  --color-ink-400: #a3abb3;
-  --color-ink-300: #c8cdd2;
-  --color-ink-200: #e3e7ea;
-  --color-ink-100: #edf0f2;
-  --color-ink-50: #f7f8f9;
-  --color-steel-900: #243244;
-  --color-steel-800: #2f4056;
-  --color-steel-700: #3e536b;
-  --color-steel-100: #e6ebef;
-  --color-steel-50: #f2f5f7;
-  --color-signal-700: #235f7a;
-  --color-signal-100: #dbeaf0;
-  --color-process-700: #2f7656;
-  --color-process-100: #dfeee6;
-  --color-copper-700: #98611a;
-  --color-copper-100: #f1e4d0;
-  --color-silver: #a8b2be;
-  --color-border: #d8dde2;
-  --font-sans: "Aptos", "IBM Plex Sans", "Noto Sans SC", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --shadow-industrial: 0 10px 30px -22px rgb(17 24 39 / 0.42);
+  --color-ink-950: #1a1a1a;
+  --color-ink-900: #1a1c1c;
+  --color-ink-800: #2f3131;
+  --color-ink-700: #444748;
+  --color-ink-600: #5d5f5f;
+  --color-ink-500: #747878;
+  --color-ink-400: #858383;
+  --color-ink-300: #c4c7c7;
+  --color-ink-200: #e5e5e5;
+  --color-ink-100: #eeeeee;
+  --color-ink-50: #f7f7f7;
+  --color-steel-900: #1a1a1a;
+  --color-steel-800: #2f3131;
+  --color-steel-700: #005eb8;
+  --color-steel-100: #d6e3ff;
+  --color-steel-50: #f3f3f4;
+  --color-signal-700: #005eb8;
+  --color-signal-100: #d6e3ff;
+  --color-process-700: #005eb8;
+  --color-process-100: #e8f2ff;
+  --color-copper-700: #005eb8;
+  --color-copper-100: #d6e3ff;
+  --color-silver: #c4c7c7;
+  --color-border: #e5e5e5;
+  --font-sans: "Inter", "Noto Sans SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, monospace;
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --shadow-industrial: none;
+}
+
+:root {
+  --stitch-primary: #1a1a1a;
+  --stitch-primary-container: #1c1b1b;
+  --stitch-secondary: #5d5f5f;
+  --stitch-blue: #005eb8;
+  --stitch-orange: #005eb8;
+  --stitch-outline: #747878;
+  --stitch-outline-variant: #c4c7c7;
+  --stitch-surface-low: #f3f3f4;
+  --stitch-surface: #f9f9f9;
+  --stitch-surface-border: #e5e5e5;
 }
 
 @layer base {
+  body:has(.stitch-native-page) > div > header,
+  body:has(.stitch-native-page) > div > footer {
+    display: none !important;
+  }
+
   * {
     box-sizing: border-box;
     border-color: var(--color-border);
@@ -51,7 +73,7 @@
   body {
     margin: 0;
     background: var(--color-background);
-    color: var(--color-ink-900);
+    color: var(--color-ink-950);
     font-family: var(--font-sans);
     letter-spacing: 0;
   }
@@ -59,7 +81,12 @@
   h1,
   h2,
   h3,
-  h4,
+  h4 {
+    margin: 0;
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+  }
+
   p {
     margin: 0;
     letter-spacing: 0;
@@ -70,21 +97,172 @@
     text-decoration: none;
   }
 
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
   ::selection {
-    background: var(--color-signal-100);
+    background: var(--color-steel-100);
     color: var(--color-ink-950);
+  }
+}
+
+@layer components {
+  .stitch-shell {
+    width: min(100% - 32px, 1280px);
+    margin-inline: auto;
+  }
+
+  .stitch-header-shell {
+    width: min(100% - 32px, 1280px);
+    margin-inline: auto;
+  }
+
+  .stitch-eyebrow {
+    color: var(--stitch-secondary);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+
+  .stitch-display {
+    color: var(--stitch-primary);
+    font-family: var(--font-sans);
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .stitch-heading {
+    color: var(--stitch-primary);
+    font-family: var(--font-sans);
+    font-size: clamp(32px, 3vw, 44px);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .stitch-card {
+    border: 1px solid var(--stitch-surface-border);
+    border-radius: 0;
+    background: var(--color-panel);
+    box-shadow: none;
+  }
+
+  .stitch-data {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stitch-section {
+    border-bottom: 1px solid var(--stitch-surface-border);
+    padding-block: 96px;
+  }
+
+  .stitch-action {
+    border: 1px solid var(--stitch-primary);
+    background: var(--color-panel);
+    color: var(--stitch-primary);
+  }
+
+  .stitch-action:hover {
+    border-color: var(--stitch-blue);
+    color: var(--stitch-blue);
+  }
+
+  .border-technical {
+    border: 1px solid var(--stitch-surface-border);
+  }
+
+  .input-industrial {
+    border: 1px solid var(--stitch-surface-border);
+    border-radius: 0;
+    background: var(--color-panel);
+    padding: 0.75rem 0.875rem;
+    color: var(--color-ink-950);
+    outline: none;
+    transition: border-color 160ms ease, color 160ms ease;
+  }
+
+  .input-industrial:focus {
+    border-color: var(--stitch-blue);
+    box-shadow: none;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--stitch-primary);
+    background: var(--color-panel);
+    color: var(--stitch-primary);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  }
+
+  .btn-primary:hover {
+    border-color: var(--stitch-blue);
+    color: var(--stitch-blue);
+  }
+
+  .tab-active {
+    border-bottom: 2px solid var(--stitch-blue);
+    color: var(--stitch-blue);
+  }
+
+  .data-table th,
+  .data-table td {
+    border-bottom: 1px solid var(--stitch-surface-border);
+    padding: 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .data-table th {
+    background: var(--color-ink-50);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 }
 
 @layer utilities {
   .industrial-grid {
     background-image:
-      linear-gradient(to right, rgb(36 50 68 / 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(36 50 68 / 0.07) 1px, transparent 1px);
+      linear-gradient(to right, rgb(0 0 0 / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(0 0 0 / 0.04) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
   .metal-rule {
     background: linear-gradient(90deg, transparent, var(--color-silver), transparent);
+  }
+}
+
+@media (min-width: 768px) {
+  .stitch-shell,
+  .stitch-header-shell {
+    width: min(100% - 128px, 1280px);
+  }
+}
+
+@media (max-width: 639px) {
+  .stitch-section {
+    padding-block: 56px;
+  }
+
+  .stitch-display {
+    font-size: clamp(36px, 11vw, 48px);
   }
 }

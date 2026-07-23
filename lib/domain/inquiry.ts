@@ -57,12 +57,12 @@ export type InquiryOutboundState = 'queued' | 'skipped' | 'not-configured' | 'fa
 export interface InquiryOutboundResult {
   readonly channel: InquiryOutboundChannel
   readonly state: InquiryOutboundState
-  readonly adapter: 'jsonl-outbox' | 'noop'
+  readonly adapter: 'jsonl-outbox' | 'resend-email' | 'noop'
   readonly note?: string
 }
 
 export interface InquiryPersistenceResult {
-  readonly adapter: 'jsonl-inbox'
+  readonly adapter: 'jsonl-inbox' | 'strapi-inquiry'
   readonly state: 'stored'
   readonly recordId: InquiryId
   readonly storedAt: string

@@ -113,7 +113,7 @@ export interface HomepageCopy {
 const siteCopy: Record<Locale, SiteCopy> = {
   zh: {
     brand: {
-      name: 'HEIYU Industrial',
+      name: 'YUFAVOR',
       descriptor: '工业测量与 OEM 传感器',
     },
     navigation: [
@@ -162,7 +162,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
   },
   en: {
     brand: {
-      name: 'HEIYU Industrial',
+      name: 'YUFAVOR',
       descriptor: 'Industrial measurement and OEM sensors',
     },
     navigation: [

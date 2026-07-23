@@ -1,12 +1,33 @@
 node_modules/
+strapi-cms/node_modules/
+
 .next/
+.next-*/
 out/
 .vercel/
+strapi-cms/dist/
+strapi-cms/.strapi/
+strapi-cms/.tmp/
+strapi-cms/.strapi-updater.json
+strapi-cms/public/uploads/
 
 .env*
 !.env.example
+!strapi-cms/.env.example
+deploy/production.env
 
 *.log
 playwright-*.png
 *.tsbuildinfo
 .runtime/
+tmp/
+.codex/
+.codex/config.toml
+outputs/
+stitch-heiyu-trans-industrial-design-system/
+({complete
+
+# Stitch import scratch space
+public/stitch/
+outputs/stitch/
+.next-stitch-fix/

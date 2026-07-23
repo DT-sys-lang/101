@@ -3,17 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "develop": "strapi develop",
-    "start": "strapi start",
-    "build": "strapi build"
+    "postinstall": "node ./scripts/apply-strapi-admin-portal-patch.mjs",
+    "patch:admin-portal": "node ./scripts/apply-strapi-admin-portal-patch.mjs",
+    "migrate:intent-phrase-status": "node ./scripts/migrate-intent-phrase-status.mjs",
+    "develop": "npm run migrate:intent-phrase-status && npm run build && strapi start",
+    "develop:raw": "npm run patch:admin-portal && strapi develop",
+    "start": "npm run migrate:intent-phrase-status && npm run patch:admin-portal && strapi start",
+    "build": "npm run patch:admin-portal && strapi build",
+    "postbuild": "node ./scripts/copy-strapi-json.mjs",
+    "provision:editorial-read-token": "node ./scripts/provision-editorial-read-token.mjs",
+    "seed:launch-mock": "node ./scripts/seed-launch-mock-content.mjs"
   },
   "dependencies": {
-    "@strapi/plugin-i18n": "4.25.20",
-    "@strapi/plugin-users-permissions": "4.25.20",
-    "@strapi/strapi": "4.25.20",
-    "pg": "8.13.1"
+    "@radix-ui/react-tooltip": "1.0.7",
+    "@strapi/plugin-users-permissions": "5.50.2",
+    "@strapi/provider-upload-aws-s3": "5.50.2",
+    "@strapi/strapi": "5.50.2",
+    "better-sqlite3": "^12.11.1",
+    "pg": "8.13.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
   },
   "engines": {
-    "node": ">=18 <=20"
+    "node": "22.x || 24.x || 26.x"
   }
 }

@@ -7,20 +7,21 @@ export function IndustrialSection({
   className,
 }: {
   children: ReactNode
-  tone?: 'white' | 'muted' | 'grid'
+  tone?: 'white' | 'muted' | 'grid' | 'dark'
   className?: string
 }) {
   return (
     <section
       className={cn(
-        'border-b border-border py-16 sm:py-20 lg:py-24',
+        'border-b border-border py-16 sm:py-20',
         tone === 'white' && 'bg-panel',
         tone === 'muted' && 'bg-ink-50',
         tone === 'grid' && 'industrial-grid bg-ink-50',
-        className
+        tone === 'dark' && 'border-steel-900 bg-steel-900',
+        className,
       )}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
+      <div className="stitch-shell">{children}</div>
     </section>
   )
 }

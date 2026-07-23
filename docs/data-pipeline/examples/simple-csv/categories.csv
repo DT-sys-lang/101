@@ -1,0 +1,13 @@
+category_id,parent_category_id,name_en,name_zh,name_ru,name_es
+cat_industrial_products,,Industrial Products,Industrial Products,,
+cat_industrial_sensors,cat_industrial_products,Industrial Sensors,Industrial Sensors,,
+cat_pressure_sensors,cat_industrial_sensors,Pressure Sensors,Pressure Sensors,,
+cat_pressure_transmitters,cat_pressure_sensors,Pressure Transmitters,Pressure Transmitters,,
+cat_differential_pressure_sensors,cat_industrial_sensors,Differential Pressure Sensors,Differential Pressure Sensors,,
+cat_level_sensors,cat_industrial_sensors,Level Sensors,Level Sensors,,
+cat_temperature_sensors,cat_industrial_sensors,Temperature Sensors,Temperature Sensors,,
+cat_flow_sensors,cat_industrial_sensors,Flow Sensors,Flow Sensors,,
+cat_industrial_valves,cat_industrial_products,Industrial Valves,Industrial Valves,,
+cat_solenoid_valves,cat_industrial_valves,Solenoid Valves,Solenoid Valves,,
+cat_ball_valves,cat_industrial_valves,Ball Valves,Ball Valves,,
+cat_butterfly_valves,cat_industrial_valves,Butterfly Valves,Butterfly Valves,,

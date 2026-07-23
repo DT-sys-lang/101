@@ -1,6 +1,8 @@
 import path from 'node:path'
 import { buildDomainFromCmsFacts } from '../adapter/product.adapter.ts'
+import { sensorValveCmsFactInput } from '../adapter/cms-fact-family.fixture.ts'
 import { routing } from '../i18n/routing.ts'
+import { searchIntentMappingContract, validateIntentPhrasebook } from '../lib/domain/intent-mapping.ts'
 import {
   createProductCatalogIndex,
   filterProductCatalog,
@@ -19,10 +21,11 @@ import { validateBoundaryRules } from './validate-boundaries.mjs'
 
 const SEO_CONTRACT_SNAPSHOT = {
   version: 'seo-runtime-contract-v1',
+  intentMappingVersion: 'search-intent-mapping-v1',
   locales: ['zh', 'en'],
   sitemap: {
-    staticLocalizedEntryCount: 6,
-    industryEntryCount: 5,
+    staticLocalizedEntryCount: 7,
+    industryEntryCount: 6,
     applicationEntryCount: 3,
     homeChangeFrequency: 'weekly',
     staticChangeFrequency: 'weekly',
@@ -49,6 +52,7 @@ const count = Number(readFlagValue('--count') ?? process.env.SCALE_PRODUCT_COUNT
 const source = readFlagValue('--scale') === 'false' ? await loadRuntimeSource() : buildDomainFromCmsFacts(generateCmsFacts(count))
 const errors = []
 const boundary = await validateSeoBoundary(errors)
+const familyCoverage = validateSeoFamilyReadableOutput(errors)
 const sitemap = buildSitemapForProducts(source.products)
 const sitemapBreakdown = getSitemapEntryBreakdown(source.products.length)
 const expectedSitemapEntries = sitemapBreakdown.totalEntries
@@ -58,6 +62,7 @@ if (sitemap.length !== expectedSitemapEntries) {
 }
 
 validateSeoContractSnapshot(source, sitemap, sitemapBreakdown, errors)
+validateSeoIntentMappingContract(errors)
 validateHreflangMap('home', buildHomeHrefLangs(), errors)
 validateSitemapEntries(sitemap, errors)
 validateProductSeo(source.products, errors)
@@ -75,6 +80,7 @@ console.log(JSON.stringify({
   expectedSitemapEntries,
   sitemapBreakdown,
   locales: routing.locales,
+  familyCoverage,
   boundary: {
     roots: boundary.roots,
     filesChecked: boundary.filesChecked,
@@ -96,10 +102,89 @@ async function validateSeoBoundary(errors) {
   return boundary
 }
 
+function validateSeoFamilyReadableOutput(errors) {
+  const fixtureDomain = buildDomainFromCmsFacts(sensorValveCmsFactInput)
+  const sensor = fixtureDomain.products.find((product) => product.core.family === 'sensor')
+  const valve = fixtureDomain.products.find((product) => product.core.family === 'valve')
+  const summary = {
+    requiredProfiles: ['sensor', 'valve'],
+    fixtureProductRecords: fixtureDomain.products.length,
+    sensorId: sensor?.identity.id ?? null,
+    valveId: valve?.identity.id ?? null,
+  }
+
+  if (!sensor) {
+    errors.push('SEO family fixture missing sensor product')
+  }
+
+  if (!valve) {
+    errors.push('SEO family fixture missing valve product')
+  }
+
+  if (!sensor || !valve) {
+    return summary
+  }
+
+  for (const locale of routing.locales) {
+    const index = createProductCatalogIndex({ locale, products: fixtureDomain.products, categoryTree: fixtureDomain.categoryTree })
+    validateReadableProductSeo(locale, index, sensor, 'sensor', ['Measurement range', '0-10 bar', '4-20 mA'], errors)
+    validateReadableProductSeo(locale, index, valve, 'valve', ['Pressure rating', 'PN16', 'Valve connection', 'G1/2'], errors)
+  }
+
+  return summary
+}
+
+function validateReadableProductSeo(locale, index, product, expectedFamily, requiredFragments, errors) {
+  const label = `${locale}:${product.identity.id}`
+  const seo = selectProductSeo(product, locale)
+  const detailResult = resolveProductDetailPage(index, {
+    locale,
+    pathname: seo.slug.canonicalPath,
+    includeNonPublic: true,
+  })
+
+  if (product.core.family !== expectedFamily) {
+    errors.push(`${label}: expected ${expectedFamily} SEO fixture product, received ${product.core.family}`)
+  }
+
+  if (!seo.title || !seo.metaDescription || !seo.h1 || !seo.jsonLd?.additionalProperty?.length) {
+    errors.push(`${label}: ${expectedFamily} SEO output is not readable`)
+  }
+
+  if (detailResult.status !== 'found') {
+    errors.push(`${label}: ${expectedFamily} product detail did not resolve for SEO output`)
+    return
+  }
+
+  const productJsonLd = buildProductSchemaJsonLd(detailResult.data)
+  const productNode = findJsonLdGraphNode(productJsonLd, 'Product')
+  const readableOutput = [
+    seo.title,
+    seo.metaDescription,
+    seo.h1,
+    JSON.stringify(seo.jsonLd.additionalProperty ?? []),
+    JSON.stringify(productNode?.additionalProperty ?? []),
+  ].join(' ')
+
+  for (const fragment of requiredFragments) {
+    if (!readableOutput.includes(fragment)) {
+      errors.push(`${label}: ${expectedFamily} SEO output missing readable fragment '${fragment}'`)
+    }
+  }
+}
+
 function validateSeoContractSnapshot(source, sitemap, sitemapBreakdown, errors) {
   assertExactArray('SEO locale contract', routing.locales, SEO_CONTRACT_SNAPSHOT.locales, errors)
   validateSitemapContractSnapshot(sitemap, sitemapBreakdown, errors)
   validateSeoJsonLdContractSnapshot(source, errors)
+}
+
+function validateSeoIntentMappingContract(errors) {
+  assertEqual('SEO intent mapping version', searchIntentMappingContract.version, SEO_CONTRACT_SNAPSHOT.intentMappingVersion, errors)
+
+  for (const error of validateIntentPhrasebook()) {
+    errors.push(`SEO intent phrasebook: ${error}`)
+  }
 }
 
 function validateSitemapContractSnapshot(sitemap, sitemapBreakdown, errors) {
@@ -152,7 +237,7 @@ function validateSitemapContractSnapshot(sitemap, sitemapBreakdown, errors) {
 function validateSeoJsonLdContractSnapshot(source, errors) {
   const locale = routing.defaultLocale
   const index = createProductCatalogIndex({ locale, products: source.products, categoryTree: source.categoryTree })
-  const product = source.products.find((item) => item.identity.lifecycle === 'active') ?? source.products[0]
+  const product = source.products.find((item) => item.identity.availability !== 'not-available') ?? source.products[0]
 
   if (!product) {
     errors.push('JSON-LD contract snapshot cannot run without a product')

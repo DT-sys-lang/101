@@ -10,6 +10,11 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
   "attributes": {
     "factId": {
       "type": "string",
@@ -36,7 +41,6 @@
     "file": {
       "type": "media",
       "multiple": false,
-      "required": true,
       "allowedTypes": ["images", "files"]
     },
     "hrefOverride": {
@@ -45,7 +49,7 @@
     "alt": {
       "type": "string"
     },
-    "locale": {
+    "contentLocale": {
       "type": "string"
     },
     "revision": {

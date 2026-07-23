@@ -1,0 +1,42 @@
+product_id,asset_id,asset_type,title,href,locale,alt,sort_order,revision
+prd_yf_p100,asset_yf_p100_primary,primary_image,YF-P100 Primary Image,/images/products/yf-p100-primary.jpg,,YF-P100 pressure transmitter front view,1,
+prd_yf_p100,asset_yf_p100_gallery_01,gallery_image,YF-P100 Side View,/images/products/yf-p100-side.jpg,,YF-P100 pressure transmitter side view,2,
+prd_yf_p100,asset_yf_p100_dimension,dimension_drawing,YF-P100 Dimension Drawing,/images/products/yf-p100-dimension.png,,YF-P100 dimension drawing,3,
+prd_yf_p100,doc_yf_p100_datasheet,datasheet,YF-P100 Datasheet,/docs/products/yf-p100-datasheet.pdf,en,,1,2026-07
+prd_yf_p100,doc_yf_p100_manual,manual,YF-P100 Manual,/docs/products/yf-p100-manual.pdf,en,,2,v1
+prd_yf_p100,doc_yf_p100_certificate,certificate,YF-P100 CE Certificate,/docs/products/yf-p100-ce.pdf,en,,3,2026
+prd_yf_p300,asset_yf_p300_primary,primary_image,YF-P300 Primary Image,/images/products/yf-p300-primary.jpg,,YF-P300 smart pressure transmitter front view,1,
+prd_yf_p300,asset_yf_p300_gallery_01,gallery_image,YF-P300 Process Port,/images/products/yf-p300-process-port.jpg,,YF-P300 process connection detail,2,
+prd_yf_p300,asset_yf_p300_diagram,diagram,YF-P300 Wiring Diagram,/images/products/yf-p300-wiring.png,,YF-P300 wiring diagram,3,
+prd_yf_p300,doc_yf_p300_datasheet,datasheet,YF-P300 Datasheet,/docs/products/yf-p300-datasheet.pdf,en,,1,2026-07
+prd_yf_p300,doc_yf_p300_manual,manual,YF-P300 Manual,/docs/products/yf-p300-manual.pdf,en,,2,v1
+prd_yf_dp200,asset_yf_dp200_primary,primary_image,YF-DP200 Primary Image,/images/products/yf-dp200-primary.jpg,,YF-DP200 differential pressure sensor,1,
+prd_yf_dp200,asset_yf_dp200_installation,installation_photo,YF-DP200 Filter Installation,/images/products/yf-dp200-installation.jpg,,YF-DP200 installed across a filter,2,
+prd_yf_dp200,doc_yf_dp200_datasheet,datasheet,YF-DP200 Datasheet,/docs/products/yf-dp200-datasheet.pdf,en,,1,2026-07
+prd_yf_dp200,doc_yf_dp200_manual,manual,YF-DP200 Manual,/docs/products/yf-dp200-manual.pdf,en,,2,v1
+prd_yf_l100,asset_yf_l100_primary,primary_image,YF-L100 Primary Image,/images/products/yf-l100-primary.jpg,,YF-L100 submersible level sensor,1,
+prd_yf_l100,asset_yf_l100_gallery_01,gallery_image,YF-L100 Cable Detail,/images/products/yf-l100-cable.jpg,,YF-L100 vented cable detail,2,
+prd_yf_l100,doc_yf_l100_datasheet,datasheet,YF-L100 Datasheet,/docs/products/yf-l100-datasheet.pdf,en,,1,2026-07
+prd_yf_l100,doc_yf_l100_manual,manual,YF-L100 Manual,/docs/products/yf-l100-manual.pdf,en,,2,v1
+prd_yf_t200,asset_yf_t200_primary,primary_image,YF-T200 Primary Image,/images/products/yf-t200-primary.jpg,,YF-T200 temperature transmitter,1,
+prd_yf_t200,asset_yf_t200_dimension,dimension_drawing,YF-T200 Dimension Drawing,/images/products/yf-t200-dimension.png,,YF-T200 probe dimension drawing,2,
+prd_yf_t200,doc_yf_t200_datasheet,datasheet,YF-T200 Datasheet,/docs/products/yf-t200-datasheet.pdf,en,,1,2026-07
+prd_yf_t200,doc_yf_t200_certificate,certificate,YF-T200 CE Certificate,/docs/products/yf-t200-ce.pdf,en,,2,2026
+prd_yf_f300,asset_yf_f300_primary,primary_image,YF-F300 Primary Image,/images/products/yf-f300-primary.jpg,,YF-F300 industrial flow sensor,1,
+prd_yf_f300,asset_yf_f300_installation,installation_photo,YF-F300 Pipe Installation,/images/products/yf-f300-installation.jpg,,YF-F300 mounted on a process line,2,
+prd_yf_f300,doc_yf_f300_datasheet,datasheet,YF-F300 Datasheet,/docs/products/yf-f300-datasheet.pdf,en,,1,2026-07
+prd_yf_f300,doc_yf_f300_manual,manual,YF-F300 Manual,/docs/products/yf-f300-manual.pdf,en,,2,v1
+prd_yf_ps50,asset_yf_ps50_primary,primary_image,YF-PS50 Primary Image,/images/products/yf-ps50-primary.jpg,,YF-PS50 pressure switch,1,
+prd_yf_ps50,asset_yf_ps50_gallery_01,gallery_image,YF-PS50 Connector Detail,/images/products/yf-ps50-connector.jpg,,YF-PS50 DIN connector detail,2,
+prd_yf_ps50,doc_yf_ps50_datasheet,datasheet,YF-PS50 Datasheet,/docs/products/yf-ps50-datasheet.pdf,en,,1,2026-07
+prd_yf_sv15,asset_yf_sv15_primary,primary_image,YF-SV15 Primary Image,/images/products/yf-sv15-primary.jpg,,YF-SV15 solenoid valve,1,
+prd_yf_sv15,asset_yf_sv15_diagram,diagram,YF-SV15 Flow Diagram,/images/products/yf-sv15-flow.png,,YF-SV15 flow direction diagram,2,
+prd_yf_sv15,doc_yf_sv15_datasheet,datasheet,YF-SV15 Datasheet,/docs/products/yf-sv15-datasheet.pdf,en,,1,2026-07
+prd_yf_sv15,doc_yf_sv15_manual,manual,YF-SV15 Manual,/docs/products/yf-sv15-manual.pdf,en,,2,v1
+prd_yf_bv25,asset_yf_bv25_primary,primary_image,YF-BV25 Primary Image,/images/products/yf-bv25-primary.jpg,,YF-BV25 manual ball valve,1,
+prd_yf_bv25,asset_yf_bv25_gallery_01,gallery_image,YF-BV25 Handle Detail,/images/products/yf-bv25-handle.jpg,,YF-BV25 handle detail,2,
+prd_yf_bv25,doc_yf_bv25_datasheet,datasheet,YF-BV25 Datasheet,/docs/products/yf-bv25-datasheet.pdf,en,,1,2026-07
+prd_yf_bfv80,asset_yf_bfv80_primary,primary_image,YF-BFV80 Primary Image,/images/products/yf-bfv80-primary.jpg,,YF-BFV80 butterfly valve,1,
+prd_yf_bfv80,asset_yf_bfv80_dimension,dimension_drawing,YF-BFV80 Dimension Drawing,/images/products/yf-bfv80-dimension.png,,YF-BFV80 dimension drawing,2,
+prd_yf_bfv80,doc_yf_bfv80_datasheet,datasheet,YF-BFV80 Datasheet,/docs/products/yf-bfv80-datasheet.pdf,en,,1,2026-07
+prd_yf_bfv80,doc_yf_bfv80_certificate,certificate,YF-BFV80 CE Certificate,/docs/products/yf-bfv80-ce.pdf,en,,2,2026

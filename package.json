@@ -11,14 +11,19 @@
     "typecheck": "tsc --noEmit",
     "validate:boundaries": "node ./scripts/validate-boundaries.mjs",
     "validate:cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-cms-facts.mjs",
+    "validate:strapi-response": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-strapi-response-adapter.mjs",
     "validate:domain": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-domain.mjs",
     "validate:seo": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-seo.mjs --count 300",
     "validate:geo": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-geo.mjs --count 300",
+    "validate:localization": "node ./scripts/validate-localization.mjs",
     "validate:scale-300": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-scale.mjs --count 300",
     "validate:scale-1000": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-scale.mjs --count 1000",
-    "validate:scale-cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/generate-scale-cms-facts.mjs --count 300 --validate"
+    "validate:scale-cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/generate-scale-cms-facts.mjs --count 300 --validate",
+    "import:cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/import-cms-facts-from-excel.mjs",
+    "check:production": "node ./scripts/production-smoke-check.mjs"
   },
   "dependencies": {
+    "@next/third-parties": "16.2.9",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -38,5 +43,10 @@
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "next": {
+      "sharp": "0.35.3"
+    }
   }
 }

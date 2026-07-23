@@ -22,6 +22,7 @@ import type { SpecificationKey } from './specification'
 import type { ProductSeoFields } from './seo'
 
 export type ProductLifecycleStatus = 'draft' | 'active' | 'phase-out' | 'discontinued' | 'hidden'
+export type ProductFamily = 'sensor' | 'valve'
 
 export type ProductAvailabilityStatus =
   | 'stock-model'
@@ -62,14 +63,25 @@ export type CertificationCode =
   | 'marine'
   | 'custom'
 
+export interface ProductCore {
+  readonly family: ProductFamily
+  readonly sku: string
+  readonly model: string
+  readonly brand: string
+  readonly primaryCategory: CategoryId
+  readonly name: LocalizedText
+  readonly shortName: LocalizedText
+  readonly summary: LocalizedText
+}
+
 export interface ProductIdentity {
   readonly id: ProductId
   readonly sku: string
   readonly model: string
-  readonly seriesId: SeriesId
+  readonly family: ProductFamily
+  readonly seriesId?: SeriesId
   readonly brand: string
   readonly manufacturer?: string
-  readonly lifecycle: ProductLifecycleStatus
   readonly availability: ProductAvailabilityStatus
   readonly releasedAt?: IsoDateString
   readonly revisedAt: IsoDateString
@@ -81,7 +93,7 @@ export interface ProductClassification {
   readonly additionalCategoryIds?: readonly CategoryId[]
   readonly industryIds: readonly IndustryId[]
   readonly applicationIds: readonly ApplicationId[]
-  readonly measurementKinds: NonEmptyReadonlyArray<MeasurementKind>
+  readonly measurementKinds: readonly MeasurementKind[]
 }
 
 export interface ProductMeasurement {
@@ -118,6 +130,22 @@ export interface ProductEnvironmentalLimits {
   readonly compatibleMedia?: readonly string[]
 }
 
+export interface SensorProfile {
+  readonly measurements: NonEmptyReadonlyArray<ProductMeasurement>
+  readonly outputs: NonEmptyReadonlyArray<ProductSignalOutput>
+  readonly connections?: ProductConnectionSet
+  readonly environmentalLimits?: ProductEnvironmentalLimits
+}
+
+export interface ValveProfile {
+  readonly pressureRating: string
+  readonly connection: string
+  readonly material: string
+  readonly mode: string
+  readonly compatibleMedia: NonEmptyReadonlyArray<string>
+  readonly size: string
+}
+
 export interface ProductSpecificationValue {
   readonly key: SpecificationKey | (string & {})
   readonly label: string
@@ -148,7 +176,6 @@ export interface ProductVariant {
   readonly outputs?: readonly ProductSignalOutput[]
   readonly connections?: ProductConnectionSet
   readonly availability: ProductAvailabilityStatus
-  readonly lifecycle: ProductLifecycleStatus
 }
 
 export interface ProductDocument {
@@ -156,7 +183,7 @@ export interface ProductDocument {
   readonly title: string
   readonly kind: 'datasheet' | 'manual' | 'certificate' | 'drawing' | 'catalog' | 'software'
   readonly href: string
-  readonly locale?: string
+  readonly contentLocale?: string
   readonly revision?: string
 }
 
@@ -179,30 +206,42 @@ export interface ProductContent {
   readonly name: LocalizedText
   readonly shortName: LocalizedText
   readonly summary: LocalizedText
-  readonly highlights: NonEmptyReadonlyArray<LocalizedText>
+  readonly highlights: readonly LocalizedText[]
   readonly applications: readonly LocalizedText[]
 }
 
 export interface ProductRecord {
+  readonly id: ProductId
+  readonly core: ProductCore
+  readonly sensorProfile?: SensorProfile
+  readonly valveProfile?: ValveProfile
+
+  /** Compatibility projection during migration to core/profile product records. */
   readonly identity: ProductIdentity
+  /** Compatibility projection during migration to core/profile product records. */
   readonly classification: ProductClassification
+  /** Compatibility projection during migration to core/profile product records. */
   readonly content: ProductContent
-  readonly measurements: NonEmptyReadonlyArray<ProductMeasurement>
-  readonly outputs: NonEmptyReadonlyArray<ProductSignalOutput>
-  readonly connections: ProductConnectionSet
+  /** Compatibility projection from `sensorProfile.measurements`; empty for non-sensor products. */
+  readonly measurements: readonly ProductMeasurement[]
+  /** Compatibility projection from `sensorProfile.outputs`; empty for non-sensor products. */
+  readonly outputs: readonly ProductSignalOutput[]
+  /** Compatibility projection from `sensorProfile.connections`; undefined for valve-only products. */
+  readonly connections?: ProductConnectionSet
   readonly environmentalLimits: ProductEnvironmentalLimits
+
   readonly specificationGroups: NonEmptyReadonlyArray<ProductSpecificationGroup>
   readonly variants: readonly ProductVariant[]
-  readonly certifications: readonly CertificationCode[]
-  readonly documents: readonly ProductDocument[]
-  readonly assets: readonly ProductAsset[]
-  readonly commercialTerms: ProductCommercialTerms
+  readonly certifications?: readonly CertificationCode[]
+  readonly documents?: readonly ProductDocument[]
+  readonly assets?: readonly ProductAsset[]
+  readonly commercialTerms?: ProductCommercialTerms
   readonly seo: ProductSeoFields
   readonly localizedSeo?: Partial<Record<LocaleCode, ProductSeoFields>>
   readonly geoAi: ProductGeoAiProfile
   readonly localizedGeoAi?: Partial<Record<LocaleCode, ProductGeoAiProfile>>
 }
 
-export type ProductListingProjection = Pick<ProductRecord, 'identity' | 'classification' | 'content' | 'measurements' | 'seo'>
+export type ProductListingProjection = Pick<ProductRecord, 'id' | 'core' | 'identity' | 'classification' | 'content' | 'sensorProfile' | 'valveProfile' | 'seo'>
 
 export type ProductDetailProjection = ProductRecord

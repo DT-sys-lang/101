@@ -16,6 +16,21 @@ export interface InquiryStoreConfig {
   readonly outboxPath: string
 }
 
+export interface StrapiInquiryConfig {
+  readonly endpoint: string
+  readonly token: string
+  readonly timeoutMs: number
+}
+
+export interface ResendEmailConfig {
+  readonly apiKey: string
+  readonly from: string
+  readonly to: readonly string[]
+  readonly replyTo?: string
+  readonly endpoint: string
+  readonly timeoutMs: number
+}
+
 export interface InquiryPersistenceInput {
   readonly recordId: InquiryId
   readonly storedAt: string
@@ -25,7 +40,7 @@ export interface InquiryPersistenceInput {
 }
 
 export interface InquiryPersistenceReceipt {
-  readonly adapter: 'jsonl-inbox'
+  readonly adapter: 'jsonl-inbox' | 'strapi-inquiry'
   readonly state: 'stored'
   readonly recordId: InquiryId
   readonly storedAt: string

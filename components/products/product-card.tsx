@@ -1,65 +1,37 @@
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ImageIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { ProductListItem } from '@/lib/domain'
 
-function getProductTags(product: ProductListItem) {
-  return [...product.categoryPathLabels.slice(1), ...product.measurementKinds].slice(0, 3)
-}
-
-export function ProductCard({
-  product,
-  href,
-  ctaLabel,
-  className,
-}: {
-  product: ProductListItem
-  href: string
-  ctaLabel: string
-  className?: string
-}) {
-  const tags = getProductTags(product)
-
+export function ProductCard({ product, href, ctaLabel, className }: { product: ProductListItem; href: string; ctaLabel: string; className?: string }) {
+  const primaryImage = product.media.primaryImage
   return (
-    <Card className={cn('group flex min-h-[360px] flex-col transition-shadow duration-200 hover:shadow-industrial', className)}>
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between gap-3">
-          <Badge variant="secondary">{product.categoryLabel}</Badge>
-          <span className="rounded-md bg-ink-50 px-2 py-1 font-mono text-xs text-ink-500">{product.model}</span>
+    <article className={cn('group flex h-full flex-col border border-border bg-panel transition-colors hover:border-steel-700', className)}>
+      <Link href={href} aria-label={product.title} className="relative block aspect-square border-b border-border bg-ink-50 p-8" style={primaryImage ? { backgroundImage: `url("${primaryImage.href}")`, backgroundPosition: 'center', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' } : undefined}>
+        {!primaryImage ? <span className="absolute inset-0 grid place-items-center text-ink-400"><ImageIcon className="size-10" aria-hidden="true" /></span> : null}
+        <span className="absolute right-4 top-4 inline-flex items-center gap-1 font-mono text-[10px] uppercase text-ink-600"><i className="h-2 w-2 bg-emerald-500" />{product.availabilityLabel}</span>
+      </Link>
+      <div className="flex flex-1 flex-col p-6">
+        <div className="text-xs font-semibold uppercase text-ink-600">{product.categoryLabel}</div>
+        <h3 className="mt-2 text-xl font-medium leading-7 text-ink-950 transition-colors group-hover:text-steel-700">{product.title}</h3>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-xs font-semibold text-ink-950">{product.model}</span>
+          <Badge variant="outline">{product.familyLabel}</Badge>
         </div>
-        <CardTitle className="pt-3 text-xl">
-          <Link href={href} className="hover:text-steel-900">
-            {product.title}
-          </Link>
-        </CardTitle>
-        <p className="text-sm leading-6 text-ink-600">{product.summary}</p>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-4">
-        <div className="rounded-md border border-border bg-ink-50 p-3">
-          {product.keySpecs.map((spec) => (
-            <div key={`${product.id}-${spec.label}`} className="flex items-center justify-between gap-4 border-b border-border py-2 text-xs last:border-b-0">
-              <span className="text-ink-500">{spec.label}</span>
-              <span className="font-mono font-semibold text-ink-900">{spec.value}</span>
+        <div className="mt-auto space-y-2 pt-6">
+          {product.keySpecs.slice(0, 3).map((spec) => (
+            <div key={`${product.id}-${spec.label}`} className="flex justify-between gap-4 border-b border-border pb-1 text-sm">
+              <span className="text-ink-600">{spec.label}</span>
+              <span className="text-right text-ink-950">{spec.value}</span>
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {tags.map((tag) => (
-            <Badge key={`${product.id}-${tag}`} variant="outline" className="text-[11px]">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
-          <span className="text-xs font-medium text-process-700">{product.availabilityLabel}</span>
-          <Link href={href} className="inline-flex items-center gap-2 text-sm font-semibold text-steel-900">
-            {ctaLabel}
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        <Link href={href} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold uppercase text-steel-700">
+          {ctaLabel}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+        </Link>
+      </div>
+    </article>
   )
 }

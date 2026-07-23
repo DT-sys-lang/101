@@ -1,0 +1,103 @@
+product_id,group_key,group_label,spec_key,spec_label,value,value_type,unit,display,is_filterable,is_highlight,source_ref_ids,source_ref_labels,source_ref_pages,source_ref_confidences
+prd_yf_p100,measurement,Measurement,measurement_range,Measurement range,0...10 bar,,bar,0...10 bar,true,true,doc_yf_p100_datasheet,YF-P100 Datasheet,2,source-backed
+prd_yf_p100,measurement,Measurement,accuracy,Accuracy,0.5% FS,,,0.5% FS,true,true,doc_yf_p100_datasheet,YF-P100 Datasheet,2,source-backed
+prd_yf_p100,measurement,Measurement,overload_limit,Overload limit,20,number,bar,20 bar,false,true,doc_yf_p100_datasheet,YF-P100 Datasheet,2,source-backed
+prd_yf_p100,electrical,Electrical,output_signal,Output signal,4-20 mA,,,4-20 mA,true,true,doc_yf_p100_datasheet,YF-P100 Datasheet,3,source-backed
+prd_yf_p100,electrical,Electrical,supply_voltage,Supply voltage,12...30 V,,v,12...30 V,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,3,source-backed
+prd_yf_p100,mechanical,Mechanical,process_connection,Process connection,G1/4 male,,,G1/4 male,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,3,source-backed
+prd_yf_p100,mechanical,Mechanical,electrical_connection,Electrical connection,M12 4-pin,,,M12 4-pin,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,3,source-backed
+prd_yf_p100,environmental,Environmental,ingress_protection,Ingress protection,IP67,,,IP67,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,4,source-backed
+prd_yf_p100,environmental,Environmental,compatible_media,Compatible media,Water;Compressed air,,,Water;Compressed air,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,4,source-backed
+prd_yf_p100,environmental,Environmental,wetted_materials,Wetted materials,316L stainless steel;FKM,,,316L stainless steel;FKM,true,false,doc_yf_p100_datasheet,YF-P100 Datasheet,4,source-backed
+prd_yf_p100,environmental,Environmental,media_temperature,Media temperature,-20...85 C,,c,-20...85 C,false,false,doc_yf_p100_datasheet,YF-P100 Datasheet,4,source-backed
+prd_yf_p100,environmental,Environmental,ambient_temperature,Ambient temperature,-20...70 C,,c,-20...70 C,false,false,doc_yf_p100_datasheet,YF-P100 Datasheet,4,source-backed
+prd_yf_p300,measurement,Measurement,measurement_range,Measurement range,0...25 bar,,bar,0...25 bar,true,true,doc_yf_p300_datasheet,YF-P300 Datasheet,2,source-backed
+prd_yf_p300,measurement,Measurement,accuracy,Accuracy,0.25% FS,,,0.25% FS,true,true,doc_yf_p300_datasheet,YF-P300 Datasheet,2,source-backed
+prd_yf_p300,measurement,Measurement,overload_limit,Overload limit,50,number,bar,50 bar,false,true,doc_yf_p300_datasheet,YF-P300 Datasheet,2,source-backed
+prd_yf_p300,electrical,Electrical,output_signal,Output signal,4-20 mA HART,,,4-20 mA HART,true,true,doc_yf_p300_datasheet,YF-P300 Datasheet,3,source-backed
+prd_yf_p300,electrical,Electrical,supply_voltage,Supply voltage,12...36 V,,v,12...36 V,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,3,source-backed
+prd_yf_p300,mechanical,Mechanical,process_connection,Process connection,G1/2 male,,,G1/2 male,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,3,source-backed
+prd_yf_p300,mechanical,Mechanical,electrical_connection,Electrical connection,M12 5-pin,,,M12 5-pin,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,3,source-backed
+prd_yf_p300,environmental,Environmental,ingress_protection,Ingress protection,IP67,,,IP67,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,4,source-backed
+prd_yf_p300,environmental,Environmental,compatible_media,Compatible media,Water;Hydraulic oil;Compressed air,,,Water;Hydraulic oil;Compressed air,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,4,source-backed
+prd_yf_p300,environmental,Environmental,wetted_materials,Wetted materials,316L stainless steel;FKM,,,316L stainless steel;FKM,true,false,doc_yf_p300_datasheet,YF-P300 Datasheet,4,source-backed
+prd_yf_p300,environmental,Environmental,media_temperature,Media temperature,-20...100 C,,c,-20...100 C,false,false,doc_yf_p300_datasheet,YF-P300 Datasheet,4,source-backed
+prd_yf_p300,environmental,Environmental,ambient_temperature,Ambient temperature,-20...70 C,,c,-20...70 C,false,false,doc_yf_p300_datasheet,YF-P300 Datasheet,4,source-backed
+prd_yf_dp200,measurement,Measurement,measurement_range,Measurement range,0...100 kPa,,kpa,0...100 kPa,true,true,doc_yf_dp200_datasheet,YF-DP200 Datasheet,2,source-backed
+prd_yf_dp200,measurement,Measurement,accuracy,Accuracy,1.0% FS,,,1.0% FS,true,true,doc_yf_dp200_datasheet,YF-DP200 Datasheet,2,source-backed
+prd_yf_dp200,measurement,Measurement,overload_limit,Overload limit,200,number,kpa,200 kPa,false,true,doc_yf_dp200_datasheet,YF-DP200 Datasheet,2,source-backed
+prd_yf_dp200,electrical,Electrical,output_signal,Output signal,4-20 mA,,,4-20 mA,true,true,doc_yf_dp200_datasheet,YF-DP200 Datasheet,3,source-backed
+prd_yf_dp200,electrical,Electrical,supply_voltage,Supply voltage,12...30 V,,v,12...30 V,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,3,source-backed
+prd_yf_dp200,mechanical,Mechanical,process_connection,Process connection,G1/4 female,,,G1/4 female,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,3,source-backed
+prd_yf_dp200,mechanical,Mechanical,electrical_connection,Electrical connection,DIN43650 connector,,,DIN43650 connector,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,3,source-backed
+prd_yf_dp200,environmental,Environmental,ingress_protection,Ingress protection,IP65,,,IP65,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,4,source-backed
+prd_yf_dp200,environmental,Environmental,compatible_media,Compatible media,Air;Water,,,Air;Water,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,4,source-backed
+prd_yf_dp200,environmental,Environmental,wetted_materials,Wetted materials,Brass;NBR,,,Brass;NBR,true,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,4,source-backed
+prd_yf_dp200,environmental,Environmental,media_temperature,Media temperature,-10...80 C,,c,-10...80 C,false,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,4,source-backed
+prd_yf_dp200,environmental,Environmental,ambient_temperature,Ambient temperature,-10...60 C,,c,-10...60 C,false,false,doc_yf_dp200_datasheet,YF-DP200 Datasheet,4,source-backed
+prd_yf_l100,measurement,Measurement,measurement_range,Measurement range,0...5 mH2O,,mh2o,0...5 mH2O,true,true,doc_yf_l100_datasheet,YF-L100 Datasheet,2,source-backed
+prd_yf_l100,measurement,Measurement,accuracy,Accuracy,0.5% FS,,,0.5% FS,true,true,doc_yf_l100_datasheet,YF-L100 Datasheet,2,source-backed
+prd_yf_l100,measurement,Measurement,overload_limit,Overload limit,10,number,mh2o,10 mH2O,false,true,doc_yf_l100_datasheet,YF-L100 Datasheet,2,source-backed
+prd_yf_l100,electrical,Electrical,output_signal,Output signal,4-20 mA,,,4-20 mA,true,true,doc_yf_l100_datasheet,YF-L100 Datasheet,3,source-backed
+prd_yf_l100,electrical,Electrical,supply_voltage,Supply voltage,12...30 V,,v,12...30 V,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,3,source-backed
+prd_yf_l100,mechanical,Mechanical,process_connection,Process connection,Submersible cable,,,Submersible cable,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,3,source-backed
+prd_yf_l100,mechanical,Mechanical,electrical_connection,Electrical connection,Vented cable,,,Vented cable,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,3,source-backed
+prd_yf_l100,environmental,Environmental,ingress_protection,Ingress protection,IP68,,,IP68,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,4,source-backed
+prd_yf_l100,environmental,Environmental,compatible_media,Compatible media,Clean water;Wastewater,,,Clean water;Wastewater,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,4,source-backed
+prd_yf_l100,environmental,Environmental,wetted_materials,Wetted materials,316L stainless steel;PUR cable,,,316L stainless steel;PUR cable,true,false,doc_yf_l100_datasheet,YF-L100 Datasheet,4,source-backed
+prd_yf_l100,environmental,Environmental,media_temperature,Media temperature,-10...60 C,,c,-10...60 C,false,false,doc_yf_l100_datasheet,YF-L100 Datasheet,4,source-backed
+prd_yf_l100,environmental,Environmental,ambient_temperature,Ambient temperature,-20...70 C,,c,-20...70 C,false,false,doc_yf_l100_datasheet,YF-L100 Datasheet,4,source-backed
+prd_yf_t200,measurement,Measurement,measurement_range,Measurement range,-50...200 C,,c,-50...200 C,true,true,doc_yf_t200_datasheet,YF-T200 Datasheet,2,source-backed
+prd_yf_t200,measurement,Measurement,accuracy,Accuracy,0.3% FS,,,0.3% FS,true,true,doc_yf_t200_datasheet,YF-T200 Datasheet,2,source-backed
+prd_yf_t200,measurement,Measurement,overload_limit,Overload limit,250,number,c,250 C,false,true,doc_yf_t200_datasheet,YF-T200 Datasheet,2,source-backed
+prd_yf_t200,electrical,Electrical,output_signal,Output signal,Pt100;4-20 mA,,,Pt100;4-20 mA,true,true,doc_yf_t200_datasheet,YF-T200 Datasheet,3,source-backed
+prd_yf_t200,electrical,Electrical,supply_voltage,Supply voltage,12...30 V,,v,12...30 V,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,3,source-backed
+prd_yf_t200,mechanical,Mechanical,process_connection,Process connection,M20x1.5 probe,,,M20x1.5 probe,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,3,source-backed
+prd_yf_t200,mechanical,Mechanical,electrical_connection,Electrical connection,Terminal head,,,Terminal head,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,3,source-backed
+prd_yf_t200,environmental,Environmental,ingress_protection,Ingress protection,IP65,,,IP65,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,4,source-backed
+prd_yf_t200,environmental,Environmental,compatible_media,Compatible media,Water;Oil;Steam,,,Water;Oil;Steam,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,4,source-backed
+prd_yf_t200,environmental,Environmental,wetted_materials,Wetted materials,316L stainless steel,,,316L stainless steel,true,false,doc_yf_t200_datasheet,YF-T200 Datasheet,4,source-backed
+prd_yf_t200,environmental,Environmental,media_temperature,Media temperature,-50...200 C,,c,-50...200 C,false,false,doc_yf_t200_datasheet,YF-T200 Datasheet,4,source-backed
+prd_yf_t200,environmental,Environmental,ambient_temperature,Ambient temperature,-20...70 C,,c,-20...70 C,false,false,doc_yf_t200_datasheet,YF-T200 Datasheet,4,source-backed
+prd_yf_f300,measurement,Measurement,measurement_range,Measurement range,0...60,,custom,0...60 m3/h,true,true,doc_yf_f300_datasheet,YF-F300 Datasheet,2,source-backed
+prd_yf_f300,measurement,Measurement,accuracy,Accuracy,1.0% FS,,,1.0% FS,true,true,doc_yf_f300_datasheet,YF-F300 Datasheet,2,source-backed
+prd_yf_f300,measurement,Measurement,overload_limit,Overload limit,90,number,custom,90 m3/h,false,true,doc_yf_f300_datasheet,YF-F300 Datasheet,2,source-backed
+prd_yf_f300,electrical,Electrical,output_signal,Output signal,Pulse;4-20 mA,,,Pulse;4-20 mA,true,true,doc_yf_f300_datasheet,YF-F300 Datasheet,3,source-backed
+prd_yf_f300,electrical,Electrical,supply_voltage,Supply voltage,12...30 V,,v,12...30 V,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,3,source-backed
+prd_yf_f300,mechanical,Mechanical,process_connection,Process connection,DN25 flange,,,DN25 flange,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,3,source-backed
+prd_yf_f300,mechanical,Mechanical,electrical_connection,Electrical connection,M12 5-pin,,,M12 5-pin,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,3,source-backed
+prd_yf_f300,environmental,Environmental,ingress_protection,Ingress protection,IP65,,,IP65,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,4,source-backed
+prd_yf_f300,environmental,Environmental,compatible_media,Compatible media,Water;Light oil,,,Water;Light oil,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,4,source-backed
+prd_yf_f300,environmental,Environmental,wetted_materials,Wetted materials,316L stainless steel;PTFE,,,316L stainless steel;PTFE,true,false,doc_yf_f300_datasheet,YF-F300 Datasheet,4,source-backed
+prd_yf_f300,environmental,Environmental,media_temperature,Media temperature,-10...90 C,,c,-10...90 C,false,false,doc_yf_f300_datasheet,YF-F300 Datasheet,4,source-backed
+prd_yf_f300,environmental,Environmental,ambient_temperature,Ambient temperature,-10...60 C,,c,-10...60 C,false,false,doc_yf_f300_datasheet,YF-F300 Datasheet,4,source-backed
+prd_yf_ps50,measurement,Measurement,measurement_range,Measurement range,0...6 bar,,bar,0...6 bar,true,true,doc_yf_ps50_datasheet,YF-PS50 Datasheet,2,source-backed
+prd_yf_ps50,measurement,Measurement,accuracy,Accuracy,1.5% FS,,,1.5% FS,true,true,doc_yf_ps50_datasheet,YF-PS50 Datasheet,2,source-backed
+prd_yf_ps50,measurement,Measurement,overload_limit,Overload limit,12,number,bar,12 bar,false,true,doc_yf_ps50_datasheet,YF-PS50 Datasheet,2,source-backed
+prd_yf_ps50,electrical,Electrical,output_signal,Output signal,SPDT relay,,,SPDT relay,true,true,doc_yf_ps50_datasheet,YF-PS50 Datasheet,3,source-backed
+prd_yf_ps50,electrical,Electrical,supply_voltage,Supply voltage,24...250 V,,v,24...250 V,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,3,source-backed
+prd_yf_ps50,mechanical,Mechanical,process_connection,Process connection,G1/4 male,,,G1/4 male,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,3,source-backed
+prd_yf_ps50,mechanical,Mechanical,electrical_connection,Electrical connection,DIN43650 connector,,,DIN43650 connector,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,3,source-backed
+prd_yf_ps50,environmental,Environmental,ingress_protection,Ingress protection,IP65,,,IP65,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,4,source-backed
+prd_yf_ps50,environmental,Environmental,compatible_media,Compatible media,Water;Compressed air,,,Water;Compressed air,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,4,source-backed
+prd_yf_ps50,environmental,Environmental,wetted_materials,Wetted materials,Brass;NBR,,,Brass;NBR,true,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,4,source-backed
+prd_yf_ps50,environmental,Environmental,media_temperature,Media temperature,-10...80 C,,c,-10...80 C,false,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,4,source-backed
+prd_yf_ps50,environmental,Environmental,ambient_temperature,Ambient temperature,-10...60 C,,c,-10...60 C,false,false,doc_yf_ps50_datasheet,YF-PS50 Datasheet,4,source-backed
+prd_yf_sv15,valve,Valve,pressure_rating,Pressure rating,PN16,,,PN16,true,true,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_sv15,valve,Valve,size,Size,DN15,,,DN15,true,true,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_sv15,valve,Valve,connection,Connection,G1/2 threaded,,,G1/2 threaded,true,true,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_sv15,valve,Valve,material,Material,316L stainless steel,,,316L stainless steel,true,false,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_sv15,valve,Valve,mode,Mode,normally closed,,,normally closed,true,false,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_sv15,valve,Valve,compatible_media,Compatible media,Water;Compressed air,,,Water;Compressed air,true,false,doc_yf_sv15_datasheet,YF-SV15 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,pressure_rating,Pressure rating,PN25,,,PN25,true,true,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,size,Size,DN25,,,DN25,true,true,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,connection,Connection,DN25 flange,,,DN25 flange,true,true,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,material,Material,316L stainless steel,,,316L stainless steel,true,false,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,mode,Mode,manual,,,manual,true,false,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bv25,valve,Valve,compatible_media,Compatible media,Water;Oil;Compressed air,,,Water;Oil;Compressed air,true,false,doc_yf_bv25_datasheet,YF-BV25 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,pressure_rating,Pressure rating,PN16,,,PN16,true,true,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,size,Size,DN80,,,DN80,true,true,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,connection,Connection,DN80 wafer,,,DN80 wafer,true,true,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,material,Material,Ductile iron;EPDM,,,Ductile iron;EPDM,true,false,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,mode,Mode,modulating,,,modulating,true,false,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed
+prd_yf_bfv80,valve,Valve,compatible_media,Compatible media,Water;Neutral liquids,,,Water;Neutral liquids,true,false,doc_yf_bfv80_datasheet,YF-BFV80 Datasheet,2,source-backed

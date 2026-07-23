@@ -6,17 +6,22 @@ import { getApplicationEntryPageViewModel } from '@/lib/domain'
 import { buildApplicationHubPageResolution } from '@/lib/domain/entry-pages'
 import { buildApplicationPageMetadata } from '@/lib/seo/application'
 import { EntryPageStructuredData } from '@/lib/seo/structured-data'
+import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 
 export const revalidate = 3600
 
-export function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
-  return params.then(({ locale }) => {
-    if (!isLocale(locale)) {
-      return {}
-    }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
 
-    return buildApplicationPageMetadata(buildApplicationHubPageResolution(locale as Locale).seo)
-  })
+  if (!isLocale(locale)) {
+    return {}
+  }
+
+  await preloadRuntimeDomainProducts()
+
+  return buildApplicationPageMetadata(
+    buildApplicationHubPageResolution(locale as Locale, runtimeProductViewModelSource).seo,
+  )
 }
 
 export default async function ApplicationsPage({
@@ -32,9 +37,11 @@ export default async function ApplicationsPage({
 
   setRequestLocale(locale)
 
+  await preloadRuntimeDomainProducts()
+
   const typedLocale = locale as Locale
-  const data = getApplicationEntryPageViewModel(typedLocale)
-  const resolution = buildApplicationHubPageResolution(typedLocale)
+  const data = getApplicationEntryPageViewModel(typedLocale, runtimeProductViewModelSource)
+  const resolution = buildApplicationHubPageResolution(typedLocale, runtimeProductViewModelSource)
 
   return (
     <>
