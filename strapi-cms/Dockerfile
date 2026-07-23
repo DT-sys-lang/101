@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.7
-
 FROM node:24-bookworm-slim AS base
 
 ENV NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=600000
