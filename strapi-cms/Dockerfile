@@ -23,7 +23,8 @@ ENV PUBLIC_URL=${PUBLIC_URL}
 ENV STRAPI_ADMIN_BACKEND_URL=${STRAPI_ADMIN_BACKEND_URL}
 
 COPY . .
-RUN npm run build
+RUN npm run build \
+  && mkdir -p database
 
 FROM base AS runner
 
