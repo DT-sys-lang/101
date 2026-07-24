@@ -91,6 +91,20 @@ docker compose --env-file deploy/production.env -f docker-compose.production.yml
 docker compose --env-file deploy/production.env -f docker-compose.production.yml logs -f strapi
 ```
 
+If the server is too small to build Strapi reliably, use the prebuilt-image
+runtime file instead:
+
+```bash
+docker compose --env-file deploy/production.env -f docker-compose.runtime.yml pull
+docker compose --env-file deploy/production.env -f docker-compose.runtime.yml up -d
+docker compose --env-file deploy/production.env -f docker-compose.runtime.yml ps
+```
+
+If the Strapi image is stored in a private registry, log in to that registry on
+the server before `pull`. If GHCR is unreachable from the server region, set
+`STRAPI_IMAGE` to an Alibaba Cloud Container Registry image URL and keep the
+same runtime compose commands.
+
 Required result:
 
 - `postgres` is healthy.

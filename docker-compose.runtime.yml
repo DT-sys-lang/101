@@ -1,0 +1,77 @@
+services:
+  strapi:
+    container_name: yufavor-strapi
+    image: ${STRAPI_IMAGE:-ghcr.io/dt-sys-lang/101-strapi-cms:main}
+    pull_policy: ${STRAPI_PULL_POLICY:-missing}
+    restart: unless-stopped
+    env_file:
+      - ${STRAPI_ENV_FILE:-./deploy/production.env}
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_SSL: "false"
+    ports:
+      - "127.0.0.1:${STRAPI_HOST_PORT:-1337}:1337"
+    volumes:
+      - strapi-public-uploads:/opt/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:1337/admin').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+    networks:
+      - yufavor-cms
+
+  postgres:
+    container_name: yufavor-postgres
+    image: ${POSTGRES_IMAGE:-public.ecr.aws/docker/library/postgres:16-alpine}
+    pull_policy: ${POSTGRES_PULL_POLICY:-missing}
+    restart: unless-stopped
+    env_file:
+      - ${STRAPI_ENV_FILE:-./deploy/production.env}
+    volumes:
+      - strapi-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - yufavor-cms
+
+  postgres-backup:
+    container_name: yufavor-postgres-backup
+    image: ${POSTGRES_IMAGE:-public.ecr.aws/docker/library/postgres:16-alpine}
+    pull_policy: ${POSTGRES_PULL_POLICY:-missing}
+    restart: unless-stopped
+    env_file:
+      - ${STRAPI_ENV_FILE:-./deploy/production.env}
+    environment:
+      POSTGRES_HOST: postgres
+      BACKUP_DIR: /backups
+    volumes:
+      - ./deploy/postgres-backup.sh:/usr/local/bin/postgres-backup.sh:ro
+      - strapi-postgres-backups:/backups
+    entrypoint: ["/bin/sh", "/usr/local/bin/postgres-backup.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - yufavor-cms
+
+volumes:
+  strapi-postgres-data:
+  strapi-postgres-backups:
+  strapi-public-uploads:
+
+networks:
+  yufavor-cms:
+    driver: bridge
