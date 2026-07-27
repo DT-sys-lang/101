@@ -18,22 +18,11 @@ form.addEventListener('submit', async (event) => {
   result.textContent = 'Reading batch...'
 
   try {
-    const cmsFactsJson = await readInputJson()
+    const request = await buildImportRequest()
 
-    JSON.parse(cmsFactsJson)
-    result.textContent = 'Sending batch...'
+    result.textContent = request.kind === 'xlsx' ? 'Uploading workbook...' : 'Sending batch...'
 
-    const response = await fetch('/internal/cms/import', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${tokenInput.value.trim()}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        dryRun: dryRunInput.checked,
-        cmsFactsJson,
-      }),
-    })
+    const response = await fetch('/internal/cms/import', request.init)
     const responseText = await response.text()
     const body = parseResponseBody(responseText, response.status)
 
@@ -48,20 +37,66 @@ form.addEventListener('submit', async (event) => {
   }
 })
 
-async function readInputJson() {
+async function buildImportRequest() {
   const file = fileInput.files && fileInput.files[0]
 
   if (file) {
-    return file.text()
+    const filename = file.name.toLowerCase()
+
+    if (filename.endsWith('.xls')) {
+      throw new Error('Save the workbook as .xlsx first. Legacy .xls files are not supported.')
+    }
+
+    if (filename.endsWith('.xlsx')) {
+      const body = new FormData()
+      body.append('dryRun', String(dryRunInput.checked))
+      body.append('file', file)
+
+      return {
+        kind: 'xlsx',
+        init: {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${tokenInput.value.trim()}`,
+          },
+          body,
+        },
+      }
+    }
+
+    if (!filename.endsWith('.json')) {
+      throw new Error('Choose a .xlsx workbook or .json file.')
+    }
+
+    return buildJsonRequest(await file.text())
   }
 
   const pasted = jsonInput.value.trim()
 
   if (!pasted) {
-    throw new Error('Choose a JSON file or paste JSON first.')
+    throw new Error('Choose a .xlsx workbook, choose a JSON file, or paste JSON first.')
   }
 
-  return pasted
+  return buildJsonRequest(pasted)
+}
+
+function buildJsonRequest(cmsFactsJson) {
+  JSON.parse(cmsFactsJson)
+
+  return {
+    kind: 'json',
+    init: {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${tokenInput.value.trim()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        dryRun: dryRunInput.checked,
+        cmsFactsJson,
+      }),
+    },
+  }
 }
 
 function parseResponseBody(text, status) {

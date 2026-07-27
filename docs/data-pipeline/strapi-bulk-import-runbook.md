@@ -9,8 +9,7 @@ The supported operations workflow is:
 
 ```text
 Excel workbook
--> export tabs as CSV files
--> convert CSV directory to CmsFactInput JSON
+-> upload .xlsx to CMS import page
 -> dry-run from the CMS import page
 -> import from the CMS import page
 -> run frontend diagnostics
@@ -29,7 +28,10 @@ The example directory is:
 docs/data-pipeline/examples/simple-csv
 ```
 
-## Local Conversion
+## Local Conversion Fallback
+
+Use local conversion only when you want to inspect or archive the generated JSON
+before upload.
 
 Run from the repository root:
 
@@ -55,8 +57,16 @@ the `strapi` container:
 INTERNAL_CMS_IMPORT_TOKEN=<random-hex-token>
 ```
 
-Open the import page, paste the token, choose `outputs/cms-facts-batch.json`,
-and keep `Dry-run only` checked. Required dry-run result:
+Open the import page, paste the token, choose a simplified `.xlsx` workbook,
+and keep `Dry-run only` checked. The workbook must contain these sheets:
+
+- `categories`
+- `products`
+- `product_specs`
+- `product_assets` optional
+
+Legacy `.xls` files are not supported; save the workbook as `.xlsx` first.
+Required dry-run result:
 
 ```json
 {
@@ -66,6 +76,9 @@ and keep `Dry-run only` checked. Required dry-run result:
 ```
 
 Only after dry-run succeeds, uncheck `Dry-run only` and run the import.
+
+JSON upload remains available as a fallback if you already generated
+`outputs/cms-facts-batch.json`.
 
 ## Server Upload Fallback
 

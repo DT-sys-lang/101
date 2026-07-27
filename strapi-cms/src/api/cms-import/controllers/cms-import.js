@@ -9,10 +9,11 @@ module.exports = {
 
   async import(ctx) {
     try {
-      const payload = requireObject(ctx.request.body, 'request body')
-      const cmsFacts = readCmsFactsPayload(payload)
-      const dryRun = payload.dryRun !== false
-      const result = await strapi.service('api::cms-import.cms-import').import(cmsFacts, { dryRun })
+      const uploadedFile = readUploadedFile(ctx.request.files)
+      const dryRun = readDryRun(ctx.request.body)
+      const result = uploadedFile
+        ? await strapi.service('api::cms-import.cms-import').importWorkbook(uploadedFile, { dryRun })
+        : await importJsonPayload(ctx.request.body, { dryRun })
 
       ctx.set('cache-control', 'no-store')
       ctx.body = result
@@ -24,6 +25,54 @@ module.exports = {
       throw error
     }
   },
+}
+
+async function importJsonPayload(body, options) {
+  const payload = requireObject(body, 'request body')
+  const cmsFacts = readCmsFactsPayload(payload)
+  return strapi.service('api::cms-import.cms-import').import(cmsFacts, options)
+}
+
+function readDryRun(body) {
+  if (!body || typeof body !== 'object') {
+    return true
+  }
+
+  if (body.dryRun === false || body.dryRun === 'false') {
+    return false
+  }
+
+  return true
+}
+
+function readUploadedFile(files) {
+  if (!files || typeof files !== 'object') {
+    return undefined
+  }
+
+  const candidates = [
+    files.file,
+    files.workbook,
+    ...Object.values(files),
+  ].flat().filter(Boolean)
+
+  const file = candidates.find((candidate) => candidate && typeof candidate === 'object')
+
+  if (!file) {
+    return undefined
+  }
+
+  const filename = file.originalFilename || file.name || ''
+
+  if (filename.toLowerCase().endsWith('.xls')) {
+    throw httpError(400, 'Legacy .xls files are not supported. Save the workbook as .xlsx and upload again.')
+  }
+
+  if (filename && !filename.toLowerCase().endsWith('.xlsx')) {
+    throw httpError(400, 'Only .xlsx workbook uploads are supported for Excel import.')
+  }
+
+  return file
 }
 
 function readCmsFactsPayload(payload) {
@@ -154,14 +203,14 @@ function renderImportPage() {
 <body>
   <main>
     <h1>Yufavor CMS Batch Import</h1>
-    <p>Upload or paste a CmsFactInput JSON batch. Run dry-run first. Import requires INTERNAL_CMS_IMPORT_TOKEN.</p>
+    <p>Upload a simplified .xlsx workbook, or paste CmsFactInput JSON as fallback. Run dry-run first. Import requires INTERNAL_CMS_IMPORT_TOKEN.</p>
     <form id="cms-import-form">
       <label for="token">Import token</label>
       <input id="token" name="token" type="password" autocomplete="off" required>
 
-      <label for="file">JSON file</label>
-      <input id="file" name="file" type="file" accept="application/json,.json">
-      <div class="hint">Use the generated outputs/cms-facts-batch.json file.</div>
+      <label for="file">Excel workbook or JSON file</label>
+      <input id="file" name="file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,.json">
+      <div class="hint">Preferred: .xlsx workbook with sheets categories, products, product_specs, and optional product_assets.</div>
 
       <label for="json">Or paste JSON</label>
       <textarea id="json" name="json" spellcheck="false"></textarea>

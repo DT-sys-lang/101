@@ -21,6 +21,7 @@
     "@strapi/provider-upload-aws-s3": "5.50.2",
     "@strapi/strapi": "5.50.2",
     "better-sqlite3": "^12.11.1",
+    "jszip": "^3.10.1",
     "pg": "8.13.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
