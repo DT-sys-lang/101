@@ -7,12 +7,21 @@ const cmsRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const workspaceRoot = dirname(cmsRoot);
 const require = createRequire(join(cmsRoot, 'package.json'));
 const { createStrapi } = require('@strapi/core');
-const inputPath = process.argv[2]
-  ? resolve(process.cwd(), process.argv[2])
+const args = readArgs(process.argv.slice(2));
+
+if (args.help) {
+  printHelp();
+  process.exit(0);
+}
+
+const inputPath = args.file
+  ? resolve(process.cwd(), args.file)
   : join(workspaceRoot, 'outputs', 'cms-facts.json');
+const dryRun = Boolean(args.dryRun);
 
 const cmsFacts = JSON.parse(readFileSync(inputPath, 'utf8'));
 const now = new Date().toISOString();
+const operationStats = {};
 
 const lookupLabels = {
   ind_water: { en: 'Water treatment', zh: 'Water treatment' },
@@ -31,6 +40,28 @@ const certificationLabels = {
   marine: { en: 'Marine', zh: 'Marine' },
   custom: { en: 'Custom', zh: 'Custom' },
 };
+
+const inputDiagnostics = diagnoseInput(cmsFacts);
+
+if (!inputDiagnostics.ok) {
+  console.error(JSON.stringify({
+    ok: false,
+    input: inputPath,
+    dryRun,
+    diagnostics: inputDiagnostics,
+  }, null, 2));
+  process.exit(1);
+}
+
+if (dryRun) {
+  console.log(JSON.stringify({
+    ok: true,
+    input: inputPath,
+    dryRun: true,
+    diagnostics: inputDiagnostics,
+  }, null, 2));
+  process.exit(0);
+}
 
 process.chdir(cmsRoot);
 const app = await createStrapi({ appDir: cmsRoot, distDir: join(cmsRoot, 'dist') }).load();
@@ -144,7 +175,9 @@ async function seed() {
   }
 
   return {
+    ok: true,
     input: inputPath,
+    dryRun: false,
     categoryFacts: cmsFacts.categoryFacts.length,
     industryFacts: industryKeys.length,
     applicationFacts: applicationKeys.length,
@@ -152,6 +185,7 @@ async function seed() {
     assets: assets.length,
     certifications: certificationKeys.length,
     productFacts: products.length,
+    operations: operationStats,
   };
 }
 
@@ -261,7 +295,7 @@ function toSpecificationValue(value) {
 }
 
 function toJsonFieldValue(value) {
-  return JSON.stringify(value);
+  return value;
 }
 
 function toSourceRef(sourceRef) {
@@ -295,11 +329,14 @@ function toCommercialTerms(terms) {
 
 async function upsert(uid, uniqueField, uniqueValue, data) {
   const existing = await findOneBy(uid, uniqueField, uniqueValue);
+  const bucket = uid.split('::')[1] || uid;
 
   if (existing) {
+    trackOperation(bucket, 'updated');
     return strapi.entityService.update(uid, existing.id, { data });
   }
 
+  trackOperation(bucket, 'created');
   return strapi.entityService.create(uid, { data });
 }
 
@@ -310,6 +347,7 @@ async function updateByStableId(uid, uniqueField, uniqueValue, data) {
     throw new Error(`${uid}.${uniqueField}=${uniqueValue} was not found.`);
   }
 
+  trackOperation(uid.split('::')[1] || uid, 'updated');
   return strapi.entityService.update(uid, existing.id, { data });
 }
 
@@ -361,6 +399,118 @@ function uniqueBy(rows, field) {
   return [...map.values()];
 }
 
+function diagnoseInput(input) {
+  const errors = [];
+  const warnings = [];
+
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return {
+      ok: false,
+      errors: ['Input must be a CMS facts object.'],
+      warnings,
+    };
+  }
+
+  if (!Array.isArray(input.categoryFacts)) {
+    errors.push('categoryFacts must be an array.');
+  }
+
+  if (!Array.isArray(input.productFacts)) {
+    errors.push('productFacts must be an array.');
+  }
+
+  if (errors.length) {
+    return {
+      ok: false,
+      errors,
+      warnings,
+    };
+  }
+
+  const categoryFacts = input.categoryFacts;
+  const productFacts = input.productFacts;
+  const categoryIds = new Set();
+  const productIds = new Set();
+  const rootCategories = categoryFacts.filter((category) => !category.parentId);
+
+  if (categoryFacts.length === 0) {
+    errors.push('At least one category fact is required.');
+  }
+
+  if (rootCategories.length !== 1) {
+    errors.push(`Exactly one root category is required; found ${rootCategories.length}.`);
+  }
+
+  for (const category of categoryFacts) {
+    if (!category?.id || !String(category.id).startsWith('cat_')) {
+      errors.push(`Invalid category id '${category?.id}'. Category ids must start with cat_.`);
+      continue;
+    }
+
+    if (categoryIds.has(category.id)) {
+      errors.push(`Duplicate category id '${category.id}'.`);
+    }
+
+    categoryIds.add(category.id);
+  }
+
+  for (const category of categoryFacts) {
+    if (category?.parentId && !categoryIds.has(category.parentId)) {
+      errors.push(`Category '${category.id}' references unknown parent '${category.parentId}'.`);
+    }
+  }
+
+  for (const product of productFacts) {
+    if (!product?.id || !String(product.id).startsWith('prd_')) {
+      errors.push(`Invalid product id '${product?.id}'. Product ids must start with prd_.`);
+      continue;
+    }
+
+    if (productIds.has(product.id)) {
+      errors.push(`Duplicate product id '${product.id}'.`);
+    }
+
+    productIds.add(product.id);
+
+    const primaryCategoryId = product.primaryCategoryId || product.core?.primaryCategory;
+    if (!primaryCategoryId || !categoryIds.has(primaryCategoryId)) {
+      errors.push(`Product '${product.id}' references unknown primary category '${primaryCategoryId}'.`);
+    }
+
+    const family = product.family || product.core?.family || 'sensor';
+    if (family === 'sensor' && (!ensureArray(product.measurements).length || !ensureArray(product.outputs).length)) {
+      errors.push(`Sensor product '${product.id}' must include at least one measurement and one output.`);
+    }
+
+    if (family === 'valve' && !product.valveProfile) {
+      errors.push(`Valve product '${product.id}' must include valveProfile.`);
+    }
+
+    if (!ensureArray(product.specificationGroups).length) {
+      errors.push(`Product '${product.id}' must include at least one specification group.`);
+    }
+  }
+
+  if (productFacts.length === 0) {
+    warnings.push('No product facts found. The frontend will not have product records after import.');
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    warnings,
+    counts: {
+      categoryFacts: categoryFacts.length,
+      productFacts: productFacts.length,
+      rootCategoryFacts: rootCategories.length,
+    },
+    samples: {
+      categoryIds: categoryFacts.map((category) => category.id).filter(Boolean).slice(0, 5),
+      productIds: productFacts.map((product) => product.id).filter(Boolean).slice(0, 5),
+    },
+  };
+}
+
 function mapIds(index, ids, label) {
   return ensureArray(ids).map((id) => requireMappedId(index, id, label));
 }
@@ -397,6 +547,64 @@ function ensureArray(value) {
 
 function withoutUndefined(value) {
   return Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined));
+}
+
+function trackOperation(bucket, action) {
+  operationStats[bucket] ??= { created: 0, updated: 0 };
+  operationStats[bucket][action] += 1;
+}
+
+function readArgs(argv) {
+  const parsed = {
+    file: undefined,
+    dryRun: false,
+    help: false,
+  };
+  const positional = [];
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+
+    if (arg === '--help' || arg === '-h') {
+      parsed.help = true;
+      continue;
+    }
+
+    if (arg === '--dry-run') {
+      parsed.dryRun = true;
+      continue;
+    }
+
+    if (arg === '--file') {
+      parsed.file = argv[index + 1];
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--')) {
+      throw new Error(`Unknown argument '${arg}'.`);
+    }
+
+    positional.push(arg);
+  }
+
+  if (!parsed.file && positional.length) {
+    parsed.file = positional[0];
+  }
+
+  return parsed;
+}
+
+function printHelp() {
+  console.log(`Usage:
+  npm run import:cms-facts -- --file /tmp/cms-facts.json --dry-run
+  npm run import:cms-facts -- --file /tmp/cms-facts.json
+
+Options:
+  --file <path>   CmsFactInput JSON file to import. Defaults to ../outputs/cms-facts.json.
+  --dry-run       Validate and summarize the JSON without starting Strapi or writing data.
+  --help          Show this help.
+`);
 }
 
 async function destroyStrapiApp(app) {

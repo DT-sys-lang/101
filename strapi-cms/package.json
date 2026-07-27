@@ -11,6 +11,7 @@
     "start": "npm run migrate:intent-phrase-status && npm run patch:admin-portal && strapi start",
     "build": "npm run patch:admin-portal && strapi build",
     "postbuild": "node ./scripts/copy-strapi-json.mjs",
+    "import:cms-facts": "node ./scripts/seed-cms-facts.mjs",
     "provision:editorial-read-token": "node ./scripts/provision-editorial-read-token.mjs",
     "seed:launch-mock": "node ./scripts/seed-launch-mock-content.mjs"
   },
