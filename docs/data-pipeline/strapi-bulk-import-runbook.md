@@ -11,8 +11,8 @@ The supported operations workflow is:
 Excel workbook
 -> export tabs as CSV files
 -> convert CSV directory to CmsFactInput JSON
--> dry-run Strapi import
--> import into Strapi
+-> dry-run from the CMS import page
+-> import from the CMS import page
 -> run frontend diagnostics
 ```
 
@@ -40,7 +40,34 @@ npm run validate:cms-facts -- --file outputs/cms-facts-batch.json
 
 Required result: both commands exit `0`.
 
-## Server Upload
+## Recommended CMS Import
+
+The easiest import path is the protected CMS import page:
+
+```text
+https://cms.yufavor.com/internal/cms/import
+```
+
+Before using it, add this value to the Strapi server environment and recreate
+the `strapi` container:
+
+```text
+INTERNAL_CMS_IMPORT_TOKEN=<random-hex-token>
+```
+
+Open the import page, paste the token, choose `outputs/cms-facts-batch.json`,
+and keep `Dry-run only` checked. Required dry-run result:
+
+```json
+{
+  "ok": true,
+  "dryRun": true
+}
+```
+
+Only after dry-run succeeds, uncheck `Dry-run only` and run the import.
+
+## Server Upload Fallback
 
 Upload `outputs/cms-facts-batch.json` to the server repository, for example:
 
@@ -51,7 +78,7 @@ Upload `outputs/cms-facts-batch.json` to the server repository, for example:
 Do not commit real product batches unless the batch is intentionally part of
 the repository.
 
-## Server Import
+## Server Import Fallback
 
 Pull the latest image first, because the import command lives inside the Strapi
 runtime image:
