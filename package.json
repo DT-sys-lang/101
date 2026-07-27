@@ -19,6 +19,7 @@
     "validate:scale-300": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-scale.mjs --count 300",
     "validate:scale-1000": "node --loader ./scripts/ts-import-loader.mjs ./scripts/validate-scale.mjs --count 1000",
     "validate:scale-cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/generate-scale-cms-facts.mjs --count 300 --validate",
+    "diagnose:cms-facts-api": "node --loader ./scripts/ts-import-loader.mjs ./scripts/diagnose-cms-facts-api.mjs",
     "import:cms-facts": "node --loader ./scripts/ts-import-loader.mjs ./scripts/import-cms-facts-from-excel.mjs",
     "check:production": "node ./scripts/production-smoke-check.mjs"
   },
