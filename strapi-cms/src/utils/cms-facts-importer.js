@@ -260,11 +260,15 @@ function toSpecificationValue(value) {
   return withoutUndefined({
     key: value.key,
     label: value.label,
-    value: value.value,
+    value: toJsonColumnValue(value.value),
     unit: value.unit,
     display: value.display,
     sourceRefs: ensureArray(value.sourceRefs).map(toSourceRef),
   })
+}
+
+function toJsonColumnValue(value) {
+  return JSON.stringify(value)
 }
 
 function toSourceRef(sourceRef) {
