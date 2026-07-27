@@ -11,7 +11,7 @@ module.exports = {
 
   async importWorkbook(file, options = {}) {
     const buffer = await readUploadedFileBuffer(file)
-    const { cmsFacts, workbook } = await buildCmsFactsFromWorkbookBuffer(buffer)
+    const { cmsFacts, workbook } = await readWorkbookFacts(buffer)
     const result = await importCmsFactsIntoStrapi(strapi, cmsFacts, {
       ...options,
       input: file.originalFilename || file.name || 'cms-facts-import.xlsx',
@@ -23,6 +23,14 @@ module.exports = {
       workbook,
     }
   },
+}
+
+async function readWorkbookFacts(buffer) {
+  try {
+    return await buildCmsFactsFromWorkbookBuffer(buffer)
+  } catch (error) {
+    throw httpError(400, `Workbook import failed: ${error instanceof Error ? error.message : String(error)}`)
+  }
 }
 
 async function readUploadedFileBuffer(file) {
@@ -37,4 +45,10 @@ async function readUploadedFileBuffer(file) {
   }
 
   return readFile(filePath)
+}
+
+function httpError(status, message) {
+  const error = new Error(message)
+  error.status = status
+  return error
 }
