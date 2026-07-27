@@ -5,6 +5,11 @@ const jsonInput = document.getElementById('json')
 const dryRunInput = document.getElementById('dryRun')
 const result = document.getElementById('result')
 const clearButton = document.getElementById('clear')
+const deleteForm = document.getElementById('cms-delete-form')
+const deleteProductIdsInput = document.getElementById('deleteProductIds')
+const deleteDryRunInput = document.getElementById('deleteDryRun')
+const deleteAssetsInput = document.getElementById('deleteAssets')
+const confirmDeleteInput = document.getElementById('confirmDelete')
 
 clearButton.addEventListener('click', () => {
   result.textContent = 'Waiting for input.'
@@ -23,6 +28,53 @@ form.addEventListener('submit', async (event) => {
     result.textContent = request.kind === 'xlsx' ? 'Uploading workbook...' : 'Sending batch...'
 
     const response = await fetch('/internal/cms/import', request.init)
+    const responseText = await response.text()
+    const body = parseResponseBody(responseText, response.status)
+
+    result.textContent = JSON.stringify(body, null, 2)
+  } catch (error) {
+    result.textContent = JSON.stringify({
+      ok: false,
+      message: error instanceof Error ? error.message : String(error),
+    }, null, 2)
+  } finally {
+    submitButton.disabled = false
+  }
+})
+
+deleteForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+
+  const submitButton = deleteForm.querySelector('button[type="submit"]')
+  submitButton.disabled = true
+  result.textContent = 'Preparing delete request...'
+
+  try {
+    const productIds = parseProductIds(deleteProductIdsInput.value)
+    const dryRun = deleteDryRunInput.checked
+
+    if (!dryRun && !confirmDeleteInput.checked) {
+      throw new Error('Confirm deletion before running a non-dry-run delete.')
+    }
+
+    if (!dryRun && !window.confirm(`Delete ${productIds.length} product(s)? This cannot be undone.`)) {
+      result.textContent = 'Delete cancelled.'
+      return
+    }
+
+    const response = await fetch('/internal/cms/import/delete-products', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${tokenInput.value.trim()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productIds,
+        dryRun,
+        deleteAssets: deleteAssetsInput.checked,
+        confirmDelete: confirmDeleteInput.checked,
+      }),
+    })
     const responseText = await response.text()
     const body = parseResponseBody(responseText, response.status)
 
@@ -97,6 +149,25 @@ function buildJsonRequest(cmsFactsJson) {
       }),
     },
   }
+}
+
+function parseProductIds(value) {
+  const productIds = [...new Set(String(value || '')
+    .split(/[\s,;；，、]+/)
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean))]
+
+  if (!productIds.length) {
+    throw new Error('Paste at least one product_id first.')
+  }
+
+  const invalid = productIds.filter((productId) => !/^prd_[a-z0-9_]+$/.test(productId))
+
+  if (invalid.length) {
+    throw new Error(`Invalid product_id value(s): ${invalid.join(', ')}`)
+  }
+
+  return productIds
 }
 
 function parseResponseBody(text, status) {

@@ -19,5 +19,14 @@ module.exports = {
         policies: ['global::internal-cms-import'],
       },
     },
+    {
+      method: 'POST',
+      path: '/import/delete-products',
+      handler: 'cms-import.deleteProducts',
+      config: {
+        auth: false,
+        policies: ['global::internal-cms-import'],
+      },
+    },
   ],
 }

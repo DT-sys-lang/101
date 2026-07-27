@@ -25,6 +25,33 @@ module.exports = {
       throw error
     }
   },
+
+  async deleteProducts(ctx) {
+    try {
+      const body = requireObject(ctx.request.body, 'request body')
+      const dryRun = readDryRun(body)
+      const productIds = readProductIds(body)
+      const deleteAssets = body.deleteAssets !== false && body.deleteAssets !== 'false'
+
+      if (!dryRun && body.confirmDelete !== true && body.confirmDelete !== 'true') {
+        throw httpError(400, 'confirmDelete must be true for non-dry-run product deletion.')
+      }
+
+      const result = await strapi.service('api::cms-import.cms-import').deleteProducts(productIds, {
+        dryRun,
+        deleteAssets,
+      })
+
+      ctx.set('cache-control', 'no-store')
+      ctx.body = result
+    } catch (error) {
+      if (error && error.status) {
+        return ctx.throw(error.status, error.message)
+      }
+
+      throw error
+    }
+  },
 }
 
 async function importJsonPayload(body, options) {
@@ -73,6 +100,23 @@ function readUploadedFile(files) {
   }
 
   return file
+}
+
+function readProductIds(body) {
+  const rawValue = body.productIds || body.productIdsText
+  const values = Array.isArray(rawValue)
+    ? rawValue
+    : String(rawValue || '').split(/[\s,;；，、]+/)
+
+  const productIds = [...new Set(values
+    .map((value) => String(value || '').trim().toLowerCase())
+    .filter(Boolean))]
+
+  if (!productIds.length) {
+    throw httpError(400, 'At least one product_id is required.')
+  }
+
+  return productIds
 }
 
 function readCmsFactsPayload(payload) {
@@ -182,6 +226,9 @@ function renderImportPage() {
     button.secondary {
       background: #315f9d;
     }
+    button.danger {
+      background: #b42318;
+    }
     button:disabled {
       cursor: progress;
       opacity: 0.7;
@@ -189,6 +236,15 @@ function renderImportPage() {
     .hint {
       color: #667085;
       font-size: 13px;
+    }
+    h2 {
+      margin: 28px 0 8px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+    .danger-note {
+      color: #b42318;
+      font-weight: 650;
     }
     pre {
       overflow: auto;
@@ -219,6 +275,22 @@ function renderImportPage() {
         <label><input id="dryRun" type="checkbox" checked> Dry-run only</label>
         <button type="submit">Run</button>
         <button class="secondary" id="clear" type="button">Clear Result</button>
+      </div>
+    </form>
+    <h2>Batch delete products</h2>
+    <p>Delete selected product facts by product_id. Dry-run first. Categories, industries, applications, and certifications are preserved.</p>
+    <form id="cms-delete-form">
+      <label for="deleteProductIds">Product IDs</label>
+      <textarea id="deleteProductIds" name="deleteProductIds" spellcheck="false" placeholder="prd_yf_f1&#10;prd_yf_f2"></textarea>
+      <div class="hint">One product_id per line, or separate with commas/spaces.</div>
+
+      <div class="row">
+        <label><input id="deleteDryRun" type="checkbox" checked> Dry-run only</label>
+        <label><input id="deleteAssets" type="checkbox" checked> Delete orphan documents/media assets</label>
+      </div>
+      <div class="row">
+        <label class="danger-note"><input id="confirmDelete" type="checkbox"> I confirm non-dry-run deletion</label>
+        <button class="danger" type="submit">Delete Products</button>
       </div>
     </form>
     <pre id="result">Waiting for input.</pre>
