@@ -28,5 +28,14 @@ module.exports = {
         policies: ['global::internal-cms-import'],
       },
     },
+    {
+      method: 'POST',
+      path: '/import/resources',
+      handler: 'cms-import.uploadResources',
+      config: {
+        auth: false,
+        policies: ['global::internal-cms-import'],
+      },
+    },
   ],
 }

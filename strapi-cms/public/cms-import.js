@@ -10,6 +10,11 @@ const deleteProductIdsInput = document.getElementById('deleteProductIds')
 const deleteDryRunInput = document.getElementById('deleteDryRun')
 const deleteAssetsInput = document.getElementById('deleteAssets')
 const confirmDeleteInput = document.getElementById('confirmDelete')
+const resourceForm = document.getElementById('cms-resource-form')
+const resourceZipInput = document.getElementById('resourceZip')
+const resourceDryRunInput = document.getElementById('resourceDryRun')
+const resourceOverwriteInput = document.getElementById('resourceOverwrite')
+const confirmUploadInput = document.getElementById('confirmUpload')
 
 clearButton.addEventListener('click', () => {
   result.textContent = 'Waiting for input.'
@@ -79,6 +84,63 @@ deleteForm.addEventListener('submit', async (event) => {
     const body = parseResponseBody(responseText, response.status)
 
     result.textContent = JSON.stringify(body, null, 2)
+  } catch (error) {
+    result.textContent = JSON.stringify({
+      ok: false,
+      message: error instanceof Error ? error.message : String(error),
+    }, null, 2)
+  } finally {
+    submitButton.disabled = false
+  }
+})
+
+resourceForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+
+  const submitButton = resourceForm.querySelector('button[type="submit"]')
+  submitButton.disabled = true
+  result.textContent = 'Reading resource package...'
+
+  try {
+    const file = resourceZipInput.files && resourceZipInput.files[0]
+    const dryRun = resourceDryRunInput.checked
+
+    if (!file) {
+      throw new Error('Choose a .zip resource package first.')
+    }
+
+    if (!file.name.toLowerCase().endsWith('.zip')) {
+      throw new Error('Choose a .zip resource package.')
+    }
+
+    if (!dryRun && !confirmUploadInput.checked) {
+      throw new Error('Confirm upload before running a non-dry-run resource upload.')
+    }
+
+    if (!dryRun && !window.confirm(`Upload resources from ${file.name}? Existing matching asset records may be updated.`)) {
+      result.textContent = 'Resource upload cancelled.'
+      return
+    }
+
+    const body = new FormData()
+    body.append('dryRun', String(dryRun))
+    body.append('overwrite', String(resourceOverwriteInput.checked))
+    body.append('confirmUpload', String(confirmUploadInput.checked))
+    body.append('file', file)
+
+    result.textContent = dryRun ? 'Checking resource package...' : 'Uploading resources...'
+
+    const response = await fetch('/internal/cms/import/resources', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${tokenInput.value.trim()}`,
+      },
+      body,
+    })
+    const responseText = await response.text()
+    const bodyResult = parseResponseBody(responseText, response.status)
+
+    result.textContent = JSON.stringify(bodyResult, null, 2)
   } catch (error) {
     result.textContent = JSON.stringify({
       ok: false,

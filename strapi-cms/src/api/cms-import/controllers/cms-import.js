@@ -52,6 +52,37 @@ module.exports = {
       throw error
     }
   },
+
+  async uploadResources(ctx) {
+    try {
+      const uploadedFile = readUploadedResourceZip(ctx.request.files)
+      const body = requireObject(ctx.request.body, 'request body')
+      const dryRun = readDryRun(body)
+      const overwrite = body.overwrite !== false && body.overwrite !== 'false'
+
+      if (!uploadedFile) {
+        throw httpError(400, 'A .zip resource package is required.')
+      }
+
+      if (!dryRun && body.confirmUpload !== true && body.confirmUpload !== 'true') {
+        throw httpError(400, 'confirmUpload must be true for non-dry-run resource upload.')
+      }
+
+      const result = await strapi.service('api::cms-import.cms-import').importResourceZip(uploadedFile, {
+        dryRun,
+        overwrite,
+      })
+
+      ctx.set('cache-control', 'no-store')
+      ctx.body = result
+    } catch (error) {
+      if (error && error.status) {
+        return ctx.throw(error.status, error.message)
+      }
+
+      throw error
+    }
+  },
 }
 
 async function importJsonPayload(body, options) {
@@ -100,6 +131,37 @@ function readUploadedFile(files) {
   }
 
   return file
+}
+
+function readUploadedResourceZip(files) {
+  const file = readAnyUploadedFile(files)
+
+  if (!file) {
+    return undefined
+  }
+
+  const filename = file.originalFilename || file.name || ''
+
+  if (filename && !filename.toLowerCase().endsWith('.zip')) {
+    throw httpError(400, 'Only .zip resource packages are supported.')
+  }
+
+  return file
+}
+
+function readAnyUploadedFile(files) {
+  if (!files || typeof files !== 'object') {
+    return undefined
+  }
+
+  const candidates = [
+    files.file,
+    files.zip,
+    files.resources,
+    ...Object.values(files),
+  ].flat().filter(Boolean)
+
+  return candidates.find((candidate) => candidate && typeof candidate === 'object')
 }
 
 function readProductIds(body) {
@@ -237,6 +299,11 @@ function renderImportPage() {
       color: #667085;
       font-size: 13px;
     }
+    .section-divider {
+      margin-top: 28px;
+      border-top: 1px solid #d9dee8;
+      padding-top: 4px;
+    }
     h2 {
       margin: 28px 0 8px;
       font-size: 22px;
@@ -277,6 +344,24 @@ function renderImportPage() {
         <button class="secondary" id="clear" type="button">Clear Result</button>
       </div>
     </form>
+    <div class="section-divider"></div>
+    <h2>Batch upload product resources</h2>
+    <p>Upload a .zip package. File names should start with an existing product_id, for example prd_yf_f1_primary.webp or prd_yf_f1_datasheet.pdf.</p>
+    <form id="cms-resource-form">
+      <label for="resourceZip">Resource ZIP</label>
+      <input id="resourceZip" name="resourceZip" type="file" accept=".zip,application/zip,application/x-zip-compressed">
+      <div class="hint">Supported images: jpg, jpeg, png, webp, gif, svg. Supported docs: pdf, doc, docx, xls, xlsx.</div>
+
+      <div class="row">
+        <label><input id="resourceDryRun" type="checkbox" checked> Dry-run only</label>
+        <label><input id="resourceOverwrite" type="checkbox" checked> Overwrite existing resource files and asset records</label>
+      </div>
+      <div class="row">
+        <label class="danger-note"><input id="confirmUpload" type="checkbox"> I confirm non-dry-run resource upload</label>
+        <button class="secondary" type="submit">Upload Resources</button>
+      </div>
+    </form>
+    <div class="section-divider"></div>
     <h2>Batch delete products</h2>
     <p>Delete selected product facts by product_id. Dry-run first. Categories, industries, applications, and certifications are preserved.</p>
     <form id="cms-delete-form">
