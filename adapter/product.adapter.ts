@@ -6,6 +6,7 @@ import type {
   LocaleCode,
   NonEmptyReadonlyArray,
   ProductCanonicalPath,
+  ProductId,
   ProductRecord,
   ProductSeoFields,
   SlugSegment,
@@ -46,10 +47,13 @@ import {
   isProductFact,
   normalizeAdapterConfig,
   normalizeCmsFactInput,
+  normalizeCmsFactInputWithProductTolerance,
+  normalizeCmsFactSourceInput,
   normalizeProductFact,
   normalizeSlug,
   productSystemGeneratedFields,
   reject,
+  toProductFactValidationIssue,
   toNonEmptyArray,
   validateCategoryFacts,
   validateProductFactsAgainstCategoryTree,
@@ -58,6 +62,7 @@ import {
   type CategoryFactGraph,
   type CmsFactAdapterOptions,
   type CmsFactInput,
+  type ProductFactValidationIssue,
   type ProductFact,
 } from './validation'
 
@@ -68,6 +73,11 @@ export interface CmsDomainBuildResult {
   readonly products: readonly ProductRecord[]
 }
 
+export interface CmsTolerantDomainBuildResult extends CmsDomainBuildResult {
+  readonly inputProductCount: number
+  readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+}
+
 export function buildDomainFromCmsFacts(input: unknown, options: CmsFactAdapterOptions = {}): CmsDomainBuildResult {
   const normalizedInput = normalizeCmsFactInput(input, options)
   const categoryContext = buildCategoryContext(normalizedInput.categoryFacts, options)
@@ -76,6 +86,24 @@ export function buildDomainFromCmsFacts(input: unknown, options: CmsFactAdapterO
   return {
     categoryTree: categoryContext.tree,
     products,
+  }
+}
+
+export function buildDomainFromCmsFactsWithProductTolerance(input: unknown, options: CmsFactAdapterOptions = {}): CmsTolerantDomainBuildResult {
+  const normalizedInput = normalizeCmsFactInputWithProductTolerance(input, options)
+  const categoryContext = buildCategoryContext(normalizedInput.categoryFacts, options)
+  const { products, rejectedProductFacts } = buildProductRecordsFromTolerantFacts(
+    normalizedInput.productFacts,
+    categoryContext,
+    options,
+    normalizedInput.rejectedProductFacts,
+  )
+
+  return {
+    categoryTree: categoryContext.tree,
+    products,
+    inputProductCount: normalizedInput.productFacts.length + normalizedInput.rejectedProductFacts.length,
+    rejectedProductFacts,
   }
 }
 
@@ -104,6 +132,65 @@ export function buildProductRecordsFromFacts(
   })
 
   return records
+}
+
+function buildProductRecordsFromTolerantFacts(
+  entries: readonly { readonly index: number; readonly fact: ProductFact }[],
+  categorySource: CategoryTree | CategoryContext,
+  options: CmsFactAdapterOptions = {},
+  initialRejectedProductFacts: readonly ProductFactValidationIssue[] = [],
+) {
+  const config = normalizeAdapterConfig(options)
+  const categoryContext = normalizeCategoryContext(categorySource, options)
+  const acceptedProductIds = new Set<ProductId>()
+  const acceptedSkus = new Set<string>()
+  const acceptedModelSlugs = new Set<SlugSegment>()
+  const canonicalPaths = new Set<ProductCanonicalPath>()
+  const products: ProductRecord[] = []
+  const rejectedProductFacts: ProductFactValidationIssue[] = [...initialRejectedProductFacts]
+
+  for (const entry of entries) {
+    const path = `productFacts[${entry.index}]`
+    const fact = entry.fact
+
+    try {
+      validateProductFactsAgainstCategoryTree([fact], categoryContext.tree, options)
+
+      if (acceptedProductIds.has(fact.id)) {
+        reject(`${path}.id`, `duplicate product id '${fact.id}'`)
+      }
+
+      if (acceptedSkus.has(fact.sku)) {
+        reject(`${path}.sku`, `duplicate product sku '${fact.sku}'`)
+      }
+
+      const modelSlug = normalizeSlug(fact.model)
+
+      if (acceptedModelSlugs.has(modelSlug)) {
+        reject(`${path}.model`, `duplicate generated model slug '${modelSlug}'`)
+      }
+
+      const record = buildProductRecordFromFact(fact, categoryContext, options, path)
+      validateGeneratedProductRecord(record, categoryContext, config, path)
+
+      if (canonicalPaths.has(record.seo.slug.canonicalPath)) {
+        reject(`${path}.seo.slug.canonicalPath`, `generated canonicalPath '${record.seo.slug.canonicalPath}' is duplicated`)
+      }
+
+      acceptedProductIds.add(fact.id)
+      acceptedSkus.add(fact.sku)
+      acceptedModelSlugs.add(modelSlug)
+      canonicalPaths.add(record.seo.slug.canonicalPath)
+      products.push(record)
+    } catch (error) {
+      rejectedProductFacts.push(toProductFactValidationIssue(entry.index, fact, error))
+    }
+  }
+
+  return {
+    products,
+    rejectedProductFacts,
+  }
 }
 
 export function buildProductRecordFromFact(
@@ -498,6 +585,8 @@ export {
   isCmsFactInput,
   isProductFact,
   normalizeCmsFactInput,
+  normalizeCmsFactInputWithProductTolerance,
+  normalizeCmsFactSourceInput,
   productSystemGeneratedFields,
   normalizeAdapterConfig,
   reject,
@@ -516,6 +605,7 @@ export type {
   CategoryFact,
   CategoryFactGraph,
   ProductFact,
+  ProductFactValidationIssue,
 }
 
 export {

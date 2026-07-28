@@ -1,4 +1,9 @@
-import { buildDomainFromCmsFacts, CmsFactValidationError, normalizeCmsFactInput } from '@/adapter/product.adapter'
+import {
+  buildDomainFromCmsFactsWithProductTolerance,
+  CmsFactValidationError,
+  normalizeCmsFactInputWithProductTolerance,
+  type ProductFactValidationIssue,
+} from '@/adapter/product.adapter'
 import { readCmsProductSourceConfig } from './source'
 
 export interface CmsFactsInputDiagnostics {
@@ -8,6 +13,8 @@ export interface CmsFactsInputDiagnostics {
   readonly counts: {
     readonly categoryFacts: number
     readonly productFacts: number
+    readonly acceptedProductFacts?: number
+    readonly rejectedProductFacts?: number
     readonly rootCategoryFacts: number
     readonly normalizedProducts?: number
   }
@@ -16,6 +23,7 @@ export interface CmsFactsInputDiagnostics {
     readonly productIds: readonly string[]
   }
   readonly error?: CmsFactsDiagnosticError
+  readonly rejectedProductFacts?: readonly ProductFactValidationIssue[]
   readonly hints: readonly string[]
 }
 
@@ -69,25 +77,31 @@ export function diagnoseCmsFactsInput(input: unknown, source = 'cms-facts-input'
   }
 
   try {
-    const normalized = normalizeCmsFactInput(input)
+    const normalized = normalizeCmsFactInputWithProductTolerance(input)
     const normalizedCounts = {
       ...counts,
       categoryFacts: normalized.categoryFacts.length,
-      productFacts: normalized.productFacts.length,
+      productFacts: normalized.productFacts.length + normalized.rejectedProductFacts.length,
+      acceptedProductFacts: normalized.productFacts.length,
+      rejectedProductFacts: normalized.rejectedProductFacts.length,
       rootCategoryFacts: normalized.categoryFacts.filter((category) => category.parentId === null).length,
     }
-    const domain = buildDomainFromCmsFacts(normalized)
+    const domain = buildDomainFromCmsFactsWithProductTolerance(input)
 
     return {
-      ok: true,
+      ok: domain.products.length > 0,
       source,
       stage: 'passed',
       counts: {
         ...normalizedCounts,
         normalizedProducts: domain.products.length,
+        rejectedProductFacts: domain.rejectedProductFacts.length,
       },
       samples,
-      hints: [],
+      rejectedProductFacts: domain.rejectedProductFacts,
+      hints: domain.products.length > 0
+        ? hintsForRejectedProducts(domain.rejectedProductFacts)
+        : ['All ProductFact entries were rejected; fix at least one product before publishing CMS data.'],
     }
   } catch (error) {
     const diagnosticError = toDiagnosticError(error)
@@ -333,6 +347,17 @@ function hintsForValidationError(error: CmsFactsDiagnosticError, counts: CmsFact
   }
 
   return hints
+}
+
+function hintsForRejectedProducts(rejectedProductFacts: readonly ProductFactValidationIssue[]) {
+  if (rejectedProductFacts.length === 0) {
+    return []
+  }
+
+  return [
+    `${rejectedProductFacts.length} ProductFact entries were skipped; valid products are still published.`,
+    'Open rejectedProductFacts in this diagnostics response to fix the affected products.',
+  ]
 }
 
 function toDiagnosticError(error: unknown): CmsFactsDiagnosticError {

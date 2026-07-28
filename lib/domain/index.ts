@@ -115,6 +115,7 @@ export const domain = {
 export * from './architecture-freeze-v1'
 export * from './application'
 export * from './category'
+export * from './category-visibility'
 export * from './geo-ai'
 export * from './industry'
 export * from './intent-mapping'

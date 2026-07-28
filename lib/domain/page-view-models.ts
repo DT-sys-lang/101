@@ -1,5 +1,6 @@
 import { type ApplicationIntent } from './application'
 import { industrialSensorCategoryTree, type CategoryNode } from './category'
+import { getVisibleProductCategoryChildren } from './category-visibility'
 import { type IndustryKey } from './industry'
 import { localizeTechnicalValue, localizeTechnicalValues } from './localization'
 import {
@@ -2026,14 +2027,14 @@ function getProductCategoryNavigation(
   categoryPath: readonly CategoryNode[],
 ): ProductCatalogNavigationViewModel {
   const rootCategory = categoryPath[0] ?? resolveCatalogRootCategory(index) ?? industrialSensorCategoryTree.root
-  const topCategories = [...(rootCategory.children ?? [])].sort((left, right) => left.sortOrder - right.sortOrder)
-  const currentTopCategory = categoryPath.find((category) => category.parentId === rootCategory.id) ?? topCategories[0]
+  const topCategories = getVisibleProductCategoryChildren(rootCategory, index)
+  const currentTopCategory = resolveCurrentNavigationCategory(topCategories, categoryPath, index)
 
   return {
     title: locale === 'zh' ? '产品分类' : 'Product categories',
     groups: topCategories.map((category) => {
       const currentCategory = index.categoryById.get(category.id) ?? category
-      const children = [...(currentCategory.children ?? [])].sort((left, right) => left.sortOrder - right.sortOrder)
+      const children = getVisibleProductCategoryChildren(currentCategory, index)
 
       return {
         id: currentCategory.id,
@@ -2050,13 +2051,34 @@ function getProductCategoryNavigation(
   }
 }
 
+function resolveCurrentNavigationCategory(
+  topCategories: readonly CategoryNode[],
+  categoryPath: readonly CategoryNode[],
+  index: ProductCatalogIndex,
+) {
+  const topCategoryIds = new Set(topCategories.map((category) => category.id))
+  const directMatch = categoryPath.find((category) => topCategoryIds.has(category.id))
+
+  if (directMatch) {
+    return directMatch
+  }
+
+  const currentCategory = categoryPath[categoryPath.length - 1]
+
+  if (currentCategory) {
+    return topCategories.find((category) => index.descendantCategoryIdsById.get(category.id)?.has(currentCategory.id)) ?? topCategories[0]
+  }
+
+  return topCategories[0]
+}
+
 function getPrimaryCategoryLinks(
   locale: LocaleCode,
   source: ProductViewModelSource = defaultProductViewModelSource,
 ) {
   const index = source.getCatalog(locale)
   const rootCategory = resolveCatalogRootCategory(index) ?? industrialSensorCategoryTree.root
-  const primaryCategories = rootCategory.children?.length ? rootCategory.children : industrialSensorCategoryTree.root.children ?? []
+  const primaryCategories = getVisibleProductCategoryChildren(rootCategory, index)
 
   return [...primaryCategories].map((category) => ({
     label: localizeText(category.name, locale),

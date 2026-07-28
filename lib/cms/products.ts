@@ -10,7 +10,7 @@ import {
   type ProductRecord,
 } from '@/lib/domain'
 import { mockProducts, mockProductSource } from '@/lib/domain/mock-products'
-import { buildDomainFromCmsFacts } from './adapter'
+import { buildDomainFromCmsFactsWithProductTolerance, type ProductFactValidationIssue } from './adapter'
 import {
   readCmsProductSource,
   readCmsProductSourceAsync,
@@ -27,6 +27,9 @@ export interface CmsProductStatus {
   readonly requestedMode: CmsProductSourceMode
   readonly activeMode: CmsProductSourceMode
   readonly productCount: number
+  readonly inputProductCount: number
+  readonly rejectedProductCount: number
+  readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
   readonly sourceVersion: string
   readonly catalogVersion: ProductCatalogIndex['version']
   readonly locales: readonly LocaleCode[]
@@ -41,6 +44,8 @@ interface CmsProductSnapshot {
   readonly sourceMetadata: CmsProductSourceMetadata
   readonly records: readonly ProductRecord[]
   readonly categoryTree: CategoryTree
+  readonly inputProductCount: number
+  readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
 }
 
 let productSnapshotCache: CmsProductSnapshot | undefined
@@ -115,6 +120,9 @@ export function getCmsProductStatus(): CmsProductStatus {
     requestedMode: snapshot.sourceMetadata.requestedMode,
     activeMode: snapshot.sourceMetadata.activeMode,
     productCount: snapshot.records.length,
+    inputProductCount: snapshot.inputProductCount,
+    rejectedProductCount: snapshot.rejectedProductFacts.length,
+    rejectedProductFacts: snapshot.rejectedProductFacts,
     sourceVersion: snapshot.sourceVersion,
     catalogVersion: enCatalog.version,
     locales: ['en', 'zh'],
@@ -154,11 +162,25 @@ async function hydrateCmsProductSnapshotAsync(): Promise<CmsProductSnapshot> {
 }
 
 function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapshot {
-  let domain: ReturnType<typeof buildDomainFromCmsFacts>
+  let domain: ReturnType<typeof buildDomainFromCmsFactsWithProductTolerance>
 
   try {
-    domain = buildDomainFromCmsFacts(source.cmsFacts)
+    domain = buildDomainFromCmsFactsWithProductTolerance(source.cmsFacts)
+
+    if (domain.inputProductCount > 0 && domain.products.length === 0) {
+      throw new Error('All ProductFact entries were rejected by the tolerant CMS facts adapter.')
+    }
   } catch (error) {
+    if (productSnapshotCache && productSnapshotCache.records.length > 0) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(
+          `[cms-products] Keeping last valid product snapshot because new CMS facts could not be normalized: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+
+      return productSnapshotCache
+    }
+
     const snapshot = createMockDomainFallbackSnapshot(source)
 
     if (process.env.NODE_ENV !== 'test') {
@@ -178,6 +200,8 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
     sourceMetadata: source.metadata,
     records: domain.products,
     categoryTree: domain.categoryTree,
+    inputProductCount: domain.inputProductCount,
+    rejectedProductFacts: domain.rejectedProductFacts,
   }
 
   productSnapshotCache = snapshot
@@ -196,6 +220,8 @@ function createMockDomainFallbackSnapshot(source: CmsProductSourceResult): CmsPr
     },
     records: mockProducts,
     categoryTree: industrialSensorCategoryTree,
+    inputProductCount: mockProducts.length,
+    rejectedProductFacts: [],
   }
 }
 

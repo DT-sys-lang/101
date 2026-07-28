@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { industrialSensorCategoryTree, type CategoryNode, type ProductRecord } from '@/lib/domain'
 import { mockProducts, mockProductSource } from '@/lib/domain/mock-products'
-import { flattenCategoryNodes, normalizeCmsFactInput, type CmsFactInput } from './adapter'
+import { flattenCategoryNodes, normalizeCmsFactSourceInput, type CmsFactInput } from './adapter'
 import { normalizeCmsFactsBusinessLocale } from './business-locale'
 
 export type CmsProductSourceMode = 'mock-domain' | 'env-facts-json' | 'cms-facts-api'
@@ -428,7 +428,7 @@ function normalizeCmsFactsApiResponse(value: unknown): CmsProductFactsApiRespons
   const businessLocaleNormalization = normalizeCmsFactsBusinessLocale(raw)
   rejectForbiddenCmsFactsApiFields(businessLocaleNormalization.cmsFacts, 'cmsFacts')
 
-  const cmsFacts = normalizeCmsFactInput(businessLocaleNormalization.cmsFacts)
+  const cmsFacts = normalizeCmsFactSourceInput(businessLocaleNormalization.cmsFacts)
 
   return cmsFacts
 }
@@ -525,7 +525,7 @@ function readCmsFactsJsonResolution(envFactsJson: string | undefined, envFactsJs
       valid: true,
       source: {
         sourceVersion: 'cms-facts-json-env-v1',
-        cmsFacts: normalizeCmsFactInput(normalizeCmsFactsBusinessLocale(JSON.parse(factsJson) as unknown).cmsFacts),
+        cmsFacts: normalizeCmsFactSourceInput(normalizeCmsFactsBusinessLocale(JSON.parse(factsJson) as unknown).cmsFacts),
       },
     }
   } catch {

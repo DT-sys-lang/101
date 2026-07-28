@@ -6,7 +6,7 @@ import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { isLocale, routing, type Locale } from '@/i18n/routing'
 import { getIndustrialSiteLayout } from '@/lib/domain'
-import { getRuntimeDomainCategoryTree, preloadRuntimeDomainProducts } from '@/lib/runtime/domain-products'
+import { getRuntimeDomainCategoryTree, getRuntimeDomainProductCatalog, preloadRuntimeDomainProducts } from '@/lib/runtime/domain-products'
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
@@ -29,7 +29,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
   const typedLocale = locale as Locale
   await preloadRuntimeDomainProducts()
-  const siteLayout = getIndustrialSiteLayout(typedLocale, getRuntimeDomainCategoryTree())
+  const siteLayout = getIndustrialSiteLayout(typedLocale, getRuntimeDomainCategoryTree(), getRuntimeDomainProductCatalog(typedLocale))
 
   return (
     <NextIntlClientProvider messages={messages}>

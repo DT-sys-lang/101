@@ -151,6 +151,26 @@ export interface CmsFactInput {
   readonly productFacts: readonly ProductFact[]
 }
 
+export interface ProductFactValidationIssue {
+  readonly index: number
+  readonly id?: string
+  readonly sku?: string
+  readonly model?: string
+  readonly path: string
+  readonly message: string
+}
+
+export interface TolerantProductFact {
+  readonly index: number
+  readonly fact: ProductFact
+}
+
+export interface TolerantCmsFactInput {
+  readonly categoryFacts: readonly CategoryFact[]
+  readonly productFacts: readonly TolerantProductFact[]
+  readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+}
+
 export interface CmsFactAdapterOptions {
   readonly locales?: readonly LocaleCode[]
   readonly defaultLocale?: LocaleCode
@@ -220,6 +240,59 @@ export function normalizeCmsFactInput(value: unknown, options: CmsFactAdapterOpt
   return {
     categoryFacts,
     productFacts,
+  }
+}
+
+export function normalizeCmsFactSourceInput(value: unknown, options: CmsFactAdapterOptions = {}): CmsFactInput {
+  const config = normalizeAdapterConfig(options)
+  assertObject(value, 'cmsFacts')
+  rejectUnknownFields(value, ['categoryFacts', 'productFacts'], 'cmsFacts')
+  rejectIllegalFields(value, ['categoryTree', 'products', 'canonical', 'slug', 'categoryPath', 'seo', 'geoAi', 'geo', 'jsonld', 'jsonLd', 'jsonLD'], 'cmsFacts')
+
+  assertArray(value.categoryFacts, 'cmsFacts.categoryFacts')
+  assertArray(value.productFacts, 'cmsFacts.productFacts')
+
+  const categoryFacts = value.categoryFacts.map((fact, index) => {
+    assertCategoryFact(fact, `cmsFacts.categoryFacts[${index}]`, config.locales)
+    return fact
+  })
+
+  return {
+    categoryFacts,
+    productFacts: value.productFacts as readonly ProductFact[],
+  }
+}
+
+export function normalizeCmsFactInputWithProductTolerance(value: unknown, options: CmsFactAdapterOptions = {}): TolerantCmsFactInput {
+  const config = normalizeAdapterConfig(options)
+  assertObject(value, 'cmsFacts')
+  rejectUnknownFields(value, ['categoryFacts', 'productFacts'], 'cmsFacts')
+  rejectIllegalFields(value, ['categoryTree', 'products', 'canonical', 'slug', 'categoryPath', 'seo', 'geoAi', 'geo', 'jsonld', 'jsonLd', 'jsonLD'], 'cmsFacts')
+
+  assertArray(value.categoryFacts, 'cmsFacts.categoryFacts')
+  assertArray(value.productFacts, 'cmsFacts.productFacts')
+
+  const categoryFacts = value.categoryFacts.map((fact, index) => {
+    assertCategoryFact(fact, `cmsFacts.categoryFacts[${index}]`, config.locales)
+    return fact
+  })
+  const productFacts: TolerantProductFact[] = []
+  const rejectedProductFacts: ProductFactValidationIssue[] = []
+
+  value.productFacts.forEach((fact, index) => {
+    try {
+      const productFact = normalizeProductFact(fact, `cmsFacts.productFacts[${index}]`, config.locales)
+      validateProductSpecificationKeys(productFact.specificationGroups, config.specificationRegistry, config.validateSpecificationKeys, `cmsFacts.productFacts[${index}].specificationGroups`)
+      productFacts.push({ index, fact: productFact })
+    } catch (error) {
+      rejectedProductFacts.push(toProductFactValidationIssue(index, fact, error))
+    }
+  })
+
+  return {
+    categoryFacts,
+    productFacts,
+    rejectedProductFacts,
   }
 }
 
@@ -375,6 +448,43 @@ export function isProductFact(value: unknown): value is ProductFact {
   } catch {
     return false
   }
+}
+
+export function toProductFactValidationIssue(index: number, value: unknown, error: unknown): ProductFactValidationIssue {
+  const raw = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined
+  const core = raw?.core && typeof raw.core === 'object' && !Array.isArray(raw.core) ? raw.core as Record<string, unknown> : undefined
+  const cmsError = error instanceof CmsFactValidationError ? error : undefined
+
+  return {
+    index,
+    id: readIssueString(raw?.id),
+    sku: readIssueString(raw?.sku ?? core?.sku),
+    model: readIssueString(raw?.model ?? core?.model),
+    path: normalizeProductIssuePath(cmsError?.path, index),
+    message: normalizeProductIssueMessage(error instanceof Error ? error.message : String(error), index),
+  }
+}
+
+function normalizeProductIssuePath(path: string | undefined, index: number) {
+  const fallback = `productFacts[${index}]`
+
+  if (!path) {
+    return fallback
+  }
+
+  return path
+    .replace(/^cmsFacts\.productFacts\[\d+\]/, fallback)
+    .replace(/^productFacts\[\d+\]/, fallback)
+}
+
+function normalizeProductIssueMessage(message: string, index: number) {
+  return message
+    .replace(/cmsFacts\.productFacts\[\d+\]/g, `productFacts[${index}]`)
+    .replace(/productFacts\[\d+\]/g, `productFacts[${index}]`)
+}
+
+function readIssueString(value: unknown) {
+  return typeof value === 'string' && value.trim() ? value : undefined
 }
 
 function normalizeProductCore(value: Record<string, unknown>, path: string, locales: readonly LocaleCode[]): ProductCore {

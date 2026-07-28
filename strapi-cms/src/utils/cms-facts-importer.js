@@ -163,6 +163,8 @@ async function seed(strapi, cmsFacts, now, operationStats) {
 }
 
 function toProductData(product, indexes, now) {
+  const primaryCategoryId = product.primaryCategoryId || product.core?.primaryCategory
+
   return withoutUndefined({
     factId: product.id,
     family: product.family || product.core?.family || 'sensor',
@@ -174,8 +176,8 @@ function toProductData(product, indexes, now) {
     availability: product.availability || 'standard-lead-time',
     releasedAt: product.releasedAt,
     revisedAt: product.revisedAt || now.slice(0, 10),
-    primaryCategory: requireMappedId(indexes.categoryIds, product.primaryCategoryId || product.core?.primaryCategory, 'primary category'),
-    additionalCategories: mapIds(indexes.categoryIds, product.additionalCategoryIds, 'additional category'),
+    primaryCategory: requireMappedId(indexes.categoryIds, primaryCategoryId, 'primary category'),
+    additionalCategories: mapIds(indexes.categoryIds, normalizeAdditionalCategoryIds(product.additionalCategoryIds, primaryCategoryId), 'additional category'),
     industries: mapIds(indexes.industryIds, product.industryIds, 'industry'),
     applications: mapIds(indexes.applicationIds, product.applicationIds, 'application'),
     measurementKinds: ensureArray(product.measurementKinds),
@@ -197,6 +199,14 @@ function toProductData(product, indexes, now) {
     commercialTerms: product.commercialTerms ? toCommercialTerms(product.commercialTerms) : undefined,
     publishedAt: now,
   })
+}
+
+function normalizeAdditionalCategoryIds(categoryIds, primaryCategoryId) {
+  return uniqueValues(ensureArray(categoryIds).filter((categoryId) => categoryId && categoryId !== primaryCategoryId))
+}
+
+function uniqueValues(values) {
+  return [...new Set(values)]
 }
 
 function toMeasurement(measurement) {

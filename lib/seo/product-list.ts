@@ -4,6 +4,7 @@ import { getRuntimeDomainProductCatalog, listRuntimeDomainProducts } from '@/lib
 import {
   industrialSensorCategoryTree,
   industrialSiteConfig,
+  isStructuralProductCategory,
   localizeText,
   type CategoryNode,
   type ProductListResult,
@@ -77,6 +78,7 @@ export function resolveProductListPage(locale: Locale, slug: readonly string[] =
 
 export function buildProductListMetadata(data: ProductListPageData): Metadata {
   const canonicalUrl = getAbsoluteUrl(`/${data.locale}${data.canonicalPath}`)
+  const shouldIndex = data.productList.pageInfo.total > 0 && !isStructuralProductCategory(data.category.id)
   const languages = Object.fromEntries(
     routing.locales.map((locale) => [hrefLangByLocale[locale], getAbsoluteUrl(`/${locale}${data.canonicalPath}`)]),
   )
@@ -100,10 +102,10 @@ export function buildProductListMetadata(data: ProductListPageData): Metadata {
       siteName: industrialSiteConfig.brandName,
     },
     robots: {
-      index: true,
+      index: shouldIndex,
       follow: true,
       googleBot: {
-        index: true,
+        index: shouldIndex,
         follow: true,
       },
     },

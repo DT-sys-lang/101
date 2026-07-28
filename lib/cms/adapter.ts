@@ -7,6 +7,7 @@ export {
   buildCategoryTreeFromFacts,
   buildCategoryTreeWithBreadcrumbs,
   buildDomainFromCmsFacts,
+  buildDomainFromCmsFactsWithProductTolerance,
   buildEvidence,
   buildFactTable,
   buildFAQPageSchema,
@@ -34,6 +35,8 @@ export {
   isCmsFactInput,
   isProductFact,
   normalizeCmsFactInput,
+  normalizeCmsFactSourceInput,
+  normalizeCmsFactInputWithProductTolerance,
 } from '@/adapter/product.adapter'
 
 export type {
@@ -42,5 +45,7 @@ export type {
   CmsDomainBuildResult,
   CmsFactAdapterOptions,
   CmsFactInput,
+  CmsTolerantDomainBuildResult,
   ProductFact,
+  ProductFactValidationIssue,
 } from '@/adapter/product.adapter'

@@ -765,7 +765,7 @@ function toProductFact(row, tables) {
     releasedAt: optionalValue(row, 'released_at'),
     revisedAt: requireValue(row, 'revised_at', `products:${id}`),
     primaryCategoryId: core.primaryCategory,
-    additionalCategoryIds: splitList(optionalValue(row, 'additional_category_ids')),
+    additionalCategoryIds: normalizeAdditionalCategoryIds(optionalValue(row, 'additional_category_ids'), core.primaryCategory),
     industryIds: splitList(optionalValue(row, 'industry_ids')),
     applicationIds: splitList(optionalValue(row, 'application_ids')),
     measurementKinds: readMeasurementKinds(row, measurements),
@@ -1218,6 +1218,10 @@ function splitList(value) {
     .split(';')
     .map((item) => item.trim())
     .filter(Boolean)
+}
+
+function normalizeAdditionalCategoryIds(value, primaryCategoryId) {
+  return [...new Set(splitList(value).filter((categoryId) => categoryId && categoryId !== primaryCategoryId))]
 }
 
 function optionalObject(value) {

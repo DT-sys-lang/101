@@ -1,6 +1,7 @@
 import { architectureFreezeV1 } from './architecture-freeze-v1'
 import { industrialSensorCategoryTree, type CategoryNode, type CategoryTree } from './category'
-import type { ProductListItem, ProductListResult } from './product-catalog'
+import { getVisibleProductCategoryChildren } from './category-visibility'
+import type { ProductCatalogIndex, ProductListItem, ProductListResult } from './product-catalog'
 import type { CategoryId, LocaleCode, LocalizedText } from './primitives'
 
 const siteOrigin = normalizeSiteOrigin(process.env.NEXT_PUBLIC_SITE_ORIGIN, 'https://www.yufavor.example')
@@ -615,7 +616,11 @@ function localize(text: LocalizedText, locale: LocaleCode) {
   return text[locale] ?? text.en
 }
 
-function getPrimaryCategories(categoryTree: CategoryTree = industrialSensorCategoryTree) {
+function getPrimaryCategories(categoryTree: CategoryTree = industrialSensorCategoryTree, catalog?: ProductCatalogIndex) {
+  if (catalog) {
+    return [...getVisibleProductCategoryChildren(categoryTree.root, catalog)]
+  }
+
   return [...(categoryTree.root.children ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
@@ -676,9 +681,9 @@ function toProductSearchHref(query: string) {
   return `/products?search=${encodeURIComponent(query)}`
 }
 
-export function getIndustrialSiteLayout(locale: LocaleCode, categoryTree: CategoryTree = industrialSensorCategoryTree): SiteLayoutProjection {
+export function getIndustrialSiteLayout(locale: LocaleCode, categoryTree: CategoryTree = industrialSensorCategoryTree, catalog?: ProductCatalogIndex): SiteLayoutProjection {
   const copy = siteText[locale]
-  const categories = getPrimaryCategories(categoryTree)
+  const categories = getPrimaryCategories(categoryTree, catalog)
 
   return {
     architectureVersion: architectureFreezeV1.version,
@@ -738,10 +743,11 @@ export function getIndustrialHomepage(
   locale: LocaleCode,
   productList: ProductListResult,
   categoryTree: CategoryTree = industrialSensorCategoryTree,
+  catalog?: ProductCatalogIndex,
 ): HomepageProjection {
   const copy = homepageText[locale]
   const site = siteText[locale]
-  const categories = getPrimaryCategories(categoryTree)
+  const categories = getPrimaryCategories(categoryTree, catalog)
 
   return {
     architectureVersion: architectureFreezeV1.version,

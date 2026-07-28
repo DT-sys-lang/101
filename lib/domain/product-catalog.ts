@@ -148,6 +148,7 @@ export interface ProductCatalogIndex {
   readonly listItemById: ReadonlyMap<ProductId, ProductListItem>
   readonly productRouteByPath: ReadonlyMap<ProductCanonicalPath, ProductRouteIndexEntry>
   readonly productIdByModelSlug: ReadonlyMap<SlugSegment, ProductId>
+  readonly categoryTree: CategoryTree
   readonly categoryById: ReadonlyMap<CategoryId, CategoryNode>
   readonly categoryBySlugPath: ReadonlyMap<SeoSlugPath, CategoryNode>
   readonly categoryPathById: ReadonlyMap<CategoryId, readonly CategoryNode[]>
@@ -310,6 +311,7 @@ export function createProductCatalogIndex({ locale, products, categoryTree }: Cr
     listItemById,
     productRouteByPath,
     productIdByModelSlug,
+    categoryTree,
     categoryById,
     categoryBySlugPath,
     categoryPathById,

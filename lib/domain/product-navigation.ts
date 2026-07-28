@@ -1,6 +1,7 @@
 import { industrialSensorCategoryTree, type CategoryNode, type CategoryTree } from './category'
+import { getCategoryProductCount, getVisibleProductCategoryChildren } from './category-visibility'
 import type { ProductCatalogIndex } from './product-catalog'
-import type { CategoryId, LocaleCode, LocalizedText, ProductId } from './primitives'
+import type { CategoryId, LocaleCode, LocalizedText } from './primitives'
 
 export interface ProductNavigationItemViewModel {
   readonly id: string
@@ -43,7 +44,7 @@ export function buildProductNavigationViewModel(
       }
 
   const toItem = (category: CategoryNode, remainingLevels: number): ProductNavigationItemViewModel => {
-    const productCount = getCategoryProductCount(category.id, catalog)
+    const productCount = getCategoryProductCount(catalog, category.id)
 
     return {
       id: category.id,
@@ -52,7 +53,7 @@ export function buildProductNavigationViewModel(
       productCount,
       productCountLabel: copy.countLabel(productCount),
       children: remainingLevels > 0
-        ? getSortedChildren(category).map((child) => toItem(child, remainingLevels - 1))
+        ? getVisibleProductCategoryChildren(category, catalog).map((child) => toItem(child, remainingLevels - 1))
         : [],
     }
   }
@@ -61,7 +62,7 @@ export function buildProductNavigationViewModel(
     categoryLabel: copy.categoryLabel,
     overviewHref: '/products',
     overviewLabel: copy.overviewLabel,
-    groups: getSortedChildren(categoryTree.root).map((category) => {
+    groups: getVisibleProductCategoryChildren(categoryTree.root, catalog).map((category) => {
       const item = toItem(category, 2)
 
       return {
@@ -71,19 +72,6 @@ export function buildProductNavigationViewModel(
       }
     }),
   }
-}
-
-function getCategoryProductCount(categoryId: CategoryId, catalog: ProductCatalogIndex) {
-  const productIds = new Set<ProductId>()
-  const categoryIds = catalog.descendantCategoryIdsById.get(categoryId) ?? new Set<CategoryId>([categoryId])
-
-  for (const descendantCategoryId of categoryIds) {
-    for (const productId of catalog.productIdsByCategoryId.get(descendantCategoryId) ?? []) {
-      productIds.add(productId)
-    }
-  }
-
-  return productIds.size
 }
 
 function getPublicCategoryHref(category: CategoryNode) {

@@ -7,6 +7,7 @@ import { buildHomePageMetadata } from '@/lib/seo/home'
 import { HomePageStructuredData } from '@/lib/seo/structured-data'
 import {
   getRuntimeDomainCategoryTree,
+  getRuntimeDomainProductCatalog,
   listRuntimeDomainHomepageProducts,
   preloadRuntimeDomainProducts,
 } from '@/lib/runtime/domain-products'
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { readonly params: Promise<{ 
   await preloadRuntimeDomainProducts()
   const typedLocale = locale as Locale
   const productList = listRuntimeDomainHomepageProducts(typedLocale)
-  const homepage = getIndustrialHomepage(typedLocale, productList, getRuntimeDomainCategoryTree())
+  const homepage = getIndustrialHomepage(typedLocale, productList, getRuntimeDomainCategoryTree(), getRuntimeDomainProductCatalog(typedLocale))
 
   return buildHomePageMetadata(typedLocale, homepage)
 }
@@ -44,7 +45,7 @@ export default async function Page({
   await preloadRuntimeDomainProducts()
   const typedLocale = locale as Locale
   const productList = listRuntimeDomainHomepageProducts(typedLocale)
-  const homepage = getIndustrialHomepage(typedLocale, productList, getRuntimeDomainCategoryTree())
+  const homepage = getIndustrialHomepage(typedLocale, productList, getRuntimeDomainCategoryTree(), getRuntimeDomainProductCatalog(typedLocale))
 
   return (
     <>
