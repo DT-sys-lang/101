@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ProductDetailDataTabs } from '@/components/products/product-detail-data-tabs'
 import { MobileProductNavigation, ProductMegaMenu } from '@/components/stitch/product-mega-menu'
 import {
   ArrowRight,
@@ -1499,64 +1500,21 @@ function ProductDetailDataSections({
     ...(productDetailData?.geoSummary?.evidence.filter((item) => item.href).map((item) => ({ title: item.title, href: item.href as string, meta: item.sourceType })) ?? []),
   ]
   const primaryDownload = downloads[0] ?? { title: zh ? '联系工程师获取数据手册' : 'Contact engineering for datasheet', href: `/${locale}/contact`, meta: zh ? '资料请求' : 'Document request' }
-  const tabs = [
-    [zh ? '技术规格' : 'Technical Specifications', '#technical-specifications'],
-    [zh ? '尺寸' : 'Dimensions', '#dimensions'],
-    [zh ? '下载' : 'Downloads', '#downloads'],
-  ] as const
+  const features = productDetailData?.hero.badges.length ? productDetailData.hero.badges : [productDetailData?.hero.availabilityLabel ?? (zh ? '在售' : 'Available')]
 
   return (
-    <>
-      <section className="mb-8 flex gap-10 overflow-x-auto border-b border-[#E5E5E5]">
-        {tabs.map(([tab, href], index) => (
-          <Link key={tab} href={href} className={index === 0 ? 'whitespace-nowrap border-b-2 border-[#005EB8] pb-4 text-base font-bold text-[#005EB8]' : 'whitespace-nowrap pb-4 text-base font-bold text-[#30383E] transition-colors hover:text-[#005EB8]'}>
-            {tab}
-          </Link>
-        ))}
-      </section>
-
-      <section id="technical-specifications" className="scroll-mt-32 mb-16 grid grid-cols-1 gap-6 md:grid-cols-12">
-        <div className="overflow-x-auto border border-[#DDE1E4] bg-white md:col-span-8">
-          <ProductDetailDataTable locale={locale} rows={specRows} />
-        </div>
-        <aside className="flex flex-col gap-5 border border-[#DDE1E4] bg-white p-8 md:col-span-4">
-          <h2 className="text-2xl font-semibold text-[#1A1A1A]">{zh ? '关键特性' : 'Key Features'}</h2>
-          <ul className="flex flex-col gap-3 text-base font-medium text-[#30383E]">
-            {(productDetailData?.hero.badges.length ? productDetailData.hero.badges : [productDetailData?.hero.availabilityLabel ?? (zh ? '在售' : 'Available')]).map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[#005EB8]" aria-hidden="true" />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </section>
-
-      <section id="dimensions" className="scroll-mt-32 mb-16">
-        <h2 className="mb-6 border-b border-[#E5E5E5] pb-4 text-3xl font-semibold text-[#1A1A1A]">{zh ? '尺寸与安装信息' : 'Dimensions & Installation Data'}</h2>
-        <div className="grid gap-6 md:grid-cols-[0.95fr_1.05fr]">
-          <div className="border border-[#DDE1E4] bg-white p-8">
-            <ProductDetailDataTable locale={locale} rows={dimensionRows.length ? dimensionRows : specRows.slice(0, 4)} />
-          </div>
-          <div className="flex min-h-[360px] items-center justify-center border border-[#DDE1E4] bg-[#F2F4F6] p-8">
-            <Image src={productDetailData?.media.primaryImage?.href ?? asset('productDetail', 'asset-003.jpg')} alt={productDetailData?.media.primaryImage?.alt ?? (zh ? '产品尺寸图片' : 'Product dimension image')} width={680} height={420} className="max-h-[320px] w-full object-contain" />
-          </div>
-        </div>
-      </section>
-
-      <section id="downloads" className="scroll-mt-32 mb-16">
-        <h2 className="mb-6 border-b border-[#E5E5E5] pb-4 text-3xl font-semibold text-[#1A1A1A]">{zh ? '下载' : 'Downloads'}</h2>
-        <div className="max-w-xl">
-          <Link href={primaryDownload.href} className="group flex items-center justify-between border border-[#DDE1E4] bg-white p-6 transition-all hover:border-[#005EB8] hover:shadow-lg">
-            <span>
-              <span className="block text-lg font-semibold text-[#1A1A1A] group-hover:text-[#005EB8]">{primaryDownload.title}</span>
-              <span className="mt-2 block text-sm font-medium text-[#4B555E]">{primaryDownload.meta}</span>
-            </span>
-            <Download className="size-5 shrink-0 text-[#005EB8]" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
-    </>
+    <ProductDetailDataTabs
+      locale={locale}
+      specRows={specRows}
+      dimensionRows={dimensionRows.length ? dimensionRows : specRows.slice(0, 4)}
+      features={features}
+      downloads={downloads}
+      primaryDownload={primaryDownload}
+      dimensionImage={{
+        href: productDetailData?.media.primaryImage?.href ?? asset('productDetail', 'asset-003.jpg'),
+        alt: productDetailData?.media.primaryImage?.alt ?? (zh ? '产品尺寸图片' : 'Product dimension image'),
+      }}
+    />
   )
 }
 
@@ -1566,35 +1524,6 @@ function ProductOverviewSpecCard({ label, value }: { readonly label: string; rea
       <h2 className="text-lg font-semibold leading-none tracking-normal text-[#1A1A1A]">{label}</h2>
       <p className="mt-5 min-h-[44px] break-words font-mono text-[15px] font-semibold leading-6 text-[#1A1A1A]">{value}</p>
     </section>
-  )
-}
-
-function ProductDetailDataTable({
-  locale,
-  rows,
-}: {
-  readonly locale: Locale
-  readonly rows: readonly { readonly label: string; readonly value: string }[]
-}) {
-  const zh = locale === 'zh'
-
-  return (
-    <table className="w-full text-left text-base text-[#1A1A1A]">
-      <thead>
-        <tr>
-          <th className="w-1/3 border-b border-[#DDE1E4] px-6 py-4 text-sm font-bold text-[#30383E]">{zh ? '参数' : 'Parameter'}</th>
-          <th className="border-b border-[#DDE1E4] px-6 py-4 text-sm font-bold text-[#30383E]">{zh ? '数值 / 描述' : 'Value / Description'}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, index) => (
-          <tr key={`${row.label}-${index}`} className={index % 2 === 1 ? 'bg-[#F7F7F7]/70' : undefined}>
-            <td className="border-b border-[#DDE1E4] px-6 py-5 text-lg font-medium text-[#1A1A1A]">{row.label}</td>
-            <td className="border-b border-[#DDE1E4] px-6 py-5 text-lg font-medium text-[#1A1A1A]">{row.value}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
   )
 }
 
