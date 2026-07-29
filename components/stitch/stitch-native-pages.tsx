@@ -120,13 +120,13 @@ export function StitchNativePage({
         }
 
         @keyframes stitch-native-carousel {
-          0%, 16% { opacity: 1; }
-          20%, 96% { opacity: 0; }
+          0%, 18% { opacity: 1; }
+          22%, 96% { opacity: 0; }
           100% { opacity: 1; }
         }
 
         .stitch-native-hero-slide {
-          animation: stitch-native-carousel 25s infinite;
+          animation: stitch-native-carousel 35s infinite;
         }
       `}</style>
       <div className="stitch-native-page" aria-hidden="true" />
@@ -381,21 +381,37 @@ function StitchFooter({ locale }: { readonly locale: Locale }) {
 
 function HomeNativePage({ locale }: { readonly locale: Locale }) {
   const zh = locale === 'zh'
-  const heroImages = [
-    ['asset-003.png', zh ? '智能物联网解决方案' : 'Smart IoT Solutions'],
-    ['asset-004.png', zh ? '精密测量' : 'Precise Measurement'],
-    ['asset-005.png', zh ? 'OEM 定制' : 'OEM Customization'],
-    ['asset-006.png', zh ? '行业解决方案' : 'Industry Solutions'],
-    ['asset-007.png', zh ? '精准控制' : 'Precise Control'],
+  const heroSlides = [
+    { kind: 'video', src: '/videos/home/home_hero_01_video.mp4', poster: '/images/home/home_hero_01_poster.webp', label: zh ? '智能物联网解决方案' : 'Smart IoT Solutions' },
+    { kind: 'image', src: asset('home', 'asset-004.png'), label: zh ? '精密测量' : 'Precise Measurement' },
+    { kind: 'image', src: asset('home', 'asset-005.png'), label: zh ? 'OEM 定制' : 'OEM Customization' },
+    { kind: 'image', src: asset('home', 'asset-006.png'), label: zh ? '行业解决方案' : 'Industry Solutions' },
+    { kind: 'image', src: asset('home', 'asset-007.png'), label: zh ? '精准控制' : 'Precise Control' },
   ] as const
 
   return (
     <article className="bg-white">
       <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={zh ? '首页图片轮播' : 'Homepage image carousel'}>
-        {heroImages.map(([file, alt], index) => (
-          <div key={file} className={`stitch-native-hero-slide absolute inset-0 ${index === 0 ? 'opacity-100' : 'opacity-0'}`} style={{ animationDelay: `${index * 5}s` }}>
+        {heroSlides.map((slide, index) => (
+          <div key={slide.src} className={`stitch-native-hero-slide absolute inset-0 ${index === 0 ? 'opacity-100' : 'opacity-0'}`} style={{ animationDelay: `${index * 7}s` }}>
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
-            <Image src={asset('home', file)} alt={alt} fill priority={index === 0} sizes="100vw" className="object-cover" />
+            {slide.kind === 'video' ? (
+              <video
+                aria-label={slide.label}
+                autoPlay
+                className="h-full w-full object-cover"
+                disablePictureInPicture
+                loop
+                muted
+                playsInline
+                poster={slide.poster}
+                preload="metadata"
+              >
+                <source src={slide.src} type="video/mp4" />
+              </video>
+            ) : (
+              <Image src={slide.src} alt={slide.label} fill priority={index === 0} sizes="100vw" className="object-cover" />
+            )}
           </div>
         ))}
       </section>
