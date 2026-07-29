@@ -25,12 +25,36 @@ export function getCategoryProductCount(index: ProductCatalogIndex, categoryId: 
   return productIds.size
 }
 
+export function getDirectCategoryProductCount(index: ProductCatalogIndex, categoryId: CategoryId) {
+  return index.productIdsByCategoryId.get(categoryId)?.size ?? 0
+}
+
+export function isPublicProductCategory(index: ProductCatalogIndex, categoryId: CategoryId) {
+  const category = index.categoryById.get(categoryId)
+  const productCount = getCategoryProductCount(index, categoryId)
+
+  if (!category || productCount === 0) {
+    return false
+  }
+
+  if (category.parentId === null || !isStructuralProductCategory(categoryId)) {
+    return true
+  }
+
+  return getDirectCategoryProductCount(index, categoryId) > 0
+}
+
 export function getVisibleProductCategoryChildren(category: CategoryNode, index: ProductCatalogIndex): readonly CategoryNode[] {
   return getSortedChildren(category).flatMap((child) => {
     const visibleChildren = getVisibleProductCategoryChildren(child, index)
     const productCount = getCategoryProductCount(index, child.id)
+    const directProductCount = getDirectCategoryProductCount(index, child.id)
 
-    if (isStructuralProductCategory(child.id) || productCount === 0) {
+    if (isStructuralProductCategory(child.id) && directProductCount === 0) {
+      return visibleChildren
+    }
+
+    if (productCount === 0) {
       return visibleChildren
     }
 

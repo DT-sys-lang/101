@@ -4,7 +4,7 @@ import { getRuntimeDomainProductCatalog, listRuntimeDomainProducts } from '@/lib
 import {
   industrialSensorCategoryTree,
   industrialSiteConfig,
-  isStructuralProductCategory,
+  isPublicProductCategory,
   localizeText,
   type CategoryNode,
   type ProductListResult,
@@ -34,6 +34,7 @@ export interface ProductListPageData {
   readonly canonicalPath: string
   readonly title: string
   readonly description: string
+  readonly indexable: boolean
 }
 
 export function resolveProductListPage(locale: Locale, slug: readonly string[] = []): ProductListPageData | null {
@@ -73,12 +74,13 @@ export function resolveProductListPage(locale: Locale, slug: readonly string[] =
     canonicalPath: category.canonicalPath,
     title,
     description,
+    indexable: productList.pageInfo.total > 0 && isPublicProductCategory(index, category.id),
   }
 }
 
 export function buildProductListMetadata(data: ProductListPageData): Metadata {
   const canonicalUrl = getAbsoluteUrl(`/${data.locale}${data.canonicalPath}`)
-  const shouldIndex = data.productList.pageInfo.total > 0 && !isStructuralProductCategory(data.category.id)
+  const shouldIndex = data.indexable
   const languages = Object.fromEntries(
     routing.locales.map((locale) => [hrefLangByLocale[locale], getAbsoluteUrl(`/${locale}${data.canonicalPath}`)]),
   )

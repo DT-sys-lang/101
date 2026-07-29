@@ -20,8 +20,7 @@ import type {
 } from '@/lib/domain'
 import {
   buildProductNavigationViewModel,
-  getCategoryProductCount,
-  isStructuralProductCategory,
+  isPublicProductCategory,
   selectProductSeo,
   type ProductStaticParam,
   type ProductViewModelSource,
@@ -78,7 +77,7 @@ export function getRuntimeProductStaticParams(locales: readonly LocaleCode[]): r
     })
     const catalog = getRuntimeDomainProductCatalog(locale)
     const categoryParams = [...catalog.categoryBySlugPath.values()]
-      .filter((category) => category.parentId !== null && !isStructuralProductCategory(category.id) && getCategoryProductCount(catalog, category.id) > 0)
+      .filter((category) => category.parentId !== null && isPublicProductCategory(catalog, category.id))
       .map((category) => ({ locale, slug: category.slugPath.split('/').filter(Boolean) }))
 
     return [...productParams, ...categoryParams]
