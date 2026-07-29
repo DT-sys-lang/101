@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ProductDetailDataTabs } from '@/components/products/product-detail-data-tabs'
+import { HomeHeroCarousel, type HomeHeroSlide } from '@/components/stitch/home-hero-carousel'
 import { MobileProductNavigation, ProductMegaMenu } from '@/components/stitch/product-mega-menu'
 import {
   ArrowRight,
@@ -119,15 +120,6 @@ export function StitchNativePage({
           display: none !important;
         }
 
-        @keyframes stitch-native-carousel {
-          0%, 18% { opacity: 1; }
-          22%, 96% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-
-        .stitch-native-hero-slide {
-          animation: stitch-native-carousel 35s infinite;
-        }
       `}</style>
       <div className="stitch-native-page" aria-hidden="true" />
       <StitchHeader locale={locale} active={screen} productNavigation={productNavigation} />
@@ -387,34 +379,16 @@ function HomeNativePage({ locale }: { readonly locale: Locale }) {
     { kind: 'image', src: asset('home', 'asset-005.png'), label: zh ? 'OEM 定制' : 'OEM Customization' },
     { kind: 'image', src: asset('home', 'asset-006.png'), label: zh ? '行业解决方案' : 'Industry Solutions' },
     { kind: 'image', src: asset('home', 'asset-007.png'), label: zh ? '精准控制' : 'Precise Control' },
-  ] as const
+  ] as const satisfies readonly HomeHeroSlide[]
 
   return (
     <article className="bg-white">
-      <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={zh ? '首页图片轮播' : 'Homepage image carousel'}>
-        {heroSlides.map((slide, index) => (
-          <div key={slide.src} className={`stitch-native-hero-slide absolute inset-0 ${index === 0 ? 'opacity-100' : 'opacity-0'}`} style={{ animationDelay: `${index * 7}s` }}>
-            <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
-            {slide.kind === 'video' ? (
-              <video
-                aria-label={slide.label}
-                autoPlay
-                className="h-full w-full object-cover"
-                disablePictureInPicture
-                loop
-                muted
-                playsInline
-                poster={slide.poster}
-                preload="metadata"
-              >
-                <source src={slide.src} type="video/mp4" />
-              </video>
-            ) : (
-              <Image src={slide.src} alt={slide.label} fill priority={index === 0} sizes="100vw" className="object-cover" />
-            )}
-          </div>
-        ))}
-      </section>
+      <HomeHeroCarousel
+        ariaLabel={zh ? '首页图片轮播' : 'Homepage image carousel'}
+        nextLabel={zh ? '下一张首屏图' : 'Next hero slide'}
+        previousLabel={zh ? '上一张首屏图' : 'Previous hero slide'}
+        slides={heroSlides}
+      />
 
       <HomeStitchContentSections locale={locale} />
     </article>
