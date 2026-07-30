@@ -52,19 +52,24 @@ export function HomeHeroCarousel({
           >
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
             {slide.kind === 'video' ? (
-              <video
-                aria-label={slide.label}
-                autoPlay
-                className="h-full w-full object-cover"
-                disablePictureInPicture
-                loop
-                muted
-                playsInline
-                poster={slide.poster}
-                preload="metadata"
-              >
-                <source src={slide.src} type="video/mp4" />
-              </video>
+              active ? (
+                <video
+                  key={slide.src}
+                  aria-label={slide.label}
+                  autoPlay
+                  className="h-full w-full object-cover"
+                  disablePictureInPicture
+                  loop
+                  muted
+                  playsInline
+                  poster={slide.poster}
+                  preload="metadata"
+                >
+                  <source src={slide.src} type="video/mp4" />
+                </video>
+              ) : (
+                <Image src={slide.poster} alt="" fill sizes="100vw" className="object-cover" />
+              )
             ) : (
               <Image src={slide.src} alt={active ? slide.label : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
             )}

@@ -6,6 +6,7 @@ import type {
   LocaleCode,
   ProductCanonicalPath,
   ProductId,
+  QuantityRange,
   SeoSlugPath,
   SlugSegment,
   UnitCode,
@@ -587,7 +588,12 @@ function toProductListImage(asset: ProductAsset, fallbackAlt: string): ProductLi
 }
 
 function isProductVisualAsset(asset: ProductAsset) {
-  return asset.kind === 'primary-image' || asset.kind === 'gallery-image' || asset.kind === 'installation-photo' || asset.kind === 'diagram' || asset.kind === 'dimension-drawing'
+  return (asset.kind === 'primary-image' || asset.kind === 'gallery-image' || asset.kind === 'installation-photo' || asset.kind === 'diagram' || asset.kind === 'dimension-drawing')
+    && isRenderableImageHref(asset.href)
+}
+
+function isRenderableImageHref(href: string) {
+  return /\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i.test(href)
 }
 
 function getAvailabilityLabel(availability: ProductAvailabilityStatus, locale: LocaleCode) {
@@ -718,15 +724,98 @@ function getProductListSpecs(product: ProductRecord, locale: LocaleCode) {
 
   if (product.sensorProfile) {
     return [
-      { label: localizeSpecLabel('measurement', locale), value: product.sensorProfile.measurements.map((measurement) => measurement.range.display).join(' / ') },
-      { label: localizeSpecLabel('output', locale), value: product.sensorProfile.outputs.map((output) => output.value).join(' / ') },
-      { label: localizeSpecLabel('media', locale), value: localizeTechnicalValue(product.sensorProfile.environmentalLimits?.compatibleMedia?.join(' / ') ?? product.environmentalLimits.compatibleMedia?.join(' / ') ?? '-', locale) },
-    ]
+      {
+        label: localizeSpecLabel('measurement', locale),
+        value: product.sensorProfile.measurements.map((measurement) => toCardRangeDisplay(measurement.range)).filter(Boolean).join(' / '),
+      },
+      {
+        label: localizeSpecLabel('output', locale),
+        value: compactCardSpecValue(product.sensorProfile.outputs.map((output) => output.value).join(';'), { maxTokens: 4, separator: ';' }),
+      },
+      {
+        label: localizeSpecLabel('media', locale),
+        value: compactCardSpecValue(localizeTechnicalValue(product.sensorProfile.environmentalLimits?.compatibleMedia?.join(' / ') ?? product.environmentalLimits.compatibleMedia?.join(' / ') ?? '', locale), { maxTokens: 3, separator: ' / ' }),
+      },
+    ].filter((spec) => spec.value)
   }
 
   return product.specificationGroups
-    .flatMap((group) => group.values.map((value) => ({ label: localizeSpecLabel(value.label, locale), value: localizeTechnicalValue(value.display, locale) })))
+    .flatMap((group) => group.values.map((value) => ({ label: localizeSpecLabel(value.label, locale), value: compactCardSpecValue(localizeTechnicalValue(value.display, locale), { maxTokens: 3 }) })))
+    .filter((spec) => spec.value)
     .slice(0, 4)
+}
+
+function toCardRangeDisplay(range: QuantityRange) {
+  const display = compactCardSpecValue(range.display, { maxTokens: 1, maxChars: 24 })
+
+  if (display && display.length <= 24 && !/[;；,，]/.test(display)) {
+    return display
+  }
+
+  return `${formatCardNumber(range.min)}...${formatCardNumber(range.max)} ${formatUnitCode(range.unit)}`
+}
+
+function compactCardSpecValue(
+  value: string,
+  {
+    maxTokens = 3,
+    maxChars = 34,
+    separator = ';',
+  }: {
+    readonly maxTokens?: number
+    readonly maxChars?: number
+    readonly separator?: string
+  } = {},
+) {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+
+  if (!normalized || isPlaceholderSpecValue(normalized)) {
+    return ''
+  }
+
+  const tokens = normalized
+    .split(/\s*[;；,，]\s*/g)
+    .map((token) => token.trim())
+    .filter((token) => token && !isPlaceholderSpecValue(token))
+
+  const compact = (tokens.length ? uniqueValues(tokens).slice(0, maxTokens).join(separator) : normalized)
+    .replace(/\s*;\s*/g, ';')
+    .replace(/\s*\/\s*/g, ' / ')
+    .trim()
+
+  if (compact.length <= maxChars) {
+    return compact
+  }
+
+  return `${compact.slice(0, Math.max(0, maxChars - 1)).trimEnd()}…`
+}
+
+function isPlaceholderSpecValue(value: string) {
+  return /contact\s+yufavor|configured\s+range|custom\s+(?:process|electrical)\s+connection|see\s+datasheet/i.test(value)
+    || value === '-'
+}
+
+function formatCardNumber(value: number) {
+  if (Number.isInteger(value)) {
+    return String(value)
+  }
+
+  return String(Number(value.toPrecision(4))).replace(/\.0+$/, '')
+}
+
+function formatUnitCode(unit: UnitCode) {
+  const labels: Partial<Record<UnitCode, string>> = {
+    c: '℃',
+    f: '℉',
+    kpa: 'kPa',
+    mpa: 'MPa',
+    mv: 'mV',
+    percent: '%',
+    us_cm: 'uS/cm',
+    v: 'V',
+  }
+
+  return labels[unit] ?? unit
 }
 
 function localizeSpecLabel(label: string, locale: LocaleCode) {

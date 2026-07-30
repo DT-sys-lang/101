@@ -375,10 +375,10 @@ function HomeNativePage({ locale }: { readonly locale: Locale }) {
   const zh = locale === 'zh'
   const heroSlides = [
     { kind: 'video', src: '/videos/home/home_hero_01_video.mp4', poster: '/images/home/home_hero_01_poster.webp', label: zh ? '智能物联网解决方案' : 'Smart IoT Solutions' },
-    { kind: 'image', src: asset('home', 'asset-004.png'), label: zh ? '精密测量' : 'Precise Measurement' },
-    { kind: 'image', src: asset('home', 'asset-005.png'), label: zh ? 'OEM 定制' : 'OEM Customization' },
-    { kind: 'image', src: asset('home', 'asset-006.png'), label: zh ? '行业解决方案' : 'Industry Solutions' },
-    { kind: 'image', src: asset('home', 'asset-007.png'), label: zh ? '精准控制' : 'Precise Control' },
+    { kind: 'video', src: '/videos/home/home_hero_02_video.mp4', poster: '/images/home/home_hero_02_poster.webp', label: zh ? '精密测量与校准' : 'Precision measurement and calibration' },
+    { kind: 'video', src: '/videos/home/home_hero_03_video.mp4', poster: '/images/home/home_hero_03_poster.webp', label: zh ? '工业生产与测试场景' : 'Industrial production and testing' },
+    { kind: 'image', src: '/images/home/home_hero_04_poster.webp', label: zh ? '传感器与仪表产品阵列' : 'Sensor and instrument product lineup' },
+    { kind: 'video', src: '/videos/home/home_hero_05_video.mp4', poster: '/images/home/home_hero_05_poster.webp', label: zh ? 'OEM 应用与系统集成' : 'OEM applications and system integration' },
   ] as const satisfies readonly HomeHeroSlide[]
 
   return (

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { ArrowRight, ImageIcon } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { ProductListItem } from '@/lib/domain'
 
@@ -15,15 +14,11 @@ export function ProductCard({ product, href, ctaLabel, className }: { product: P
       <div className="flex flex-1 flex-col p-6">
         <div className="text-xs font-semibold uppercase text-ink-600">{product.categoryLabel}</div>
         <h3 className="mt-2 text-xl font-medium leading-7 text-ink-950 transition-colors group-hover:text-steel-700">{product.title}</h3>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <span className="font-mono text-xs font-semibold text-ink-950">{product.model}</span>
-          <Badge variant="outline">{product.familyLabel}</Badge>
-        </div>
-        <div className="mt-auto space-y-2 pt-6">
+        <div className="mt-auto space-y-2 pt-8">
           {product.keySpecs.slice(0, 3).map((spec) => (
-            <div key={`${product.id}-${spec.label}`} className="flex justify-between gap-4 border-b border-border pb-1 text-sm">
-              <span className="text-ink-600">{spec.label}</span>
-              <span className="text-right text-ink-950">{spec.value}</span>
+            <div key={`${product.id}-${spec.label}`} className="flex min-h-8 items-center justify-between gap-5 border-b border-border pb-1 text-sm">
+              <span className="shrink-0 text-ink-600">{spec.label}</span>
+              <span className="min-w-0 flex-1 truncate text-right text-ink-950" title={spec.value}>{spec.value}</span>
             </div>
           ))}
         </div>
