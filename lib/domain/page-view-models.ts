@@ -16,6 +16,10 @@ import {
   type ProductListResult,
 } from './product-catalog'
 import {
+  buildBusinessProductCategoryGroups,
+  getBusinessProductCategoryLabel,
+} from './product-navigation'
+import {
   getProductCatalog as getDefaultProductCatalog,
   getProductStaticParams as getDefaultProductStaticParams,
   listProducts as listDefaultProducts,
@@ -2026,50 +2030,22 @@ function getProductCategoryNavigation(
   index: ProductCatalogIndex,
   categoryPath: readonly CategoryNode[],
 ): ProductCatalogNavigationViewModel {
-  const rootCategory = categoryPath[0] ?? resolveCatalogRootCategory(index) ?? industrialSensorCategoryTree.root
-  const topCategories = getVisibleProductCategoryChildren(rootCategory, index)
-  const currentTopCategory = resolveCurrentNavigationCategory(topCategories, categoryPath, index)
+  const businessGroups = buildBusinessProductCategoryGroups(locale, index.categoryTree, index, categoryPath)
 
   return {
     title: locale === 'zh' ? '产品分类' : 'Product categories',
-    groups: topCategories.map((category) => {
-      const currentCategory = index.categoryById.get(category.id) ?? category
-      const children = getVisibleProductCategoryChildren(currentCategory, index)
-
-      return {
-        id: currentCategory.id,
-        title: localizeText(currentCategory.name, locale),
-        href: currentCategory.canonicalPath,
-        active: currentCategory.id === currentTopCategory?.id,
-        items: children.map((child) => ({
-          id: child.id,
-          title: localizeText(child.name, locale),
-          href: child.canonicalPath,
-        })),
-      }
-    }),
+    groups: businessGroups.map((group) => ({
+      id: group.id,
+      title: group.label,
+      href: group.href,
+      active: group.active,
+      items: group.categories.map((category) => ({
+        id: category.id,
+        title: getBusinessProductCategoryLabel(category, locale),
+        href: category.canonicalPath,
+      })),
+    })),
   }
-}
-
-function resolveCurrentNavigationCategory(
-  topCategories: readonly CategoryNode[],
-  categoryPath: readonly CategoryNode[],
-  index: ProductCatalogIndex,
-) {
-  const topCategoryIds = new Set(topCategories.map((category) => category.id))
-  const directMatch = categoryPath.find((category) => topCategoryIds.has(category.id))
-
-  if (directMatch) {
-    return directMatch
-  }
-
-  const currentCategory = categoryPath[categoryPath.length - 1]
-
-  if (currentCategory) {
-    return topCategories.find((category) => index.descendantCategoryIdsById.get(category.id)?.has(currentCategory.id)) ?? topCategories[0]
-  }
-
-  return topCategories[0]
 }
 
 function getPrimaryCategoryLinks(
