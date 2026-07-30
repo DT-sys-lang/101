@@ -11,8 +11,8 @@
       },
       "story": {
         "connect": {
-          "eyebrow": "Connect",
-          "title": "Connected Industry",
+          "eyebrow": "连接",
+          "title": "连接工业",
           "subtitle": "连接测量与工业物联网",
           "helperText": "传感器 · 数据 · 连接",
           "mediaLabel": "工业物联网与数据连接场景",
@@ -23,8 +23,8 @@
           }
         },
         "measure": {
-          "eyebrow": "Measure",
-          "title": "Precision Measurement",
+          "eyebrow": "测量",
+          "title": "精密测量",
           "subtitle": "为可靠测量而设计",
           "helperText": "压力 · 温度 · 液位",
           "mediaLabel": "压力、温度与液位测量产品",
@@ -35,8 +35,8 @@
           }
         },
         "engineer": {
-          "eyebrow": "Engineer",
-          "title": "OEM Engineering",
+          "eyebrow": "工程",
+          "title": "OEM 工程",
           "subtitle": "从核心部件到完整方案",
           "helperText": "工程 · 制造 · 定制 · 测试",
           "mediaLabel": "OEM 工程制造、定制与测试能力",
@@ -48,8 +48,8 @@
           }
         },
         "solve": {
-          "eyebrow": "Solve",
-          "title": "Industry Solutions",
+          "eyebrow": "方案",
+          "title": "行业解决方案",
           "subtitle": "面向真实工业挑战的工程方案",
           "helperText": "水系统 · 工业自动化 · 能源 · 机械",
           "mediaLabel": "覆盖水系统、工业自动化、能源与机械的行业解决方案",
@@ -61,8 +61,8 @@
           }
         },
         "control": {
-          "eyebrow": "Control",
-          "title": "Precise Control",
+          "eyebrow": "控制",
+          "title": "精准控制",
           "subtitle": "为可靠控制而设计",
           "helperText": "电磁阀 · 精准控制 · 应用定制方案",
           "mediaLabel": "精准控制阀门与应用定制方案",

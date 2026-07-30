@@ -1892,7 +1892,7 @@ function toProductDetailViewModel(
       model: product.identity.model,
       categoryLabel: data.listItem.categoryLabel,
       availabilityLabel: data.listItem.availabilityLabel,
-      badges: [product.identity.brand, product.identity.sku, product.core.family],
+      badges: [product.identity.brand, product.identity.sku, data.listItem.familyLabel],
     },
     media: {
       title: labels.media,
@@ -1929,7 +1929,7 @@ function toProductDetailViewModel(
     },
     applications: {
       title: labels.applications,
-      items: product.content.applications.map((application) => localizeText(application, locale)),
+      items: product.content.applications.map((application) => localizeText(application, locale)).filter(isString),
     },
     compatibility: {
       title: labels.compatibility,

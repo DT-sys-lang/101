@@ -25,6 +25,7 @@ export function HomeHeroCarousel({
   readonly slides: readonly HomeHeroSlide[]
 }) {
   const [activeIndex, setActiveIndex] = useAutoplayIndex(slides.length)
+  const [readyVideoSrcs, setReadyVideoSrcs] = useState<ReadonlySet<string>>(() => new Set())
   const carouselT = useTranslations('home.hero.carousel')
   const storyT = useTranslations('home.hero.story')
   const slideCount = slides.length
@@ -35,6 +36,17 @@ export function HomeHeroCarousel({
 
   const showPrevious = () => setActiveIndex((current) => (current - 1 + slideCount) % slideCount)
   const showNext = () => setActiveIndex((current) => (current + 1) % slideCount)
+  const markVideoReady = (src: string) => {
+    setReadyVideoSrcs((current) => {
+      if (current.has(src)) {
+        return current
+      }
+
+      const next = new Set(current)
+      next.add(src)
+      return next
+    })
+  }
 
   return (
     <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={carouselT('ariaLabel')}>
@@ -42,6 +54,7 @@ export function HomeHeroCarousel({
         const active = index === activeIndex
         const overlayConfig = homeHeroOverlaySlides[index]
         const slideLabel = overlayConfig ? storyT(`${overlayConfig.translationKey}.${overlayConfig.mediaLabelKey}`) : ''
+        const videoReady = slide.kind === 'video' && readyVideoSrcs.has(slide.src)
 
         return (
           <div
@@ -51,24 +64,27 @@ export function HomeHeroCarousel({
           >
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
             {slide.kind === 'video' ? (
-              active ? (
-                <video
-                  key={slide.src}
-                  aria-label={slideLabel}
-                  autoPlay
-                  className="h-full w-full object-cover"
-                  disablePictureInPicture
-                  loop
-                  muted
-                  playsInline
-                  poster={slide.poster}
-                  preload="metadata"
-                >
-                  <source src={slide.src} type="video/mp4" />
-                </video>
-              ) : (
-                <Image src={slide.poster} alt="" fill sizes="100vw" className="object-cover" />
-              )
+              <>
+                <Image src={slide.poster} alt={active ? slideLabel : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
+                {active ? (
+                  <video
+                    key={slide.src}
+                    aria-label={slideLabel}
+                    autoPlay
+                    className={cn('absolute inset-0 h-full w-full object-cover transition-opacity duration-500 motion-reduce:transition-none', videoReady ? 'opacity-100' : 'opacity-0')}
+                    disablePictureInPicture
+                    loop
+                    muted
+                    playsInline
+                    poster={slide.poster}
+                    preload="auto"
+                    onCanPlay={() => markVideoReady(slide.src)}
+                    onLoadedData={() => markVideoReady(slide.src)}
+                  >
+                    <source src={slide.src} type="video/mp4" />
+                  </video>
+                ) : null}
+              </>
             ) : (
               <Image src={slide.src} alt={active ? slideLabel : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
             )}

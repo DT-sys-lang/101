@@ -30,7 +30,7 @@ import {
   searchRoutePriority,
   type IntentPhrasebookEntry,
 } from './intent-mapping'
-import { localizeTechnicalValue } from './localization'
+import { isTextSafeForLocale, localizeTechnicalValue } from './localization'
 
 export type ProductListSort = 'relevance' | 'model-asc' | 'name-asc' | 'updated-desc' | 'category-sort'
 
@@ -509,8 +509,9 @@ export function toProductListItem(
   const seo = selectProductSeo(product, locale)
   const primaryCategory = categoryById.get(product.classification.primaryCategoryId)
   const categoryPath = categoryPathById.get(product.classification.primaryCategoryId) ?? []
-  const title = localizeText(product.content.shortName, locale) || localizeText(product.content.name, locale)
-  const summary = localizeText(product.content.summary, locale)
+  const familyLabel = getFamilyLabel(product.identity.family, locale)
+  const title = localizeText(product.content.shortName, locale) || localizeText(product.content.name, locale) || product.identity.model
+  const summary = localizeText(product.content.summary, locale) || getProductSummaryFallback(product.identity.model, familyLabel, locale)
   const keySpecs = getProductListSpecs(product, locale)
 
   return {
@@ -519,7 +520,7 @@ export function toProductListItem(
     model: product.identity.model,
     sku: product.identity.sku,
     family: product.identity.family,
-    familyLabel: getFamilyLabel(product.identity.family, locale),
+    familyLabel,
     title,
     summary,
     href: seo.slug.canonicalPath,
@@ -548,7 +549,35 @@ export function selectProductGeoAi(product: ProductRecord, locale: LocaleCode): 
 }
 
 export function localizeText(text: Readonly<Record<LocaleCode, string> & Partial<Record<string, string>>>, locale: LocaleCode) {
-  return text[locale] ?? text.en
+  const preferred = text[locale]
+
+  if (isTextSafeForLocale(preferred, locale)) {
+    return preferred.trim()
+  }
+
+  if (locale === 'en') {
+    const englishFallback = text.en
+
+    if (isTextSafeForLocale(englishFallback, locale)) {
+      return englishFallback.trim()
+    }
+
+    return Object.values(text).find((value) => isTextSafeForLocale(value, locale))?.trim() ?? ''
+  }
+
+  const zhFallback = text.zh
+
+  if (isTextSafeForLocale(zhFallback, locale)) {
+    return zhFallback.trim()
+  }
+
+  return Object.values(text).find((value) => isTextSafeForLocale(value, locale))?.trim() ?? ''
+}
+
+function getProductSummaryFallback(model: string, familyLabel: string, locale: LocaleCode) {
+  return locale === 'zh'
+    ? `${model} 工业${familyLabel}，用于技术选型、参数确认和询价沟通。`
+    : `${model} industrial ${familyLabel.toLowerCase()} for technical selection, parameter review, and RFQ discussion.`
 }
 
 function getFamilyLabel(family: ProductFamily, locale: LocaleCode) {

@@ -225,17 +225,17 @@ export function buildCategorySeoFields(category: CategoryNode, locale: LocaleCod
 }
 
 function buildProductTitle(source: ProductSeoSource, locale: LocaleCode) {
-  const shortName = localizeFactText(source.fact.shortName, locale)
-  const categoryLabel = localizeFactText(source.primaryCategory.name, locale)
+  const shortName = getProductDisplayName(source, locale)
+  const categoryLabel = getCategoryDisplayName(source, locale)
   return `${shortName} | ${categoryLabel} | ${industrialSiteConfig.brandName}`
 }
 
 function buildProductHeading(source: ProductSeoSource, locale: LocaleCode) {
-  return localizeFactText(source.fact.shortName, locale)
+  return getProductDisplayName(source, locale)
 }
 
 function buildProductDescription(source: ProductSeoSource, locale: LocaleCode) {
-  const summary = localizeFactText(source.fact.summary, locale)
+  const summary = localizeFactText(source.fact.summary, locale) || getProductDescriptionFallback(source, locale)
   const measurement = source.fact.measurements?.[0]?.range.display
   const output = source.fact.outputs?.[0]?.value
   const parts = [summary]
@@ -405,10 +405,10 @@ function buildProductPropertyValues(source: ProductSeoSource, locale: LocaleCode
 
 function buildProductFaqItems(source: ProductSeoSource, locale: LocaleCode) {
   const productName = buildProductHeading(source, locale)
-  const summary = localizeFactText(source.fact.summary, locale)
+  const summary = localizeFactText(source.fact.summary, locale) || getProductDescriptionFallback(source, locale)
   const measurement = source.fact.measurements?.[0]?.range.display
   const output = source.fact.outputs?.[0]?.value
-  const primaryCategory = localizeFactText(source.primaryCategory.name, locale)
+  const primaryCategory = getCategoryDisplayName(source, locale)
 
   return [
     {
@@ -428,6 +428,25 @@ function buildProductFaqItems(source: ProductSeoSource, locale: LocaleCode) {
       answer: output ? (locale === 'zh' ? `标准输出为 ${output}。` : `The standard output is ${output}.`) : (locale === 'zh' ? '请查看数据表确认输出配置。' : 'Check the datasheet for output configurations.'),
     },
   ]
+}
+
+function getProductDisplayName(source: ProductSeoSource, locale: LocaleCode) {
+  return localizeFactText(source.fact.shortName, locale)
+    || localizeFactText(source.fact.name, locale)
+    || source.fact.model
+}
+
+function getCategoryDisplayName(source: ProductSeoSource, locale: LocaleCode) {
+  return localizeFactText(source.primaryCategory.name, locale)
+    || (locale === 'zh' ? '工业产品' : 'Industrial product')
+}
+
+function getProductDescriptionFallback(source: ProductSeoSource, locale: LocaleCode) {
+  const category = getCategoryDisplayName(source, locale)
+
+  return locale === 'zh'
+    ? `${source.fact.model} 是用于${category}选型、参数确认和询价沟通的工业产品。`
+    : `${source.fact.model} is an industrial product for ${category.toLowerCase()} selection, parameter review, and RFQ discussion.`
 }
 
 function mapAvailabilityToSchema(availability: ProductAvailabilityStatus) {

@@ -48,6 +48,7 @@ import type {
   SignalOutputKind,
   ValveProfile,
 } from '@/lib/domain'
+import { isTextSafeForLocale } from '@/lib/domain/localization'
 
 export const CMS_FACT_ADAPTER_VERSION = 'cms-fact-layer-domain-adapter-v1'
 
@@ -869,7 +870,21 @@ export function normalizeSlug(value: string): SlugSegment | '' {
 }
 
 export function localizeFactText(text: LocalizedText, locale: LocaleCode) {
-  return text[locale] || text.en || Object.values(text).find(Boolean) || ''
+  const preferred = text[locale]
+
+  if (isTextSafeForLocale(preferred, locale)) {
+    return preferred.trim()
+  }
+
+  if (locale === 'en' && isTextSafeForLocale(text.en, locale)) {
+    return text.en.trim()
+  }
+
+  if (locale === 'zh' && isTextSafeForLocale(text.zh, locale)) {
+    return text.zh.trim()
+  }
+
+  return Object.values(text).find((value) => isTextSafeForLocale(value, locale))?.trim() ?? ''
 }
 
 export function assertObject(value: unknown, path: string): asserts value is Record<string, unknown> {

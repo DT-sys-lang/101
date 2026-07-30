@@ -12,6 +12,10 @@ const defaultPages = [
 const localeRules = {
   zh: {
     blocked: [
+      /\bConnected Industry\b/i,
+      /\bPrecision Measurement\b/i,
+      /\bIndustry Solutions\b/i,
+      /\bPrecise Control\b/i,
       /\bproduct catalog and selection hub\b/i,
       /\bFluid Control\b/,
       /\bCustomizable\b/,
@@ -41,8 +45,10 @@ const pages = (process.env.LOCALIZATION_AUDIT_PATHS ?? defaultPages.join(','))
   .split(',')
   .map((path) => path.trim())
   .filter(Boolean)
+const productDetailLimit = Number.parseInt(process.env.LOCALIZATION_AUDIT_PRODUCT_DETAIL_LIMIT ?? '5', 10)
 
 const failures = []
+const auditedPagesByLocale = {}
 
 for (const locale of locales) {
   const rules = localeRules[locale]
@@ -52,7 +58,13 @@ for (const locale of locales) {
     continue
   }
 
-  for (const path of pages) {
+  const localePages = uniqueStrings([
+    ...pages,
+    ...(await discoverProductDetailPaths(locale)),
+  ])
+  auditedPagesByLocale[locale] = localePages
+
+  for (const path of localePages) {
     const url = new URL(`/${locale}${path}`, baseUrl)
     const response = await fetch(url)
 
@@ -86,7 +98,28 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log(JSON.stringify({ ok: true, baseUrl, locales, pages }, null, 2))
+console.log(JSON.stringify({ ok: true, baseUrl, locales, pages: auditedPagesByLocale }, null, 2))
+
+async function discoverProductDetailPaths(locale) {
+  if (!Number.isFinite(productDetailLimit) || productDetailLimit < 1) {
+    return []
+  }
+
+  const response = await fetch(new URL(`/${locale}/products`, baseUrl))
+
+  if (!response.ok) {
+    return []
+  }
+
+  const html = await response.text()
+  const matches = [...html.matchAll(new RegExp(`href=["']/${locale}(/products/[^"'?#]+)["']`, 'g'))]
+
+  return uniqueStrings(matches
+    .map((match) => match[1])
+    .filter((path) => path !== '/products')
+    .filter((path) => !path.includes('/geo/')))
+    .slice(0, productDetailLimit)
+}
 
 function htmlToVisibleText(html) {
   return html
@@ -104,4 +137,8 @@ function readContext(text, index) {
   const start = Math.max(0, index - 80)
   const end = Math.min(text.length, index + 120)
   return text.slice(start, end)
+}
+
+function uniqueStrings(values) {
+  return [...new Set(values)]
 }

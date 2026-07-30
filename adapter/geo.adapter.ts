@@ -12,6 +12,7 @@ import type {
   RevisionString,
   SourceRef,
 } from '@/lib/domain'
+import { localizeTechnicalValue, localizeTechnicalValues } from '@/lib/domain/localization'
 import { selectProductClaimTypes } from '@/lib/domain/intent-mapping'
 import { localizeFactText, toNonEmptyArray } from './validation'
 
@@ -47,7 +48,7 @@ export function buildGeoAiProfile(
     },
     entity: {
       productId: product.identity.id,
-      canonicalName: localizeFactText(product.content.name, locale),
+      canonicalName: getProductDisplayName(product, locale),
       model: product.identity.model,
       brand: product.identity.brand,
       canonicalPath: seo.slug.canonicalPath,
@@ -166,33 +167,37 @@ export function buildAnswerSummary(
   locale: LocaleCode,
 ): ProductGeoAiProfile['answerSummary'] {
   const model = product.identity.model
-  const productName = localizeFactText(product.content.name, locale)
-  const categoryName = localizeFactText(categoryPath[categoryPath.length - 1].name, locale)
-  const summary = localizeFactText(product.content.summary, locale)
+  const productName = getProductDisplayName(product, locale)
+  const categoryName = getCategoryDisplayName(categoryPath, locale)
+  const summary = localizeFactText(product.content.summary, locale) || getProductSummaryFallback(product, categoryName, locale)
   const measurements = product.measurements.map((measurement) => measurement.range.display).join(', ')
   const outputs = product.outputs.map((output) => output.value).join(', ')
-  const connectionText = product.connections
-    ? `${product.connections.process.value} process connection and ${product.connections.electrical.value} electrical connection`
-    : product.valveProfile
-      ? `${product.valveProfile.connection} connection, ${product.valveProfile.material} material, and ${product.valveProfile.mode} mode`
-      : 'documented installation requirements'
+  const connectionText = getConnectionText(product, locale)
   const technicalFacts = [
-    measurements ? `${measurements} measurement coverage` : undefined,
-    outputs ? `${outputs} output options` : undefined,
+    measurements ? (locale === 'zh' ? `${measurements} 测量覆盖` : `${measurements} measurement coverage`) : undefined,
+    outputs ? (locale === 'zh' ? `${outputs} 输出选项` : `${outputs} output options`) : undefined,
     connectionText,
   ].filter(Boolean).join(', ')
   const primaryUseCaseText = product.content.applications.length
     ? product.content.applications.map((item) => localizeFactText(item, locale))
     : product.content.highlights.map((item) => localizeFactText(item, locale))
+  const filteredPrimaryUseCases = primaryUseCaseText.filter(Boolean)
   const primaryUseCases = toNonEmptyArray(
-    primaryUseCaseText.length ? primaryUseCaseText : [`${categoryName} applications`],
+    filteredPrimaryUseCases.length
+      ? filteredPrimaryUseCases
+      : [locale === 'zh' ? `${categoryName}应用` : `${categoryName} applications`],
     `product.${product.identity.id}.geoAi.answerSummary.primaryUseCases`,
   )
+  const primaryUseCase = normalizeUseCasePhrase(primaryUseCases[0], locale)
 
   return {
-    oneSentence: `${model} is a ${categoryName} for ${primaryUseCases[0]}.`,
+    oneSentence: locale === 'zh'
+      ? `${model} 是${categoryName}，适用于${primaryUseCase}。`
+      : `${model} is a ${categoryName} for ${primaryUseCase}.`,
     shortParagraph: summary,
-    technicalAbstract: `${productName} combines ${technicalFacts}.`,
+    technicalAbstract: locale === 'zh'
+      ? `${productName} 集成 ${technicalFacts}。`
+      : `${productName} combines ${technicalFacts}.`,
     primaryUseCases,
   }
 }
@@ -202,28 +207,41 @@ export function buildSelectionGuidance(
   categoryPath: NonEmptyReadonlyArray<CategoryNode>,
   locale: LocaleCode,
 ): ProductGeoAiProfile['selectionGuidance'] {
-  const categoryName = localizeFactText(categoryPath[categoryPath.length - 1].name, locale)
+  const categoryName = getCategoryDisplayName(categoryPath, locale)
+  const applicationText = product.content.applications.map((item) => localizeFactText(item, locale)).filter(Boolean)
   const bestFor = toNonEmptyArray(
-    product.content.applications.length
-      ? product.content.applications.map((item) => localizeFactText(item, locale))
-      : [`${categoryName} applications`],
+    applicationText.length
+      ? applicationText
+      : [locale === 'zh' ? `${categoryName}应用` : `${categoryName} applications`],
     `product.${product.identity.id}.geoAi.selectionGuidance.bestFor`,
   )
   const decisionCriteria = toNonEmptyArray([
-    ...(product.measurements.length ? [`Select range from ${product.measurements.map((measurement) => measurement.range.display).join(', ')}.`] : []),
-    ...(product.outputs.length ? [`Match output to controller input: ${product.outputs.map((output) => output.value).join(', ')}.`] : []),
-    ...(product.connections ? [`Confirm process connection ${product.connections.process.value}.`, `Confirm electrical connection ${product.connections.electrical.value}.`] : []),
-    ...(product.valveProfile ? [`Confirm pressure rating ${product.valveProfile.pressureRating}.`, `Confirm valve size ${product.valveProfile.size}.`] : []),
+    ...(product.measurements.length ? [locale === 'zh' ? `根据 ${product.measurements.map((measurement) => measurement.range.display).join(', ')} 确认量程。` : `Select range from ${product.measurements.map((measurement) => measurement.range.display).join(', ')}.`] : []),
+    ...(product.outputs.length ? [locale === 'zh' ? `匹配控制器输入：${product.outputs.map((output) => output.value).join(', ')}。` : `Match output to controller input: ${product.outputs.map((output) => output.value).join(', ')}.`] : []),
+    ...(product.connections ? [
+      locale === 'zh' ? `确认过程连接 ${localizeTechnicalValue(product.connections.process.value, locale)}。` : `Confirm process connection ${localizeTechnicalValue(product.connections.process.value, locale)}.`,
+      locale === 'zh' ? `确认电气连接 ${localizeTechnicalValue(product.connections.electrical.value, locale)}。` : `Confirm electrical connection ${localizeTechnicalValue(product.connections.electrical.value, locale)}.`,
+    ] : []),
+    ...(product.valveProfile ? [
+      locale === 'zh' ? `确认压力等级 ${product.valveProfile.pressureRating}。` : `Confirm pressure rating ${product.valveProfile.pressureRating}.`,
+      locale === 'zh' ? `确认阀门尺寸 ${localizeTechnicalValue(product.valveProfile.size, locale)}。` : `Confirm valve size ${localizeTechnicalValue(product.valveProfile.size, locale)}.`,
+    ] : []),
   ], `product.${product.identity.id}.geoAi.selectionGuidance.decisionCriteria`)
   const installationNotes = [
-    ...(product.connections ? [`Process connection: ${product.connections.process.value}`, `Electrical connection: ${product.connections.electrical.value}`] : []),
-    ...(product.valveProfile ? [`Valve connection: ${product.valveProfile.connection}`, `Valve mode: ${product.valveProfile.mode}`] : []),
+    ...(product.connections ? [
+      locale === 'zh' ? `过程连接：${localizeTechnicalValue(product.connections.process.value, locale)}` : `Process connection: ${localizeTechnicalValue(product.connections.process.value, locale)}`,
+      locale === 'zh' ? `电气连接：${localizeTechnicalValue(product.connections.electrical.value, locale)}` : `Electrical connection: ${localizeTechnicalValue(product.connections.electrical.value, locale)}`,
+    ] : []),
+    ...(product.valveProfile ? [
+      locale === 'zh' ? `阀门连接：${localizeTechnicalValue(product.valveProfile.connection, locale)}` : `Valve connection: ${localizeTechnicalValue(product.valveProfile.connection, locale)}`,
+      locale === 'zh' ? `阀门模式：${localizeTechnicalValue(product.valveProfile.mode, locale)}` : `Valve mode: ${localizeTechnicalValue(product.valveProfile.mode, locale)}`,
+    ] : []),
   ]
 
   return {
     bestFor,
     decisionCriteria,
-    compatibleMedia: product.environmentalLimits.compatibleMedia,
+    compatibleMedia: localizeTechnicalValues(product.environmentalLimits.compatibleMedia ?? [], locale),
     installationNotes,
     requiredOptions: product.variants.length ? product.variants.map((variant) => variant.orderCode) : undefined,
   }
@@ -243,10 +261,11 @@ export function buildEvidence(product: ProductGeoSource): readonly GeoAiEvidence
 function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef | undefined, locale: LocaleCode): readonly GeoAiFaqItem[] {
   const sourceRefs = toSourceRefs(sourceRef)
   const model = product.identity.model
+  const summary = localizeFactText(product.content.summary, locale) || getProductSummaryFallback(product, undefined, locale)
   const items: GeoAiFaqItem[] = [
     {
-      question: `What is ${model} used for?`,
-      answer: product.content.summary[locale] ?? product.content.summary.en,
+      question: locale === 'zh' ? `${model} 用于什么场景？` : `What is ${model} used for?`,
+      answer: summary,
       audience: 'engineer',
       sourceRefs,
     },
@@ -255,8 +274,8 @@ function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef | undefined
   const ranges = product.measurements.map((measurement) => measurement.range.display).join(', ')
   if (ranges) {
     items.push({
-      question: `What measurement range does ${model} support?`,
-      answer: `${model} supports ${ranges}.`,
+      question: locale === 'zh' ? `${model} 支持什么测量范围？` : `What measurement range does ${model} support?`,
+      answer: locale === 'zh' ? `${model} 支持 ${ranges}。` : `${model} supports ${ranges}.`,
       audience: 'engineer',
       sourceRefs,
     })
@@ -265,8 +284,8 @@ function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef | undefined
   const outputs = product.outputs.map((output) => output.value).join(', ')
   if (outputs) {
     items.push({
-      question: `What output signal does ${model} provide?`,
-      answer: `${model} provides ${outputs}.`,
+      question: locale === 'zh' ? `${model} 提供什么输出信号？` : `What output signal does ${model} provide?`,
+      answer: locale === 'zh' ? `${model} 提供 ${outputs}。` : `${model} provides ${outputs}.`,
       audience: 'buyer',
       sourceRefs,
     })
@@ -274,24 +293,78 @@ function buildGeoFaq(product: ProductGeoSource, sourceRef: SourceRef | undefined
 
   if (product.valveProfile) {
     items.push({
-      question: `What pressure rating does ${model} support?`,
-      answer: `${model} is specified with ${product.valveProfile.pressureRating} pressure rating, ${product.valveProfile.connection} connection, and ${product.valveProfile.size} size.`,
+      question: locale === 'zh' ? `${model} 支持什么压力等级？` : `What pressure rating does ${model} support?`,
+      answer: locale === 'zh'
+        ? `${model} 标注压力等级为 ${product.valveProfile.pressureRating}，连接为 ${localizeTechnicalValue(product.valveProfile.connection, locale)}，尺寸为 ${localizeTechnicalValue(product.valveProfile.size, locale)}。`
+        : `${model} is specified with ${product.valveProfile.pressureRating} pressure rating, ${localizeTechnicalValue(product.valveProfile.connection, locale)} connection, and ${localizeTechnicalValue(product.valveProfile.size, locale)} size.`,
       audience: 'engineer',
       sourceRefs,
     })
   }
 
-  const media = product.environmentalLimits.compatibleMedia?.join(', ') || product.environmentalLimits.wettedMaterials.join(', ')
+  const media = localizeTechnicalValues(product.environmentalLimits.compatibleMedia?.length ? product.environmentalLimits.compatibleMedia : product.environmentalLimits.wettedMaterials, locale).join(', ')
   if (media) {
     items.push({
-      question: `Which media is ${model} suitable for?`,
-      answer: `${model} is listed for compatible media including ${media}.`,
+      question: locale === 'zh' ? `${model} 适合哪些介质？` : `Which media is ${model} suitable for?`,
+      answer: locale === 'zh' ? `${model} 适用介质包括 ${media}。` : `${model} is listed for compatible media including ${media}.`,
       audience: 'buyer',
       sourceRefs,
     })
   }
 
   return items
+}
+
+function getProductDisplayName(product: ProductGeoSource, locale: LocaleCode) {
+  return localizeFactText(product.content.name, locale)
+    || localizeFactText(product.content.shortName, locale)
+    || product.identity.model
+}
+
+function getCategoryDisplayName(categoryPath: NonEmptyReadonlyArray<CategoryNode>, locale: LocaleCode) {
+  return localizeFactText(categoryPath[categoryPath.length - 1].name, locale)
+    || (locale === 'zh' ? '工业产品' : 'industrial product')
+}
+
+function getProductSummaryFallback(product: ProductGeoSource, categoryName: string | undefined, locale: LocaleCode) {
+  const category = categoryName ?? (locale === 'zh' ? '工业产品' : 'industrial product')
+
+  return locale === 'zh'
+    ? `${product.identity.model} 是用于${category}选型、参数确认和询价沟通的工业产品。`
+    : `${product.identity.model} is an industrial product for ${category} selection, parameter review, and RFQ discussion.`
+}
+
+function getConnectionText(product: ProductGeoSource, locale: LocaleCode) {
+  if (product.connections) {
+    const process = localizeTechnicalValue(product.connections.process.value, locale)
+    const electrical = localizeTechnicalValue(product.connections.electrical.value, locale)
+
+    return locale === 'zh'
+      ? `${process} 过程连接和 ${electrical} 电气连接`
+      : `${process} process connection and ${electrical} electrical connection`
+  }
+
+  if (product.valveProfile) {
+    const connection = localizeTechnicalValue(product.valveProfile.connection, locale)
+    const material = localizeTechnicalValue(product.valveProfile.material, locale)
+    const mode = localizeTechnicalValue(product.valveProfile.mode, locale)
+
+    return locale === 'zh'
+      ? `${connection} 连接、${material} 材质和 ${mode} 模式`
+      : `${connection} connection, ${material} material, and ${mode} mode`
+  }
+
+  return locale === 'zh' ? '已记录安装要求' : 'documented installation requirements'
+}
+
+function normalizeUseCasePhrase(value: string, locale: LocaleCode) {
+  const trimmed = value.trim().replace(/[.。]+$/g, '')
+
+  if (locale === 'zh') {
+    return trimmed.replace(/^用于/, '')
+  }
+
+  return trimmed
 }
 
 function buildEnvironmentalFacts(product: ProductGeoSource, sourceRef: SourceRef | undefined): readonly GeoAiFact[] {

@@ -5,8 +5,15 @@ const localizedTechnicalTerms: Record<string, Partial<Record<LocaleCode, string>
   'water': { zh: '水' },
   'oil': { zh: '油' },
   'natural gas': { zh: '天然气' },
+  'groundwater': { zh: '地下水' },
+  'wastewater': { zh: '废水' },
+  'seawater': { zh: '海水' },
+  'clean water': { zh: '清水' },
   'inert gas': { zh: '惰性气体' },
   'hydraulic oil': { zh: '液压油' },
+  'gas': { zh: '气体' },
+  'liquid': { zh: '液体' },
+  'liquids': { zh: '液体' },
   'compressed air': { zh: '压缩空气' },
   'process media': { zh: '过程介质' },
   'customizable': { zh: '可定制' },
@@ -21,8 +28,14 @@ const localizedTechnicalTerms: Record<string, Partial<Record<LocaleCode, string>
   '水': { en: 'Water' },
   '油': { en: 'Oil' },
   '天然气': { en: 'Natural gas' },
+  '地下水': { en: 'Groundwater' },
+  '废水': { en: 'Wastewater' },
+  '海水': { en: 'Seawater' },
+  '清水': { en: 'Clean water' },
   '惰性气体': { en: 'Inert gas' },
   '液压油': { en: 'Hydraulic oil' },
+  '气体': { en: 'Gas' },
+  '液体': { en: 'Liquid' },
   '压缩空气': { en: 'Compressed air' },
   '过程介质': { en: 'Process media' },
   '不锈钢': { en: 'Stainless steel' },
@@ -58,10 +71,16 @@ const preservedTechnicalTokens = new Set([
 ])
 
 export function localizeTechnicalValue(value: string, locale: LocaleCode): string {
-  return localizeEmbeddedTechnicalTerms(value, locale)
+  const localized = localizeEmbeddedTechnicalTerms(value, locale)
     .split(/(\s*[/;,]\s*)/g)
     .map((segment) => localizeTechnicalSegment(segment, locale))
     .join('')
+
+  if (locale === 'en' && containsCjkText(localized)) {
+    return 'Contact Yufavor for configured value'
+  }
+
+  return localized
 }
 
 export function localizeTechnicalValues(values: readonly string[], locale: LocaleCode): readonly string[] {
@@ -113,4 +132,26 @@ function preserveTechnicalToken(value: string): string | undefined {
   }
 
   return undefined
+}
+
+export function containsCjkText(value: string): boolean {
+  return /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(value)
+}
+
+export function isTextSafeForLocale(value: string | undefined, locale: LocaleCode): value is string {
+  const trimmed = value?.trim()
+
+  if (!trimmed) {
+    return false
+  }
+
+  if (locale === 'en') {
+    return !containsCjkText(trimmed)
+  }
+
+  return !containsMojibakeText(trimmed)
+}
+
+function containsMojibakeText(value: string): boolean {
+  return /[�ÃÂ]|(?:涓|浜|鍘|鏁|绋|阃|闃|鎶|鐢|浼|犳|娴|绌)/.test(value)
 }
