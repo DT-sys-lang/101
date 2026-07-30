@@ -3,33 +3,30 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
+import { homeHeroOverlaySlides } from './home-hero-overlay.config'
+import { HomeHeroOverlayPresence } from './home-hero-overlay'
 
 export type HomeHeroSlide =
   | {
       readonly kind: 'image'
       readonly src: string
-      readonly label: string
     }
   | {
       readonly kind: 'video'
       readonly src: string
       readonly poster: string
-      readonly label: string
     }
 
 export function HomeHeroCarousel({
-  ariaLabel,
-  nextLabel,
-  previousLabel,
   slides,
 }: {
-  readonly ariaLabel: string
-  readonly nextLabel: string
-  readonly previousLabel: string
   readonly slides: readonly HomeHeroSlide[]
 }) {
   const [activeIndex, setActiveIndex] = useAutoplayIndex(slides.length)
+  const carouselT = useTranslations('home.hero.carousel')
+  const storyT = useTranslations('home.hero.story')
   const slideCount = slides.length
 
   if (!slideCount) {
@@ -40,9 +37,11 @@ export function HomeHeroCarousel({
   const showNext = () => setActiveIndex((current) => (current + 1) % slideCount)
 
   return (
-    <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={ariaLabel}>
+    <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={carouselT('ariaLabel')}>
       {slides.map((slide, index) => {
         const active = index === activeIndex
+        const overlayConfig = homeHeroOverlaySlides[index]
+        const slideLabel = overlayConfig ? storyT(`${overlayConfig.translationKey}.${overlayConfig.mediaLabelKey}`) : ''
 
         return (
           <div
@@ -55,7 +54,7 @@ export function HomeHeroCarousel({
               active ? (
                 <video
                   key={slide.src}
-                  aria-label={slide.label}
+                  aria-label={slideLabel}
                   autoPlay
                   className="h-full w-full object-cover"
                   disablePictureInPicture
@@ -71,18 +70,20 @@ export function HomeHeroCarousel({
                 <Image src={slide.poster} alt="" fill sizes="100vw" className="object-cover" />
               )
             ) : (
-              <Image src={slide.src} alt={active ? slide.label : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
+              <Image src={slide.src} alt={active ? slideLabel : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
             )}
           </div>
         )
       })}
 
+      <HomeHeroOverlayPresence activeIndex={activeIndex} />
+
       {slideCount > 1 ? (
-        <div className="absolute right-4 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-2 sm:right-6 lg:right-8">
+        <div className="absolute right-4 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-2 sm:right-6 lg:right-8">
           <button
-            aria-label={previousLabel}
+            aria-label={carouselT('previousLabel')}
             className="grid size-10 place-items-center border border-white/60 bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-[#111820] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-            title={previousLabel}
+            title={carouselT('previousLabel')}
             type="button"
             onClick={showPrevious}
           >
@@ -93,9 +94,9 @@ export function HomeHeroCarousel({
             <span className="block text-white/55">/ {String(slideCount).padStart(2, '0')}</span>
           </div>
           <button
-            aria-label={nextLabel}
+            aria-label={carouselT('nextLabel')}
             className="grid size-10 place-items-center border border-white/60 bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-[#111820] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-            title={nextLabel}
+            title={carouselT('nextLabel')}
             type="button"
             onClick={showNext}
           >

@@ -1,5 +1,78 @@
 {
   "common": {
     "localeName": "English"
+  },
+  "home": {
+    "hero": {
+      "carousel": {
+        "ariaLabel": "Homepage brand story carousel",
+        "nextLabel": "Next hero slide",
+        "previousLabel": "Previous hero slide"
+      },
+      "story": {
+        "connect": {
+          "eyebrow": "Connect",
+          "title": "Connected Industry",
+          "subtitle": "Connecting Measurement to the Industrial IoT",
+          "helperText": "Sensors · Data · Connectivity",
+          "mediaLabel": "Connected industry and industrial IoT data flow",
+          "tags": {
+            "sensors": "Sensors",
+            "data": "Data",
+            "connectivity": "Connectivity"
+          }
+        },
+        "measure": {
+          "eyebrow": "Measure",
+          "title": "Precision Measurement",
+          "subtitle": "Engineered for Reliable Measurement",
+          "helperText": "Pressure · Temperature · Level",
+          "mediaLabel": "Precision measurement products for pressure, temperature, and level",
+          "tags": {
+            "pressure": "Pressure",
+            "temperature": "Temperature",
+            "level": "Level"
+          }
+        },
+        "engineer": {
+          "eyebrow": "Engineer",
+          "title": "OEM Engineering",
+          "subtitle": "From Components to Complete Solutions",
+          "helperText": "Engineering · Manufacturing · Customization · Testing",
+          "mediaLabel": "OEM engineering, manufacturing, customization, and testing",
+          "tags": {
+            "engineering": "Engineering",
+            "manufacturing": "Manufacturing",
+            "customization": "Customization",
+            "testing": "Testing"
+          }
+        },
+        "solve": {
+          "eyebrow": "Solve",
+          "title": "Industry Solutions",
+          "subtitle": "Engineering for Real-World Challenges",
+          "helperText": "Water Systems · Industrial Automation · Energy · Machinery",
+          "mediaLabel": "Industry solutions across water systems, automation, energy, and machinery",
+          "tags": {
+            "waterSystems": "Water Systems",
+            "industrialAutomation": "Industrial Automation",
+            "energy": "Energy",
+            "machinery": "Machinery"
+          }
+        },
+        "control": {
+          "eyebrow": "Control",
+          "title": "Precise Control",
+          "subtitle": "Engineered for Reliable Control",
+          "helperText": "Solenoid Valves · Precise Control · Application-Specific Solutions",
+          "mediaLabel": "Precise control valve systems and application-specific solutions",
+          "tags": {
+            "solenoidValves": "Solenoid Valves",
+            "preciseControl": "Precise Control",
+            "applicationSpecificSolutions": "Application-Specific Solutions"
+          }
+        }
+      }
+    }
   }
 }

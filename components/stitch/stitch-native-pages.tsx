@@ -372,23 +372,17 @@ function StitchFooter({ locale }: { readonly locale: Locale }) {
 }
 
 function HomeNativePage({ locale }: { readonly locale: Locale }) {
-  const zh = locale === 'zh'
   const heroSlides = [
-    { kind: 'video', src: '/videos/home/home_hero_01_video.mp4', poster: '/images/home/home_hero_01_poster.webp', label: zh ? '智能物联网解决方案' : 'Smart IoT Solutions' },
-    { kind: 'video', src: '/videos/home/home_hero_02_video.mp4', poster: '/images/home/home_hero_02_poster.webp', label: zh ? '精密测量与校准' : 'Precision measurement and calibration' },
-    { kind: 'video', src: '/videos/home/home_hero_03_video.mp4', poster: '/images/home/home_hero_03_poster.webp', label: zh ? '工业生产与测试场景' : 'Industrial production and testing' },
-    { kind: 'image', src: '/images/home/home_hero_04_poster.webp', label: zh ? '传感器与仪表产品阵列' : 'Sensor and instrument product lineup' },
-    { kind: 'video', src: '/videos/home/home_hero_05_video.mp4', poster: '/images/home/home_hero_05_poster.webp', label: zh ? 'OEM 应用与系统集成' : 'OEM applications and system integration' },
+    { kind: 'video', src: '/videos/home/home_hero_01_video.mp4', poster: '/images/home/home_hero_01_poster.webp' },
+    { kind: 'video', src: '/videos/home/home_hero_02_video.mp4', poster: '/images/home/home_hero_02_poster.webp' },
+    { kind: 'video', src: '/videos/home/home_hero_03_video.mp4', poster: '/images/home/home_hero_03_poster.webp' },
+    { kind: 'image', src: '/images/home/home_hero_04_poster.webp' },
+    { kind: 'video', src: '/videos/home/home_hero_05_video.mp4', poster: '/images/home/home_hero_05_poster.webp' },
   ] as const satisfies readonly HomeHeroSlide[]
 
   return (
     <article className="bg-white">
-      <HomeHeroCarousel
-        ariaLabel={zh ? '首页图片轮播' : 'Homepage image carousel'}
-        nextLabel={zh ? '下一张首屏图' : 'Next hero slide'}
-        previousLabel={zh ? '上一张首屏图' : 'Previous hero slide'}
-        slides={heroSlides}
-      />
+      <HomeHeroCarousel slides={heroSlides} />
 
       <HomeStitchContentSections locale={locale} />
     </article>
