@@ -15,6 +15,7 @@ export interface CmsFactsInputDiagnostics {
     readonly productFacts: number
     readonly acceptedProductFacts?: number
     readonly rejectedProductFacts?: number
+    readonly droppedSpecificationValues?: number
     readonly rootCategoryFacts: number
     readonly normalizedProducts?: number
   }
@@ -24,6 +25,7 @@ export interface CmsFactsInputDiagnostics {
   }
   readonly error?: CmsFactsDiagnosticError
   readonly rejectedProductFacts?: readonly ProductFactValidationIssue[]
+  readonly droppedSpecificationValues?: readonly ProductFactValidationIssue[]
   readonly hints: readonly string[]
 }
 
@@ -84,6 +86,7 @@ export function diagnoseCmsFactsInput(input: unknown, source = 'cms-facts-input'
       productFacts: normalized.productFacts.length + normalized.rejectedProductFacts.length,
       acceptedProductFacts: normalized.productFacts.length,
       rejectedProductFacts: normalized.rejectedProductFacts.length,
+      droppedSpecificationValues: normalized.droppedSpecificationValues.length,
       rootCategoryFacts: normalized.categoryFacts.filter((category) => category.parentId === null).length,
     }
     const domain = buildDomainFromCmsFactsWithProductTolerance(input)
@@ -96,11 +99,13 @@ export function diagnoseCmsFactsInput(input: unknown, source = 'cms-facts-input'
         ...normalizedCounts,
         normalizedProducts: domain.products.length,
         rejectedProductFacts: domain.rejectedProductFacts.length,
+        droppedSpecificationValues: domain.droppedSpecificationValues.length,
       },
       samples,
       rejectedProductFacts: domain.rejectedProductFacts,
+      droppedSpecificationValues: domain.droppedSpecificationValues,
       hints: domain.products.length > 0
-        ? hintsForRejectedProducts(domain.rejectedProductFacts)
+        ? hintsForProductIssues(domain.rejectedProductFacts, domain.droppedSpecificationValues)
         : ['All ProductFact entries were rejected; fix at least one product before publishing CMS data.'],
     }
   } catch (error) {
@@ -349,15 +354,27 @@ function hintsForValidationError(error: CmsFactsDiagnosticError, counts: CmsFact
   return hints
 }
 
-function hintsForRejectedProducts(rejectedProductFacts: readonly ProductFactValidationIssue[]) {
-  if (rejectedProductFacts.length === 0) {
-    return []
+function hintsForProductIssues(
+  rejectedProductFacts: readonly ProductFactValidationIssue[],
+  droppedSpecificationValues: readonly ProductFactValidationIssue[],
+) {
+  const hints: string[] = []
+
+  if (rejectedProductFacts.length > 0) {
+    hints.push(
+      `${rejectedProductFacts.length} ProductFact entries were skipped; valid products are still published.`,
+      'Open rejectedProductFacts in this diagnostics response to fix the affected products.',
+    )
   }
 
-  return [
-    `${rejectedProductFacts.length} ProductFact entries were skipped; valid products are still published.`,
-    'Open rejectedProductFacts in this diagnostics response to fix the affected products.',
-  ]
+  if (droppedSpecificationValues.length > 0) {
+    hints.push(
+      `${droppedSpecificationValues.length} invalid specification value(s) were dropped while their products remained published.`,
+      'Open droppedSpecificationValues in this diagnostics response and correct the CMS field key, value, or unit.',
+    )
+  }
+
+  return hints
 }
 
 function toDiagnosticError(error: unknown): CmsFactsDiagnosticError {

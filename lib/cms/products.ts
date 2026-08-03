@@ -30,6 +30,8 @@ export interface CmsProductStatus {
   readonly inputProductCount: number
   readonly rejectedProductCount: number
   readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+  readonly droppedSpecificationValueCount: number
+  readonly droppedSpecificationValues: readonly ProductFactValidationIssue[]
   readonly sourceVersion: string
   readonly catalogVersion: ProductCatalogIndex['version']
   readonly locales: readonly LocaleCode[]
@@ -47,6 +49,7 @@ interface CmsProductSnapshot {
   readonly categoryTree: CategoryTree
   readonly inputProductCount: number
   readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+  readonly droppedSpecificationValues: readonly ProductFactValidationIssue[]
 }
 
 let productSnapshotCache: CmsProductSnapshot | undefined
@@ -133,6 +136,8 @@ export function getCmsProductStatus(): CmsProductStatus {
     inputProductCount: snapshot.inputProductCount,
     rejectedProductCount: snapshot.rejectedProductFacts.length,
     rejectedProductFacts: snapshot.rejectedProductFacts,
+    droppedSpecificationValueCount: snapshot.droppedSpecificationValues.length,
+    droppedSpecificationValues: snapshot.droppedSpecificationValues,
     sourceVersion: snapshot.sourceVersion,
     catalogVersion: enCatalog.version,
     locales: ['en', 'zh'],
@@ -219,6 +224,12 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
     return snapshot
   }
 
+  if (domain.droppedSpecificationValues.length > 0 && process.env.NODE_ENV !== 'test') {
+    console.warn(
+      `[cms-products] Dropped ${domain.droppedSpecificationValues.length} invalid specification value(s) while retaining their products. Inspect /api/cms/status for details.`,
+    )
+  }
+
   const snapshot: CmsProductSnapshot = {
     loadedAtMs: Date.now(),
     mode: source.mode,
@@ -228,6 +239,7 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
     categoryTree: domain.categoryTree,
     inputProductCount: domain.inputProductCount,
     rejectedProductFacts: domain.rejectedProductFacts,
+    droppedSpecificationValues: domain.droppedSpecificationValues,
   }
 
   productSnapshotCache = snapshot
@@ -249,6 +261,7 @@ function createMockDomainFallbackSnapshot(source: CmsProductSourceResult): CmsPr
     categoryTree: industrialSensorCategoryTree,
     inputProductCount: mockProducts.length,
     rejectedProductFacts: [],
+    droppedSpecificationValues: [],
   }
 }
 

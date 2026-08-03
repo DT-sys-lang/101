@@ -76,6 +76,7 @@ export interface CmsDomainBuildResult {
 export interface CmsTolerantDomainBuildResult extends CmsDomainBuildResult {
   readonly inputProductCount: number
   readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+  readonly droppedSpecificationValues: readonly ProductFactValidationIssue[]
 }
 
 export function buildDomainFromCmsFacts(input: unknown, options: CmsFactAdapterOptions = {}): CmsDomainBuildResult {
@@ -104,6 +105,7 @@ export function buildDomainFromCmsFactsWithProductTolerance(input: unknown, opti
     products,
     inputProductCount: normalizedInput.productFacts.length + normalizedInput.rejectedProductFacts.length,
     rejectedProductFacts,
+    droppedSpecificationValues: normalizedInput.droppedSpecificationValues,
   }
 }
 

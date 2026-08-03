@@ -170,6 +170,7 @@ export interface TolerantCmsFactInput {
   readonly categoryFacts: readonly CategoryFact[]
   readonly productFacts: readonly TolerantProductFact[]
   readonly rejectedProductFacts: readonly ProductFactValidationIssue[]
+  readonly droppedSpecificationValues: readonly ProductFactValidationIssue[]
 }
 
 export interface CmsFactAdapterOptions {
@@ -279,12 +280,22 @@ export function normalizeCmsFactInputWithProductTolerance(value: unknown, option
   })
   const productFacts: TolerantProductFact[] = []
   const rejectedProductFacts: ProductFactValidationIssue[] = []
+  const droppedSpecificationValues: ProductFactValidationIssue[] = []
+
+  validateSpecificationRegistryOrThrow(config.specificationRegistry, config.validateSpecificationKeys)
 
   value.productFacts.forEach((fact, index) => {
     try {
       const productFact = normalizeProductFact(fact, `cmsFacts.productFacts[${index}]`, config.locales)
-      validateProductSpecificationKeys(productFact.specificationGroups, config.specificationRegistry, config.validateSpecificationKeys, `cmsFacts.productFacts[${index}].specificationGroups`)
-      productFacts.push({ index, fact: productFact })
+      const sanitized = dropInvalidSpecificationValues(
+        productFact,
+        index,
+        config.specificationRegistry,
+        config.validateSpecificationKeys,
+      )
+
+      productFacts.push({ index, fact: sanitized.fact })
+      droppedSpecificationValues.push(...sanitized.issues)
     } catch (error) {
       rejectedProductFacts.push(toProductFactValidationIssue(index, fact, error))
     }
@@ -294,6 +305,7 @@ export function normalizeCmsFactInputWithProductTolerance(value: unknown, option
     categoryFacts,
     productFacts,
     rejectedProductFacts,
+    droppedSpecificationValues,
   }
 }
 
@@ -1202,11 +1214,7 @@ function validateProductSpecificationKeys(
     return
   }
 
-  const registryErrors = validateSpecificationDefinitionRegistry(registry)
-
-  for (const error of registryErrors) {
-    reject('adapter.specificationRegistry', error)
-  }
+  validateSpecificationRegistryOrThrow(registry, enabled)
 
   groups.forEach((group, groupIndex) => {
     group.values.forEach((value, valueIndex) => {
@@ -1218,6 +1226,79 @@ function validateProductSpecificationKeys(
       }
     })
   })
+}
+
+function validateSpecificationRegistryOrThrow(
+  registry: SpecificationDefinitionRegistry,
+  enabled: boolean,
+) {
+  if (!enabled) {
+    return
+  }
+
+  const registryErrors = validateSpecificationDefinitionRegistry(registry)
+
+  for (const error of registryErrors) {
+    reject('adapter.specificationRegistry', error)
+  }
+}
+
+function dropInvalidSpecificationValues(
+  fact: ProductFact,
+  productIndex: number,
+  registry: SpecificationDefinitionRegistry,
+  enabled: boolean,
+): { readonly fact: ProductFact; readonly issues: readonly ProductFactValidationIssue[] } {
+  if (!enabled) {
+    return { fact, issues: [] }
+  }
+
+  const issues: ProductFactValidationIssue[] = []
+  const specificationGroups = fact.specificationGroups.flatMap((group, groupIndex) => {
+    const values = group.values.filter((value, valueIndex) => {
+      const errors = validateSpecificationValueAgainstRegistry(value, registry)
+
+      if (errors.length === 0) {
+        return true
+      }
+
+      const valuePath = `cmsFacts.productFacts[${productIndex}].specificationGroups[${groupIndex}].values[${valueIndex}]`
+
+      for (const error of errors) {
+        issues.push(toProductFactValidationIssue(
+          productIndex,
+          fact,
+          new CmsFactValidationError(valuePath, error),
+        ))
+      }
+
+      return false
+    })
+
+    if (values.length === 0) {
+      return []
+    }
+
+    return [{
+      ...group,
+      values: toNonEmptyArray(values, `cmsFacts.productFacts[${productIndex}].specificationGroups[${groupIndex}].values`),
+    }]
+  })
+
+  if (specificationGroups.length === 0) {
+    reject(
+      `cmsFacts.productFacts[${productIndex}].specificationGroups`,
+      'expected at least one valid specification group after invalid values were removed',
+    )
+  }
+
+  return {
+    fact: {
+      ...fact,
+      specificationGroups,
+    },
+    issues,
+  }
 }
 
 function assertVariantArray(value: unknown, path: string) {

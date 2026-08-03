@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { buildDomainFromCmsFacts, normalizeCmsFactInput } from '../adapter/product.adapter.ts'
+import { buildDomainFromCmsFacts, buildDomainFromCmsFactsWithProductTolerance, normalizeCmsFactInput } from '../adapter/product.adapter.ts'
 import { sensorValveCmsFactInput } from '../adapter/cms-fact-family.fixture.ts'
 import { generateCmsFacts } from './scale-fixtures.mjs'
 import { summarizeScaleRisks } from './scale-risk-summary.mjs'
@@ -9,6 +9,7 @@ const familyFixtureSummary = summarizeCmsFactsInput(sensorValveCmsFactInput, 'se
 const errors = []
 
 validateSensorValveFixture(familyFixtureSummary.domain, errors)
+validateTolerantSpecificationFixture(errors)
 
 if (errors.length) {
   console.error(JSON.stringify({ ok: false, source: sourceSummary.summary.source, errors }, null, 2))
@@ -63,6 +64,55 @@ function validateSensorValveFixture(domain, errors) {
 
   if (valve && (!valve.valveProfile || valve.measurements.length || valve.outputs.length || valve.connections)) {
     errors.push(`${valve.identity.id}: fixture valve must validate without measurements, outputs, or electrical connections`)
+  }
+}
+
+function validateTolerantSpecificationFixture(errors) {
+  const input = structuredClone(sensorValveCmsFactInput)
+  const sensor = input.productFacts.find((product) => product.family === 'sensor')
+
+  if (!sensor) {
+    errors.push('tolerant specification fixture requires a sensor product')
+    return
+  }
+
+  sensor.specificationGroups[0].values.push({
+    key: 'media_temperature',
+    label: 'Media temperature',
+    value: '0-100% RH',
+    display: '0-100% RH',
+    unit: 'percent',
+  })
+
+  let strictValidationRejected = false
+
+  try {
+    buildDomainFromCmsFacts(input)
+  } catch {
+    strictValidationRejected = true
+  }
+
+  if (!strictValidationRejected) {
+    errors.push('strict CMS fact validation must reject a percent unit on media_temperature')
+  }
+
+  const tolerantDomain = buildDomainFromCmsFactsWithProductTolerance(input)
+  const retainedSensor = tolerantDomain.products.find((product) => product.identity.id === sensor.id)
+
+  if (!retainedSensor) {
+    errors.push('tolerant CMS fact validation must retain a product when only one specification value is invalid')
+  }
+
+  if (tolerantDomain.rejectedProductFacts.length !== 0) {
+    errors.push('tolerant CMS fact validation must not reject the whole product for one invalid specification value')
+  }
+
+  if (tolerantDomain.droppedSpecificationValues.length !== 1) {
+    errors.push(`tolerant CMS fact validation must report one dropped specification value, received ${tolerantDomain.droppedSpecificationValues.length}`)
+  }
+
+  if (retainedSensor?.specificationGroups.some((group) => group.values.some((value) => value.key === 'media_temperature'))) {
+    errors.push('tolerant CMS fact validation must not publish the invalid media_temperature value')
   }
 }
 
