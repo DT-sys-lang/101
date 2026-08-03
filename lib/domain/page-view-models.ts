@@ -1565,10 +1565,10 @@ function getManualResourceEntries(
 
 function getStaticResourceEntries(locale: LocaleCode, kind: ResourceCollectionKind): readonly ResourceEntryViewModel[] {
   const zh = locale === 'zh'
-  const commonCover = '/stitch/heiyu-trans-industrial-design-system/10-resources-technical-documents-knowledge-center/assets/asset-002.png'
+  const commonCover = '/stitch/heiyu-trans-industrial-design-system/03-product-detail-precision-pressure-sensor-series/assets/asset-003.jpg'
   const labCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg'
-  const caseCover = '/stitch/heiyu-trans-industrial-design-system/01-yufavor-industry-sections-with-image-carousel/assets/asset-006.png'
-  const oemCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-004.png'
+  const caseCover = '/stitch/heiyu-trans-industrial-design-system/04-water-pump-systems-updated-hero-image/assets/asset-003.png'
+  const oemCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg'
 
   const entries: Record<ResourceCollectionKind, readonly ResourceContentInput[]> = {
     manuals: [

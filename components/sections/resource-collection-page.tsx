@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { ArrowRight, Download, FileText, FolderOpen } from 'lucide-react'
+import { ArrowRight, Download, FolderOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { Locale } from '@/i18n/routing'
 import type { ResourceCollectionViewModel } from '@/lib/domain'
+import { getResourceEntryVisual } from './page-visual-assets'
 
 function localizedHref(locale: Locale, href: string) {
   return `/${locale}${href}`
@@ -63,20 +64,17 @@ export function ResourceCollectionPage({
 
           {visibleEntries.length ? (
             <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {visibleEntries.map((entry) => (
-                <article key={entry.key} className="flex min-h-[372px] flex-col border border-border bg-panel transition-colors hover:border-steel-700">
-                  {entry.coverImage ? (
-                    <div
-                      aria-label={entry.coverImage.alt}
-                      className="aspect-[16/8] border-b border-border bg-cover bg-center bg-ink-100"
-                      role="img"
-                      style={{ backgroundImage: `url("${entry.coverImage.href}")` }}
-                    />
-                  ) : (
-                    <div className="grid aspect-[16/8] place-items-center border-b border-border bg-ink-50 text-steel-700">
-                      <FileText className="size-7" aria-hidden="true" />
-                    </div>
-                  )}
+              {visibleEntries.map((entry, index) => {
+                const visual = getResourceEntryVisual(locale, data.kind, entry, index)
+
+                return (
+                <article key={entry.key} className="flex min-h-[372px] flex-col overflow-hidden border border-border bg-panel transition-colors hover:border-steel-700">
+                  <div
+                    aria-label={visual.alt}
+                    className="aspect-[16/8] border-b border-border bg-cover bg-center bg-ink-100"
+                    role="img"
+                    style={{ backgroundImage: `url("${visual.href}")`, backgroundPosition: visual.position ?? 'center' }}
+                  />
                   <div className="flex flex-1 flex-col p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="signal">{entry.kindLabel}</Badge>
@@ -114,7 +112,8 @@ export function ResourceCollectionPage({
                     </div>
                   </div>
                 </article>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="mt-7 border border-dashed border-ink-300 bg-ink-50 p-8 text-sm leading-7 text-ink-600">

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Locale } from '@/i18n/routing'
 import type { EntryCardViewModel, EntryPageViewModel } from '@/lib/domain'
+import { getEntryCardVisual, getEntryPageVisual, type PageVisualAsset } from './page-visual-assets'
 
 function localizedHref(locale: Locale, href: string) {
   return `/${locale}${href}`
@@ -32,7 +33,7 @@ function EntryOverviewPage({ locale, data }: { locale: Locale; data: EntryPageVi
               <Button asChild size="lg" variant="secondary"><Link href={localizedHref(locale, data.secondaryAction.href)}>{data.secondaryAction.label}<Send aria-hidden="true" /></Link></Button>
             </div>
           </div>
-          <ProofGrid data={data} />
+          <EntryVisualPanel data={data} visual={getEntryPageVisual(locale, data)} />
         </div>
       </section>
 
@@ -77,7 +78,7 @@ function FocusedEntryPage({ locale, data, entry }: { locale: Locale; data: Entry
               <Button asChild size="lg" variant="secondary"><Link href={`/${locale}/products`}>{data.rfq.secondary}</Link></Button>
             </div>
           </div>
-          <ProofGrid data={data} />
+          <EntryVisualPanel data={data} visual={getEntryCardVisual(locale, entry)} />
         </div>
       </section>
 
@@ -124,9 +125,55 @@ function ProofGrid({ data }: { data: EntryPageViewModel }) {
   return <div className="grid gap-px border border-border bg-border sm:grid-cols-3">{data.proof.map((item) => <div key={item.label} className="bg-ink-50 p-6"><div className="font-mono text-3xl font-semibold text-ink-950">{item.value}</div><div className="mt-2 text-xs leading-5 text-ink-600">{item.label}</div></div>)}</div>
 }
 
+function EntryVisualPanel({ data, visual }: { data: EntryPageViewModel; visual: PageVisualAsset }) {
+  return (
+    <div className="overflow-hidden border border-border bg-panel">
+      <div
+        aria-label={visual.alt}
+        className="relative min-h-[270px] bg-cover bg-center"
+        role="img"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(8, 21, 37, 0.04), rgba(8, 21, 37, 0.55)), url("${visual.href}")`,
+          backgroundPosition: visual.position ?? 'center',
+        }}
+      >
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/20 bg-ink-950/70 px-5 py-4 text-white backdrop-blur-sm">
+          <p className="font-mono text-[11px] font-semibold uppercase text-white/70">{data.eyebrow}</p>
+          <p className="mt-1 text-sm leading-6 text-white/85">{data.body}</p>
+        </div>
+      </div>
+      <ProofGrid data={data} />
+    </div>
+  )
+}
+
 function EntryCard({ locale, entry, label, index }: { locale: Locale; entry: EntryCardViewModel; label: string; index: number }) {
   const Icon = [Gauge, Waves, Factory, Layers3][index % 4]
-  return <Link href={localizedHref(locale, entry.href)} className="group flex min-h-[292px] flex-col border border-border bg-panel p-6 transition-colors hover:border-steel-700"><div className="flex items-start justify-between gap-4"><span className="grid h-11 w-11 place-items-center border border-border text-steel-700"><Icon className="size-5" aria-hidden="true" /></span><Badge variant="outline">{entry.meta}</Badge></div><h2 className="mt-8 text-xl font-medium text-ink-950 group-hover:text-steel-700">{entry.title}</h2><p className="mt-4 text-sm leading-6 text-ink-600">{entry.description}</p><div className="mt-auto flex items-center justify-between border-t border-border pt-5"><span className="font-mono text-[11px] text-ink-600">{entry.products.length} products</span><span className="inline-flex items-center gap-2 text-sm font-semibold uppercase text-steel-700">{label}<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span></div></Link>
+  const visual = getEntryCardVisual(locale, entry, index)
+  const productCountLabel = locale === 'zh' ? '个产品' : 'products'
+
+  return (
+    <Link href={localizedHref(locale, entry.href)} className="group flex min-h-[384px] flex-col overflow-hidden border border-border bg-panel transition-colors hover:border-steel-700">
+      <div
+        aria-label={visual.alt}
+        className="aspect-[16/7] border-b border-border bg-cover bg-center bg-ink-100"
+        role="img"
+        style={{ backgroundImage: `url("${visual.href}")`, backgroundPosition: visual.position ?? 'center' }}
+      />
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-start justify-between gap-4">
+          <span className="grid h-11 w-11 place-items-center border border-border text-steel-700"><Icon className="size-5" aria-hidden="true" /></span>
+          <Badge variant="outline">{entry.meta}</Badge>
+        </div>
+        <h2 className="mt-7 text-xl font-medium text-ink-950 group-hover:text-steel-700">{entry.title}</h2>
+        <p className="mt-4 text-sm leading-6 text-ink-600">{entry.description}</p>
+        <div className="mt-auto flex items-center justify-between gap-4 border-t border-border pt-5">
+          <span className="font-mono text-[11px] text-ink-600">{entry.products.length} {productCountLabel}</span>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase text-steel-700">{label}<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+        </div>
+      </div>
+    </Link>
+  )
 }
 
 function ScenarioCard({ icon: Icon, title, body }: { icon: typeof Gauge; title: string; body: string }) {

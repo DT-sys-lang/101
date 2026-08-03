@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Locale } from '@/i18n/routing'
 import type { ResourceDetailViewModel } from '@/lib/domain'
+import { getResourceDetailVisual } from './page-visual-assets'
 
 const contentIcons = [CircleDot, TriangleAlert, Lightbulb]
 
@@ -57,6 +58,8 @@ export function ResourceDetailPage({
         back: 'Back to list',
       }
 
+  const coverImage = getResourceDetailVisual(locale, data)
+
   return (
     <article className="bg-background">
       <header className="border-b border-border bg-panel">
@@ -83,18 +86,16 @@ export function ResourceDetailPage({
         </div>
       </header>
 
-      {data.coverImage ? (
-        <section className="border-b border-border bg-panel">
-          <div className="stitch-shell py-8 lg:py-10">
-            <div
-              aria-label={data.coverImage.alt}
-              className="aspect-[16/7] border border-border bg-cover bg-center bg-ink-100"
-              role="img"
-              style={{ backgroundImage: `url("${data.coverImage.href}")` }}
-            />
-          </div>
-        </section>
-      ) : null}
+      <section className="border-b border-border bg-panel">
+        <div className="stitch-shell py-8 lg:py-10">
+          <div
+            aria-label={coverImage.alt}
+            className="aspect-[16/7] border border-border bg-cover bg-center bg-ink-100"
+            role="img"
+            style={{ backgroundImage: `url("${coverImage.href}")`, backgroundPosition: coverImage.position ?? 'center' }}
+          />
+        </div>
+      </section>
 
       <section className="stitch-section bg-panel">
         <div className="stitch-shell grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
