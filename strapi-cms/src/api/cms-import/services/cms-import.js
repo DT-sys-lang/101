@@ -120,6 +120,15 @@ async function importResourceZip(strapiInstance, buffer, options = {}) {
     throw httpError(400, 'No importable product resources were found in the ZIP package.')
   }
 
+  const uploadProvider = String(process.env.STRAPI_UPLOAD_PROVIDER || 'local').trim().toLowerCase()
+
+  if (uploadProvider !== 'local' && !options.uploadRootDir) {
+    throw httpError(
+      409,
+      `Resource ZIP writes are disabled for the ${uploadProvider} upload provider because this importer only supports local storage. Use the provider-backed Strapi Media Library, or run dry-run validation only.`,
+    )
+  }
+
   const productRecords = await findProductsByFactIds(strapiInstance, unique(plan.resources.map((resource) => resource.productId)))
   const now = new Date().toISOString()
   const writtenFiles = []
@@ -127,52 +136,54 @@ async function importResourceZip(strapiInstance, buffer, options = {}) {
   const upsertedDocumentAssets = []
   const relationUpdates = []
 
-  for (const resource of plan.resources) {
-    const fileBuffer = await resource.entry.async('nodebuffer')
+  await strapiInstance.db.transaction(async () => {
+    for (const resource of plan.resources) {
+      const fileBuffer = await resource.entry.async('nodebuffer')
 
-    if (fileBuffer.length > maxSingleResourceBytes) {
-      throw httpError(400, `${resource.entryName} is too large. Maximum single resource size is ${maxSingleResourceBytes} bytes.`)
-    }
+      if (fileBuffer.length > maxSingleResourceBytes) {
+        throw httpError(400, `${resource.entryName} is too large. Maximum single resource size is ${maxSingleResourceBytes} bytes.`)
+      }
 
-    const fileWritten = await writeResourceFile(resource, fileBuffer, { overwrite, uploadRootDir: options.uploadRootDir })
+      const fileWritten = await writeResourceFile(resource, fileBuffer, { overwrite, uploadRootDir: options.uploadRootDir })
 
-    if (fileWritten) {
-      writtenFiles.push(resource)
-    } else {
-      skippedFiles.push(resource)
-    }
+      if (fileWritten) {
+        writtenFiles.push(resource)
+      } else {
+        skippedFiles.push(resource)
+      }
 
-    const documentAsset = await upsertDocumentAsset(strapiInstance, resource, now)
-    upsertedDocumentAssets.push({
-      ...documentAsset,
-      productId: resource.productId,
-      relationField: resource.relationField,
-    })
-  }
-
-  for (const product of productRecords) {
-    const related = upsertedDocumentAssets.filter((asset) => asset.productId === product.factId)
-    const documentIds = related.filter((asset) => asset.relationField === 'documents').map((asset) => asset.id)
-    const assetIds = related.filter((asset) => asset.relationField === 'assets').map((asset) => asset.id)
-    const data = {}
-
-    if (documentIds.length) {
-      data.documents = unique([...relationArray(product.documents).map((item) => item.id), ...documentIds])
-    }
-
-    if (assetIds.length) {
-      data.assets = unique([...relationArray(product.assets).map((item) => item.id), ...assetIds])
-    }
-
-    if (Object.keys(data).length) {
-      await strapiInstance.entityService.update(productFactUid, product.id, { data })
-      relationUpdates.push({
-        factId: product.factId,
-        documents: documentIds.length,
-        assets: assetIds.length,
+      const documentAsset = await upsertDocumentAsset(strapiInstance, resource, now)
+      upsertedDocumentAssets.push({
+        ...documentAsset,
+        productId: resource.productId,
+        relationField: resource.relationField,
       })
     }
-  }
+
+    for (const product of productRecords) {
+      const related = upsertedDocumentAssets.filter((asset) => asset.productId === product.factId)
+      const documentIds = related.filter((asset) => asset.relationField === 'documents').map((asset) => asset.id)
+      const assetIds = related.filter((asset) => asset.relationField === 'assets').map((asset) => asset.id)
+      const data = {}
+
+      if (documentIds.length) {
+        data.documents = unique([...relationArray(product.documents).map((item) => item.id), ...documentIds])
+      }
+
+      if (assetIds.length) {
+        data.assets = unique([...relationArray(product.assets).map((item) => item.id), ...assetIds])
+      }
+
+      if (Object.keys(data).length) {
+        await strapiInstance.entityService.update(productFactUid, product.id, { data })
+        relationUpdates.push({
+          factId: product.factId,
+          documents: documentIds.length,
+          assets: assetIds.length,
+        })
+      }
+    }
+  })
 
   return {
     ok: true,
@@ -538,8 +549,10 @@ async function deleteImportedProducts(strapiInstance, productIds, options = {}) 
     }
   }
 
-  const deletedProductFacts = await deleteEntities(strapiInstance, productFactUid, products)
-  const deletedDocumentAssets = await deleteEntities(strapiInstance, documentAssetUid, assetPlan.documentAssetsToDelete)
+  const { deletedProductFacts, deletedDocumentAssets } = await strapiInstance.db.transaction(async () => ({
+    deletedProductFacts: await deleteEntities(strapiInstance, productFactUid, products),
+    deletedDocumentAssets: await deleteEntities(strapiInstance, documentAssetUid, assetPlan.documentAssetsToDelete),
+  }))
 
   return {
     ok: true,

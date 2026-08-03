@@ -2,7 +2,7 @@ import { type ApplicationIntent } from './application'
 import { industrialSensorCategoryTree, type CategoryNode } from './category'
 import { getVisibleProductCategoryChildren } from './category-visibility'
 import { type IndustryKey } from './industry'
-import { localizeTechnicalValue, localizeTechnicalValues } from './localization'
+import { containsCjkText, localizeTechnicalValue, localizeTechnicalValues } from './localization'
 import {
   filterProductCatalog,
   localizeText,
@@ -181,6 +181,17 @@ export interface ProductListPageViewModel {
     }[]
   }
   readonly countLabel: string
+  readonly pagination: {
+    readonly currentPage: number
+    readonly totalPages: number
+    readonly previousHref?: string
+    readonly nextHref?: string
+    readonly pages: readonly {
+      readonly number: number
+      readonly href: string
+      readonly current: boolean
+    }[]
+  }
   readonly labels: {
     readonly eyebrow: string
     readonly allProducts: string
@@ -224,6 +235,8 @@ export interface ProductListFilterItemViewModel {
 }
 
 interface ProductListViewModelOptions {
+  readonly page?: number
+  readonly basePath?: string
   readonly search?: string
   readonly categoryIds?: readonly string[]
   readonly families?: readonly string[]
@@ -1072,8 +1085,10 @@ export function resolveProductListViewModel(
   }
 
   const filters = normalizeProductListFilters(options)
-  const filterPath = getProductListFilterPath(category)
-  const productList = source.listProducts(locale, {
+  const filterPath = options.basePath?.startsWith('/') ? options.basePath : getProductListFilterPath(category)
+  const requestedPage = normalizePageNumber(options.page)
+  const pageSize = 48
+  const query = {
     categoryId: category.id,
     categoryIds: filters.categoryIds,
     categoryMode: 'with-descendants',
@@ -1088,8 +1103,20 @@ export function resolveProductListViewModel(
     rangeMaxBar: filters.rangeMaxBar,
     search: filters.search,
     sort: 'category-sort',
-    limit: 48,
+    limit: pageSize,
+  } as const
+  const initialProductList = source.listProducts(locale, {
+    ...query,
+    offset: (requestedPage - 1) * pageSize,
   })
+  const totalPages = Math.max(1, Math.ceil(initialProductList.pageInfo.total / pageSize))
+  const currentPage = Math.min(requestedPage, totalPages)
+  const productList = currentPage === requestedPage
+    ? initialProductList
+    : source.listProducts(locale, {
+        ...query,
+        offset: (currentPage - 1) * pageSize,
+      })
   const categoryPath = index.categoryPathById.get(category.id) ?? [category]
 
   return {
@@ -1113,6 +1140,17 @@ export function resolveProductListViewModel(
       hiddenInputs: getProductSearchHiddenInputs(filters),
     },
     countLabel: locale === 'zh' ? `${productList.pageInfo.total} 款产品` : `${productList.pageInfo.total} products`,
+    pagination: {
+      currentPage,
+      totalPages,
+      previousHref: currentPage > 1 ? buildProductListHref(filterPath, filters, currentPage - 1) : undefined,
+      nextHref: currentPage < totalPages ? buildProductListHref(filterPath, filters, currentPage + 1) : undefined,
+      pages: getVisiblePageNumbers(currentPage, totalPages).map((page) => ({
+        number: page,
+        href: buildProductListHref(filterPath, filters, page),
+        current: page === currentPage,
+      })),
+    },
     labels: productListLabels[locale],
   }
 }
@@ -1896,10 +1934,19 @@ function toProductDetailViewModel(
     },
     media: {
       title: labels.media,
-      primaryImage: primaryAsset ? { href: primaryAsset.href, alt: primaryAsset.alt } : undefined,
+      primaryImage: primaryAsset
+        ? {
+            href: primaryAsset.href,
+            alt: localizeProductAssetAlt(primaryAsset.alt, data.seo.h1, locale),
+          }
+        : undefined,
       galleryImages: assets
         .filter((asset) => asset.id !== primaryAsset?.id)
-        .map((asset) => ({ href: asset.href, alt: asset.alt, kind: asset.kind })),
+        .map((asset) => ({
+          href: asset.href,
+          alt: localizeProductAssetAlt(asset.alt, data.seo.h1, locale),
+          kind: asset.kind,
+        })),
     },
     actions: {
       quoteLabel: labels.quote,
@@ -1992,6 +2039,24 @@ function toProductDetailViewModel(
       items: relatedProducts,
     },
   }
+}
+
+function localizeProductAssetAlt(
+  value: string | undefined,
+  fallback: string,
+  locale: LocaleCode,
+): string {
+  const alt = value?.trim()
+
+  if (!alt) {
+    return fallback
+  }
+
+  if (locale === 'zh') {
+    return containsCjkText(alt) ? alt : fallback
+  }
+
+  return containsCjkText(alt) ? fallback : alt
 }
 
 function toProductFaq(product: ProductRecord, locale: LocaleCode) {
@@ -2425,7 +2490,7 @@ function buildProductCategoryFacetHref(basePath: string, filters: NormalizedProd
   return buildToggleProductFilterHref(basePath, filters, 'category', categoryId)
 }
 
-function buildProductListHref(basePath: string, filters: NormalizedProductListFilters) {
+function buildProductListHref(basePath: string, filters: NormalizedProductListFilters, page = 1) {
   const params = new URLSearchParams()
 
   if (filters.search) {
@@ -2472,9 +2537,26 @@ function buildProductListHref(basePath: string, filters: NormalizedProductListFi
     params.set('rangeMaxBar', String(filters.rangeMaxBar))
   }
 
+  if (page > 1) {
+    params.set('page', String(page))
+  }
+
   const queryString = params.toString()
 
   return queryString ? `${basePath}?${queryString}` : basePath
+}
+
+function normalizePageNumber(value: number | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 1
+    ? Math.floor(value)
+    : 1
+}
+
+function getVisiblePageNumbers(currentPage: number, totalPages: number) {
+  const firstPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4))
+  const lastPage = Math.min(totalPages, firstPage + 4)
+
+  return Array.from({ length: lastPage - firstPage + 1 }, (_, index) => firstPage + index)
 }
 
 function buildToggleProductFilterHref(
@@ -2746,6 +2828,16 @@ function localizeSpecLabel(label: string, locale: LocaleCode) {
     mode: { zh: '模式' },
     'Process connection': { zh: '过程连接' },
     'Electrical connection': { zh: '电气连接' },
+    'Measurement range': { zh: '测量范围' },
+    Accuracy: { zh: '精度' },
+    'Overload limit': { zh: '过载极限' },
+    'Output signal': { zh: '输出信号' },
+    'Supply voltage': { zh: '供电电压' },
+    'Ingress protection': { zh: '防护等级' },
+    'Wetted materials': { zh: '接液材质' },
+    'Compatible media': { zh: '适用介质' },
+    'Ambient temperature': { zh: '环境温度' },
+    'Media temperature': { zh: '介质温度' },
     量程: { en: 'Range' },
     输出: { en: 'Output' },
     特性: { en: 'Feature' },

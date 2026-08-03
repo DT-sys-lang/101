@@ -1,250 +1,99 @@
-# Deployment Readiness Checklist
+# Production Deployment Readiness Checklist
 
-This checklist covers the current production target: Next.js frontend, Strapi 4.25.20, PostgreSQL, Railway for Strapi/PostgreSQL, and GitHub as the source repository.
+This checklist matches the current target: Next.js 16 on Vercel at `global.yufavor.com`, and Strapi 5 plus PostgreSQL in Docker Compose behind `cms.yufavor.com`.
 
-## Source Control Rules
+## Release Identity
 
-These files and directories must not be committed:
+- Record the Git commit used for the Vercel deployment and Strapi image.
+- Use an immutable Strapi image digest for production and retain the previous digest for rollback.
+- Run the frontend and Strapi CI gates on Node 24, matching `strapi-cms/Dockerfile`, `strapi-cms/.node-version`, and package engines.
+- Do not deploy with uncommitted or ignored runtime assets.
 
-- `.env.local`
-- `strapi-cms/.env`
-- `node_modules/`
-- `strapi-cms/node_modules/`
-- `.next/`
-- `strapi-cms/dist/`
-- `strapi-cms/.strapi/`
-- `*.log`
-- `*.tsbuildinfo`
-- `.runtime/`
+## Vercel Frontend
 
-These files are safe and expected to commit:
+Configure the production environment from `.env.example`:
 
-- `.env.example`
-- `strapi-cms/.env.example`
-- `docs/deployment-readiness-checklist.md`
-- `public/assets/products/**`
-- `outputs/cms-facts.json`, only when the frontend uses the static JSON fallback
+- `NEXT_PUBLIC_SITE_ORIGIN=https://global.yufavor.com`
+- `NEXT_PUBLIC_MEDIA_ORIGIN` equals the public R2/S3 media origin.
+- `CMS_SOURCE_MODE=cms-facts-api`
+- `CMS_FACTS_API_URL=https://cms.yufavor.com/internal/cms/facts`
+- `CMS_FACTS_API_TOKEN` matches `INTERNAL_CMS_FACTS_TOKEN` on Strapi.
+- `CMS_RESOURCES_API_URL=https://cms.yufavor.com`
+- `CMS_RESOURCES_API_TOKEN` is a read-only editorial token when required.
+- `CMS_STRAPI_API_VERSION=5`
+- `CMS_REVALIDATE_SECRET` and `CMS_PREVIEW_SECRET` are unique production secrets.
+- `STRAPI_INQUIRY_API_URL=https://cms.yufavor.com/internal/cms/inquiries`
+- `STRAPI_INQUIRY_API_TOKEN` matches `INTERNAL_CMS_INQUIRY_TOKEN` on Strapi.
+- Configure Resend values before relying on email notifications.
 
-`public/assets/products/**` must be committed before deployment because product records reference images under `/assets/products/...`.
+Never expose Strapi tokens through `NEXT_PUBLIC_*` variables.
 
-## Railway PostgreSQL
+## Strapi and PostgreSQL
 
-1. Create a PostgreSQL service in the same Railway project as Strapi.
-2. Bind the PostgreSQL service variables to the Strapi service.
-3. Prefer `DATABASE_URL` from the Railway PostgreSQL service binding.
-4. Keep `DATABASE_SSL=true` for Railway production connections.
-5. Use `DATABASE_SSL_REJECT_UNAUTHORIZED=false` unless Railway provides a trusted CA configuration for this service.
+Copy `deploy/production.env.example` to the ignored `deploy/production.env`, then verify:
 
-Required PostgreSQL/Strapi database variables:
+- `PUBLIC_URL` and `STRAPI_ADMIN_BACKEND_URL` are `https://cms.yufavor.com`.
+- `STRAPI_CORS_ORIGINS` contains only `https://global.yufavor.com` and approved preview origins.
+- Every Strapi secret and database password is unique and no placeholder remains.
+- PostgreSQL has no public host port.
+- R2/S3 credentials, bucket, endpoint, and `STRAPI_UPLOAD_BASE_URL` are configured before media migration.
+- PostgreSQL backup volume exists and backups are copied off the server.
 
-```env
-DATABASE_CLIENT=postgres
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
-DATABASE_SCHEMA=public
-DATABASE_SSL=true
-DATABASE_SSL_REJECT_UNAUTHORIZED=false
+Validate both Compose variants:
+
+```bash
+STRAPI_ENV_FILE=./deploy/production.env docker compose --env-file deploy/production.env -f docker-compose.production.yml config
+STRAPI_ENV_FILE=./deploy/production.env docker compose --env-file deploy/production.env -f docker-compose.runtime.yml config
 ```
 
-The expanded host/user/password variables can also be provided for local compatibility:
+Prefer `docker-compose.runtime.yml` on a low-memory server and pull the prebuilt image by digest.
 
-```env
-DATABASE_HOST=HOST
-DATABASE_PORT=5432
-DATABASE_NAME=DATABASE
-DATABASE_USERNAME=USER
-DATABASE_PASSWORD=PASSWORD
-DATABASE_POOL_MIN=2
-DATABASE_POOL_MAX=10
-DATABASE_CONNECTION_TIMEOUT_MS=60000
-```
+## Pre-Deploy Gates
 
-## Railway Strapi Service
+From the repository root:
 
-Set the Railway service root directory to:
-
-```text
-strapi-cms
-```
-
-Set the Node version to 20. The repository already contains:
-
-```text
-strapi-cms/.node-version
-```
-
-The Strapi package also declares:
-
-```json
-{
-  "engines": {
-    "node": ">=18 <=20"
-  }
-}
-```
-
-Required Strapi runtime variables:
-
-```env
-NODE_ENV=production
-HOST=0.0.0.0
-PUBLIC_URL=https://your-strapi-service.up.railway.app
-APP_KEYS=replace-with-random-key-1,replace-with-random-key-2,replace-with-random-key-3,replace-with-random-key-4
-API_TOKEN_SALT=replace-with-random-api-token-salt
-ADMIN_JWT_SECRET=replace-with-random-admin-jwt-secret
-TRANSFER_TOKEN_SALT=replace-with-random-transfer-token-salt
-JWT_SECRET=replace-with-random-jwt-secret
-ENCRYPTION_KEY=replace-with-random-encryption-key
-STRAPI_REST_PREFIX=/internal/cms
-INTERNAL_CMS_FACTS_TOKEN=replace-with-shared-internal-cms-facts-token
-STRAPI_TELEMETRY_DISABLED=true
-```
-
-`PORT` is normally provided by Railway. Do not hard-code a public port unless Railway requires it for this service.
-
-`INTERNAL_CMS_FACTS_TOKEN` protects the Strapi facts endpoint. It must be a strong random value and must match the frontend `CMS_FACTS_API_TOKEN` exactly.
-
-The Strapi facts endpoint is:
-
-```text
-https://your-strapi-service.up.railway.app/internal/cms/facts
-```
-
-It must be accessed with:
-
-```http
-Authorization: Bearer replace-with-shared-internal-cms-facts-token
-```
-
-## Frontend Environment
-
-Choose one production source mode.
-
-Live Strapi API mode:
-
-```env
-CMS_SOURCE_MODE=cms-facts-api
-CMS_FACTS_API_URL=https://your-strapi-service.up.railway.app/internal/cms/facts
-CMS_FACTS_API_ALLOW_FETCH=true
-CMS_FACTS_API_TOKEN=replace-with-shared-internal-cms-facts-token
-CMS_FACTS_API_TIMEOUT_MS=5000
-CMS_REVALIDATE_SECRET=replace-with-random-revalidate-secret
-CMS_PREVIEW_SECRET=replace-with-random-preview-secret
-```
-
-The frontend `CMS_FACTS_API_TOKEN` must equal the Strapi `INTERNAL_CMS_FACTS_TOKEN`.
-
-Editorial resources API mode for blog, case, and manual content:
-
-```env
-CMS_RESOURCES_API_URL=https://your-strapi-service.up.railway.app
-CMS_RESOURCES_API_TOKEN=replace-with-optional-strapi-content-api-token
-CMS_RESOURCES_API_TIMEOUT_MS=5000
-```
-
-`CMS_RESOURCES_API_URL` points to the Strapi content API origin or REST root. It can be the Strapi origin, `/internal/cms`, or `/api`; this project defaults an origin-only value to `/internal/cms` to match `STRAPI_REST_PREFIX`. Set `CMS_RESOURCES_API_TOKEN` only if the Strapi content API requires authorization for `blog-posts`, `case-studies`, or `product-manuals`.
-
-Static JSON fallback mode:
-
-```env
-CMS_SOURCE_MODE=env-facts-json
-CMS_FACTS_JSON_FILE=cms-facts.json
-```
-
-The application resolves `CMS_FACTS_JSON_FILE` by basename under `outputs/`, so `CMS_FACTS_JSON_FILE=cms-facts.json` reads `outputs/cms-facts.json`. Commit `outputs/cms-facts.json` when this mode is used.
-
-Do not use `mock-domain` for production unless intentionally running a demo with fixture data.
-
-## Pre-Deploy Build Checks
-
-Run these commands from a clean working tree before deployment:
-
-```powershell
-Set-Location -LiteralPath "<project-root>"
-npm run build
-
-Set-Location -LiteralPath "<project-root>\strapi-cms"
+```bash
+npm ci
+npm run lint
+npm run typecheck
+npm run validate:boundaries
+npm run validate:cms-facts
+npm run validate:strapi-response
+npm run validate:domain
+npm run validate:seo
+npm run validate:geo
+npm run validate:scale-300
 npm run build
 ```
 
-Equivalent `cmd.exe` form:
+From `strapi-cms` with Node 24:
 
-```cmd
-cd /d "<project-root>"
-npm run build
-
-cd /d "<project-root>\strapi-cms"
+```bash
+npm ci
 npm run build
 ```
 
-The Strapi build should run with Node 20 in CI/Railway. If the local machine uses Node 24, treat local success as useful but not a substitute for Railway Node 20 validation.
+Run `npm audit --omit=dev` in both workspaces and resolve production high/critical findings before launch.
 
 ## Post-Deploy Smoke Tests
 
-Replace domains and secrets with production values.
+- `https://global.yufavor.com/zh` and `/en` return 200 and the `<html lang>` value matches the locale.
+- Core product, industry, application, resource, and contact pages return 200 in both languages.
+- `/api/cms/status` reports `activeMode: cms-facts-api` and the expected product count.
+- `/api/product-feed`, `/sitemap.xml`, `/robots.txt`, and `/llms.txt` return valid content.
+- A known sensor and valve detail page render images, specifications, canonical metadata, and JSON-LD.
+- Product pagination exposes every published product.
+- `cms.yufavor.com/admin` loads through Nginx and the protected facts endpoint rejects missing tokens.
+- Publish one CMS change and confirm the revalidation webhook refreshes the frontend.
+- Submit one test inquiry and confirm the record exists in Strapi/PostgreSQL and the expected notification is delivered.
+- Upload one image and one PDF through Strapi's provider-backed Media Library, then verify both resolve through the public media origin.
+- With `STRAPI_UPLOAD_PROVIDER=aws-s3`, the custom resource ZIP importer intentionally permits dry-run only until it gains provider-backed upload support.
+- Run localization validation against production:
 
-1. Frontend CMS status should not be mock:
-
-```powershell
-Invoke-RestMethod "https://your-frontend-domain/api/cms/status"
+```bash
+LOCALIZATION_AUDIT_BASE_URL=https://global.yufavor.com npm run validate:localization
 ```
 
-Expected: `activeMode` is not `mock-domain`. For live Strapi, it should be `cms-facts-api`; for static fallback, it should be `env-facts-json`.
+## Go / No-Go
 
-2. Product feed should contain 10 products:
-
-```powershell
-Invoke-RestMethod "https://your-frontend-domain/api/product-feed"
-```
-
-Expected: product count is `10`.
-
-3. Product listing should be accessible:
-
-```text
-https://your-frontend-domain/zh/products
-```
-
-4. One sensor detail page should be accessible:
-
-```text
-https://your-frontend-domain/zh/products/<sensor-product-path>
-```
-
-Use a known sensor product from the feed, such as a `YF-P*` product.
-
-5. One valve detail page should be accessible:
-
-```text
-https://your-frontend-domain/zh/products/<valve-product-path>
-```
-
-Use a known valve product from the feed, such as a `YF-F*` product.
-
-6. Strapi facts endpoint should be accessible with the Bearer token:
-
-```powershell
-Invoke-RestMethod `
-  -Headers @{ Authorization = "Bearer replace-with-shared-internal-cms-facts-token" } `
-  "https://your-strapi-service.up.railway.app/internal/cms/facts"
-```
-
-Expected: response is direct CMS facts JSON, not a Strapi `{ data, meta }` envelope.
-
-## Go/No-Go Criteria
-
-Go when all are true:
-
-- Frontend build passes.
-- Strapi build passes on Node 20.
-- Railway PostgreSQL is created and bound to Strapi.
-- Strapi root directory is `strapi-cms`.
-- `NODE_ENV=production` is set for Strapi.
-- Strapi secrets are unique production values, not example placeholders.
-- `ENCRYPTION_KEY` is injected from the secret manager so protected admin users can recover API-token keys.
-- `INTERNAL_CMS_FACTS_TOKEN` and frontend `CMS_FACTS_API_TOKEN` match.
-- The frontend source mode is intentionally selected.
-- `CMS_RESOURCES_API_URL` is set if blog, case, or manual pages should read Strapi editorial content.
-- `public/assets/products/**` is committed.
-- `outputs/cms-facts.json` is committed if static JSON fallback is used.
-- `.env.local` and `strapi-cms/.env` are not tracked.
-- Post-deploy smoke tests pass.
+Proceed only when all automated gates pass, the production-equivalent smoke tests have evidence, backups and rollback are proven, CMS mode is not `mock-domain`, and inquiry persistence is confirmed. Any missing runtime asset, language contamination, inaccessible product page, high/critical production dependency advisory, or unverified backup/rollback is a launch blocker.

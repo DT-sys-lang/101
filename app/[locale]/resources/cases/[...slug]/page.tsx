@@ -5,6 +5,7 @@ import { isLocale, type Locale, routing } from '@/i18n/routing'
 import { resolveResourceDetailPageViewModel } from '@/lib/domain'
 import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { listRuntimeResourceContent } from '@/lib/runtime/domain-resources'
+import { buildResourceDetailMetadata } from '@/lib/seo/resources'
 
 export const revalidate = 3600
 
@@ -13,6 +14,17 @@ export function generateStaticParams() {
     { locale, slug: ['iot-application-cases'] },
     { locale, slug: ['oem-cases'] },
   ])
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: readonly string[] }> }) {
+  const { locale, slug } = await params
+
+  if (!isLocale(locale)) return {}
+
+  await preloadRuntimeDomainProducts()
+  const content = await listRuntimeResourceContent(locale, 'cases')
+  const data = resolveResourceDetailPageViewModel(locale, 'cases', slug, runtimeProductViewModelSource, content)
+  return data ? buildResourceDetailMetadata(locale, 'cases', slug, data) : {}
 }
 
 export default async function CaseResourceDetailPage({

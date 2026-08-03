@@ -134,26 +134,7 @@ async function fetchCmsResourceRecords(config: CmsResourcesConfig, kind: Resourc
   const url = new URL(`${config.apiBaseUrl}/${collectionPaths[kind]}`)
   addDefaultQuery(url, kind, config.apiVersion)
 
-  const controller = new AbortController()
-  const timeoutId = globalThis.setTimeout(() => controller.abort(), config.timeoutMs)
-
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: buildRequestHeaders(config),
-      signal: controller.signal,
-      next: { revalidate: 3600, tags: ['cms-resources'] },
-    })
-
-    if (!response.ok) {
-      return []
-    }
-
-    const parsed = await response.json() as unknown
-    return readStrapiCollectionData(parsed)
-  } finally {
-    globalThis.clearTimeout(timeoutId)
-  }
+  return fetchAllCmsResourcePages(url, config)
 }
 
 async function fetchCmsResourceUploadRecords(config: CmsResourcesConfig, kind: ResourceCollectionKind): Promise<readonly EntityRecord[]> {
@@ -172,31 +153,60 @@ async function fetchCmsResourceUploadRecords(config: CmsResourcesConfig, kind: R
   url.searchParams.append('sort[0]', 'priority:asc')
   url.searchParams.append('sort[1]', 'publishedOn:desc')
 
-  const controller = new AbortController()
-  const timeoutId = globalThis.setTimeout(() => controller.abort(), config.timeoutMs)
-
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: buildRequestHeaders(config),
-      signal: controller.signal,
-      next: { revalidate: 3600, tags: ['cms-resources'] },
-    })
-
-    if (!response.ok) {
-      return []
-    }
-
-    const parsed = await response.json() as unknown
-    return readStrapiCollectionData(parsed).filter((record) => {
+    return (await fetchAllCmsResourcePages(url, config)).filter((record) => {
       const section = readResourceUploadSection(record.section)
       return section ? resourceUploadSlots[section].kind === kind : false
     })
   } catch {
     return []
-  } finally {
-    globalThis.clearTimeout(timeoutId)
   }
+}
+
+async function fetchAllCmsResourcePages(url: URL, config: CmsResourcesConfig): Promise<readonly EntityRecord[]> {
+  const allRecords: EntityRecord[] = []
+
+  for (let page = 1; page <= 1000; page += 1) {
+    const pageUrl = new URL(url)
+    pageUrl.searchParams.set('pagination[page]', String(page))
+    const controller = new AbortController()
+    const timeoutId = globalThis.setTimeout(() => controller.abort(), config.timeoutMs)
+
+    try {
+      const response = await fetch(pageUrl, {
+        method: 'GET',
+        headers: buildRequestHeaders(config),
+        signal: controller.signal,
+        next: { revalidate: 3600, tags: ['cms-resources'] },
+      })
+
+      if (!response.ok) {
+        return allRecords
+      }
+
+      const parsed = await response.json() as unknown
+      const records = readStrapiCollectionData(parsed)
+      allRecords.push(...records)
+      const pageCount = readStrapiPageCount(parsed)
+
+      if ((pageCount !== undefined && page >= pageCount) || (pageCount === undefined && records.length < 100)) {
+        return allRecords
+      }
+    } finally {
+      globalThis.clearTimeout(timeoutId)
+    }
+  }
+
+  return allRecords
+}
+
+function readStrapiPageCount(value: unknown): number | undefined {
+  if (!isRecord(value) || !isRecord(value.meta) || !isRecord(value.meta.pagination)) {
+    return undefined
+  }
+
+  const pageCount = value.meta.pagination.pageCount
+  return typeof pageCount === 'number' && Number.isFinite(pageCount) && pageCount >= 0 ? pageCount : undefined
 }
 
 function addDefaultQuery(url: URL, kind: ResourceCollectionKind, apiVersion: CmsStrapiApiVersion): void {

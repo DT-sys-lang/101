@@ -1,7 +1,8 @@
 import { performance } from 'node:perf_hooks'
 import { buildDomainFromCmsFacts } from '../adapter/product.adapter.ts'
 import { routing } from '../i18n/routing.ts'
-import { createProductCatalogIndex } from '../lib/domain/product-catalog.ts'
+import { createProductCatalogIndex, filterProductCatalog } from '../lib/domain/product-catalog.ts'
+import { resolveProductListViewModel } from '../lib/domain/page-view-models.ts'
 import { buildApplicationGeoAnswerBlocksDocument, buildGeoAnswerBlocksDocument, buildGeoIndex, buildGeoProductFeed } from '../lib/geo/index.ts'
 import { buildSitemapForProducts } from '../lib/seo/sitemap.ts'
 import { generateCmsFacts } from './scale-fixtures.mjs'
@@ -23,6 +24,7 @@ const geoBreakdown = getGeoAnswerBlockBreakdown(domain.products)
 const indexes = time('buildCatalogIndexesMs', () => Object.fromEntries(
   routing.locales.map((locale) => [locale, createProductCatalogIndex({ locale, products: domain.products, categoryTree: domain.categoryTree })]),
 ))
+const paginationChecks = validateProductPagination(indexes, requestedCount, errors)
 const geoDocuments = time('buildGeoDocumentsMs', () => Object.fromEntries(
   routing.locales.map((locale) => [locale, {
     feed: buildGeoProductFeed(locale),
@@ -50,6 +52,7 @@ console.log(JSON.stringify({
   sitemapBreakdown,
   geoBreakdown,
   duplicateRisks: summarizeScaleRisks(facts, domain),
+  paginationChecks,
   timings,
   budgets: {
     maxSitemapEntriesPerFile: 50000,
@@ -160,6 +163,43 @@ function validateDuplicateRisks({ facts, domain, errors }) {
   if (risks.productsMissingOverloadLimit > 0) {
     errors.push(`products missing overloadLimit: ${risks.productsMissingOverloadLimit}`)
   }
+}
+
+function validateProductPagination(indexes, expectedCount, errors) {
+  const checks = {}
+
+  for (const locale of routing.locales) {
+    const source = {
+      getCatalog: () => indexes[locale],
+      listProducts: (_locale, query = {}) => filterProductCatalog(indexes[locale], query),
+    }
+    const totalPages = Math.max(1, Math.ceil(expectedCount / 48))
+    const productIds = []
+
+    for (let page = 1; page <= totalPages; page += 1) {
+      const viewModel = resolveProductListViewModel(locale, [], { page }, source)
+
+      if (!viewModel) {
+        errors.push(`${locale}: product list page ${page} did not resolve`)
+        continue
+      }
+
+      if (viewModel.pagination.currentPage !== page || viewModel.pagination.totalPages !== totalPages) {
+        errors.push(`${locale}: pagination metadata mismatch on page ${page}`)
+      }
+
+      productIds.push(...viewModel.productList.items.map((item) => item.id))
+    }
+
+    const uniqueIds = new Set(productIds)
+    if (productIds.length !== expectedCount || uniqueIds.size !== expectedCount) {
+      errors.push(`${locale}: pagination did not expose every product exactly once (${productIds.length}/${uniqueIds.size}/${expectedCount})`)
+    }
+
+    checks[locale] = { totalPages, listedProducts: productIds.length, uniqueProducts: uniqueIds.size }
+  }
+
+  return checks
 }
 
 function assertPayloadBudget(label, value, maxBytes, errors) {

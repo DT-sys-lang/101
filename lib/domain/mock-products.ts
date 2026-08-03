@@ -932,21 +932,12 @@ function toProductRecord(seed: MockProductSeed): ProductRecord {
       },
     ],
     certifications: seed.certifications,
-    documents: [
-      {
-        id: documentId(seed),
-        title: `${seed.model} datasheet`,
-        kind: 'datasheet',
-        href: `/documents/${seed.key}-datasheet.pdf`,
-        contentLocale: 'en',
-        revision: documentRevision,
-      },
-    ],
+    documents: undefined,
     assets: [
       {
         id: assetId(seed),
         kind: 'primary-image',
-        href: `/images/products/${seed.key}.png`,
+        href: '/images/hero/industrial-instrumentation.png',
         alt: seed.name.en,
       },
     ],
@@ -1043,9 +1034,8 @@ function toProductGeo(seed: MockProductSeed, locale: LocaleCode, seo: ProductSeo
   const evidence = evidenceId(seed)
   const sourceRef: SourceRef = {
     id: evidence,
-    label: locale === 'zh' ? `${seed.model} 数据手册` : `${seed.model} datasheet`,
-    href: `/documents/${seed.key}-datasheet.pdf`,
-    confidence: 'source-backed',
+    label: locale === 'zh' ? `${seed.model} 回退工程记录` : `${seed.model} fallback engineering record`,
+    confidence: 'unverified',
   }
 
   return {
@@ -1054,7 +1044,7 @@ function toProductGeo(seed: MockProductSeed, locale: LocaleCode, seo: ProductSeo
       locale,
       lastReviewedAt: productReviewDate,
       reviewedBy: 'product-engineering',
-      allowedForAiExtraction: true,
+      allowedForAiExtraction: false,
     },
     entity: {
       productId: seed.id,
@@ -1111,9 +1101,8 @@ function toProductGeo(seed: MockProductSeed, locale: LocaleCode, seo: ProductSeo
     evidence: [
       {
         id: evidence,
-        title: locale === 'zh' ? `${seed.model} 数据手册` : `${seed.model} datasheet`,
-        sourceType: 'datasheet',
-        href: `/documents/${seed.key}-datasheet.pdf`,
+        title: locale === 'zh' ? `${seed.model} 回退工程记录` : `${seed.model} fallback engineering record`,
+        sourceType: 'engineering-note',
         revision: documentRevision,
         updatedAt: productReviewDate,
       },
@@ -1190,10 +1179,6 @@ function specs(rangeDisplay: string, outputDisplay: string, thirdDisplay: string
 
 function certs(...values: NonEmptyReadonlyArray<CertificationCode>): NonEmptyReadonlyArray<CertificationCode> {
   return values
-}
-
-function documentId(seed: MockProductSeed): DocumentId {
-  return `doc_${seed.key.replace(/-/g, '_')}_datasheet` as DocumentId
 }
 
 function assetId(seed: MockProductSeed): AssetId {

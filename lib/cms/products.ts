@@ -39,6 +39,7 @@ export interface CmsProductStatus {
 }
 
 interface CmsProductSnapshot {
+  readonly loadedAtMs: number
   readonly mode: CmsProductSourceMode
   readonly sourceVersion: string
   readonly sourceMetadata: CmsProductSourceMetadata
@@ -51,6 +52,7 @@ interface CmsProductSnapshot {
 let productSnapshotCache: CmsProductSnapshot | undefined
 let productSnapshotHydrationPromise: Promise<CmsProductSnapshot> | undefined
 const catalogCache = new Map<LocaleCode, ProductCatalogIndex>()
+const cmsProductSnapshotTtlMs = readPositiveInteger(process.env.CMS_FACTS_CACHE_TTL_MS, 5 * 60 * 1000)
 
 export function getCmsProductRecords(): readonly ProductRecord[] {
   return getCmsProductSnapshot().records
@@ -110,6 +112,14 @@ export async function preloadCmsProductSnapshotAsync(): Promise<void> {
   await productSnapshotHydrationPromise
 }
 
+export async function refreshCmsProductSnapshotAsync(): Promise<void> {
+  if (!productSnapshotHydrationPromise) {
+    productSnapshotHydrationPromise = hydrateCmsProductSnapshotAsync()
+  }
+
+  await productSnapshotHydrationPromise
+}
+
 export function getCmsProductStatus(): CmsProductStatus {
   const snapshot = getCmsProductSnapshot()
   const enCatalog = getCmsProductCatalog('en')
@@ -138,6 +148,7 @@ export function getCmsProductStatus(): CmsProductStatus {
       'CMS_FACTS_API_PREVIEW_CONTENT_TYPE_PARAM',
       'CMS_FACTS_API_TOKEN',
       'CMS_FACTS_API_ALLOW_FETCH',
+      'CMS_FACTS_CACHE_TTL_MS',
     ],
     sourceMetadata: snapshot.sourceMetadata,
   }
@@ -162,6 +173,20 @@ async function hydrateCmsProductSnapshotAsync(): Promise<CmsProductSnapshot> {
 }
 
 function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapshot {
+  if (
+    productSnapshotCache?.mode === 'cms-facts-api'
+    && source.metadata.requestedMode === 'cms-facts-api'
+    && source.mode !== 'cms-facts-api'
+  ) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn(
+        `[cms-products] Keeping last live CMS snapshot because refresh fell back to ${source.mode}: ${source.metadata.fallbackReason ?? 'unknown reason'}`,
+      )
+    }
+
+    return productSnapshotCache
+  }
+
   let domain: ReturnType<typeof buildDomainFromCmsFactsWithProductTolerance>
 
   try {
@@ -195,6 +220,7 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
   }
 
   const snapshot: CmsProductSnapshot = {
+    loadedAtMs: Date.now(),
     mode: source.mode,
     sourceVersion: source.sourceVersion,
     sourceMetadata: source.metadata,
@@ -211,6 +237,7 @@ function setCmsProductSnapshot(source: CmsProductSourceResult): CmsProductSnapsh
 
 function createMockDomainFallbackSnapshot(source: CmsProductSourceResult): CmsProductSnapshot {
   return {
+    loadedAtMs: Date.now(),
     mode: 'mock-domain',
     sourceVersion: `${mockProductSource.version}:fallback-from-${source.sourceVersion}`,
     sourceMetadata: {
@@ -226,7 +253,14 @@ function createMockDomainFallbackSnapshot(source: CmsProductSourceResult): CmsPr
 }
 
 function shouldRefreshSnapshotWithAsyncSource(snapshot: CmsProductSnapshot) {
-  return snapshot.sourceMetadata.requestedMode === 'cms-facts-api'
-    && snapshot.sourceMetadata.factsApiFetchEnabled
-    && snapshot.mode !== 'cms-facts-api'
+  if (snapshot.sourceMetadata.requestedMode !== 'cms-facts-api' || !snapshot.sourceMetadata.factsApiFetchEnabled) {
+    return false
+  }
+
+  return snapshot.mode !== 'cms-facts-api' || Date.now() - snapshot.loadedAtMs >= cmsProductSnapshotTtlMs
+}
+
+function readPositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number.parseInt(value?.trim() ?? '', 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }

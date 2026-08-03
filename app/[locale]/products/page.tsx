@@ -63,6 +63,7 @@ export default async function ProductsIndexPage({ params, searchParams }: Produc
 
 function readProductListOptions(params?: Record<string, string | string[] | undefined>) {
   return {
+    page: readPageParam(params?.page),
     search: readSingleParam(params?.search),
     categoryIds: readMultiParam(params?.category),
     families: readMultiParam(params?.family),
@@ -75,6 +76,13 @@ function readProductListOptions(params?: Record<string, string | string[] | unde
     rangeMinBar: readNumberParam(params?.rangeMinBar),
     rangeMaxBar: readNumberParam(params?.rangeMaxBar),
   }
+}
+
+function readPageParam(value?: string | string[]) {
+  const rawValue = readSingleParam(value)
+  const parsedValue = rawValue ? Number.parseInt(rawValue, 10) : 1
+
+  return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : 1
 }
 
 function readSingleParam(value?: string | string[]) {

@@ -29,6 +29,14 @@ stitch-heiyu-trans-industrial-design-system/
 ({complete
 
 # Stitch import scratch space
-public/stitch/
 outputs/stitch/
 .next-stitch-fix/
+
+# Runtime assets exported from the approved Stitch design are part of the site.
+!public/stitch/
+!public/stitch/**
+
+# Keep the last validated CMS facts snapshot as the production-safe fallback.
+!outputs/
+outputs/*
+!outputs/cms-facts.json

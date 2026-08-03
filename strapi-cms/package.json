@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "1.0.7",
-    "@strapi/plugin-users-permissions": "5.50.2",
-    "@strapi/provider-upload-aws-s3": "5.50.2",
-    "@strapi/strapi": "5.50.2",
+    "@strapi/plugin-users-permissions": "5.51.1",
+    "@strapi/provider-upload-aws-s3": "5.51.1",
+    "@strapi/strapi": "5.51.1",
     "better-sqlite3": "^12.11.1",
     "jszip": "^3.10.1",
     "pg": "8.13.1",
@@ -30,5 +30,11 @@
   },
   "engines": {
     "node": "22.x || 24.x || 26.x"
+  },
+  "overrides": {
+    "brace-expansion@<1.1.17": "1.1.18",
+    "postcss": "8.5.25",
+    "sharp": "0.35.3",
+    "vite": "6.4.3"
   }
 }

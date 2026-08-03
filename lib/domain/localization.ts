@@ -45,6 +45,7 @@ const localizedTechnicalTerms: Record<string, Partial<Record<LocaleCode, string>
   '标准型': { en: 'Standard' },
   '常闭': { en: 'Normally closed' },
   '二位二通常闭电磁阀': { en: '2-position 2-way normally closed solenoid valve' },
+  '继电器输出': { en: 'Relay output' },
   '其他': { en: 'Other' },
   '2倍额定压力': { en: '2x rated pressure' },
   '2 倍额定压力': { en: '2x rated pressure' },

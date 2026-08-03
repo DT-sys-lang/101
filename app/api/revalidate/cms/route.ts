@@ -6,6 +6,7 @@ import {
   parseCmsWebhookRevalidationRequest,
 } from '@/lib/api/cms-webhook'
 import { calculateRevalidationImpact } from '@/lib/api/revalidation'
+import { refreshRuntimeDomainProducts } from '@/lib/runtime/domain-products'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -17,6 +18,7 @@ export function GET() {
 export async function POST(request: Request) {
   try {
     const webhook = parseCmsWebhookRevalidationRequest(request.headers, await request.text())
+    await refreshRuntimeDomainProducts()
     const impact = calculateRevalidationImpact(webhook.revalidationInput)
 
     for (const path of impact.paths) {

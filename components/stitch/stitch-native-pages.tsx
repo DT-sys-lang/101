@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ProductDetailDataTabs } from '@/components/products/product-detail-data-tabs'
+import { ContactInquiryForm } from '@/components/sections/contact-inquiry-form'
 import { HomeHeroCarousel, type HomeHeroSlide } from '@/components/stitch/home-hero-carousel'
 import { MobileProductNavigation, ProductMegaMenu } from '@/components/stitch/product-mega-menu'
 import {
@@ -765,7 +766,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
           <Link href={`/${locale}/industries`} className="group relative min-h-[450px] cursor-pointer overflow-hidden border border-[#E5E5E5] bg-gray-50 shadow-sm transition-shadow duration-500 hover:shadow-md lg:col-span-8">
             <div className="relative z-10 flex h-full max-w-[68%] flex-col justify-between bg-gradient-to-r from-gray-50 via-gray-50/90 to-transparent p-8 md:p-12">
               <div>
-                <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#005EB8]">Featured System</span>
+                <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#005EB8]">{zh ? '重点系统' : 'Featured System'}</span>
                 <h2 className="text-4xl font-bold leading-tight text-[#1A1A1A] transition-colors duration-500 group-hover:text-[#005EB8] md:text-5xl">
                   {zh ? '行业解决方案' : 'Industry Solutions'}
                 </h2>
@@ -983,6 +984,7 @@ function ProductCatalogPage({
   const primaryFilterTitle = primaryFilterGroup?.title ?? (zh ? '产品类别' : 'Product Category')
   const secondaryFilterTitle = secondaryFilterGroup?.title ?? (zh ? '行业' : 'Industry')
   const countLabel = productListData?.countLabel ?? (zh ? '显示 24 个产品' : 'Showing 24 products')
+  const pagination = productListData?.pagination
   const productSectionTitle = productListData?.category.name ?? (searchMode ? (zh ? '搜索结果' : 'Search Results') : (zh ? '产品列表' : 'Product List'))
   const emptyProductTitle = zh ? '当前分类暂无产品' : 'No products in this category yet'
   const emptyProductBody = zh ? '后续上传到该分类后会显示在这里。' : 'Products assigned to this category will appear here.'
@@ -1070,15 +1072,23 @@ function ProductCatalogPage({
               <div className="grid gap-6 md:grid-cols-3">
                 {catalogProducts.map((product) => <CatalogProductTile key={product.name} product={product} />)}
               </div>
-              <div className="mt-12 border-t border-[#DDE1E4] pt-8">
-                <nav className="flex justify-center gap-2" aria-label={zh ? '产品分页' : 'Product pagination'}>
-                  {['‹', '1', '2', '3', '›'].map((item) => (
-                    <Link key={item} href={`/${locale}/products`} className={item === '1' ? 'grid size-9 place-items-center border border-[#005EB8] bg-white text-sm font-semibold text-[#005EB8]' : 'grid size-9 place-items-center border border-[#D6DCE0] bg-white text-sm font-medium text-[#4B555E] hover:border-[#005EB8] hover:text-[#005EB8]'}>
-                      {item}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
+              {pagination && pagination.totalPages > 1 ? (
+                <div className="mt-12 border-t border-[#DDE1E4] pt-8">
+                  <nav className="flex justify-center gap-2" aria-label={zh ? '产品分页' : 'Product pagination'}>
+                    {pagination.previousHref ? (
+                      <Link aria-label={zh ? '上一页' : 'Previous page'} href={`/${locale}${pagination.previousHref}#product-list`} className="grid size-9 place-items-center border border-[#D6DCE0] bg-white text-sm font-medium text-[#4B555E] hover:border-[#005EB8] hover:text-[#005EB8]">‹</Link>
+                    ) : null}
+                    {pagination.pages.map((page) => (
+                      <Link key={page.number} aria-current={page.current ? 'page' : undefined} href={`/${locale}${page.href}#product-list`} className={page.current ? 'grid size-9 place-items-center border border-[#005EB8] bg-white text-sm font-semibold text-[#005EB8]' : 'grid size-9 place-items-center border border-[#D6DCE0] bg-white text-sm font-medium text-[#4B555E] hover:border-[#005EB8] hover:text-[#005EB8]'}>
+                        {page.number}
+                      </Link>
+                    ))}
+                    {pagination.nextHref ? (
+                      <Link aria-label={zh ? '下一页' : 'Next page'} href={`/${locale}${pagination.nextHref}#product-list`} className="grid size-9 place-items-center border border-[#D6DCE0] bg-white text-sm font-medium text-[#4B555E] hover:border-[#005EB8] hover:text-[#005EB8]">›</Link>
+                    ) : null}
+                  </nav>
+                </div>
+              ) : null}
             </>
           ) : (
             <div className="border border-[#DDE1E4] bg-white p-8">
@@ -1436,7 +1446,7 @@ function ProductDetailDataPage({
             <Image src={image.href} alt={image.alt} width={720} height={720} priority className="h-full w-full object-contain" />
           </div>
           <div className="flex flex-col justify-center">
-            <span className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-[#5D5F5F]">Model: {model}</span>
+            <span className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-[#5D5F5F]">{zh ? '型号' : 'Model'}: {model}</span>
             <h1 className="mb-4 text-4xl font-semibold leading-tight text-[#1A1A1A] md:text-5xl">{title}</h1>
             <p className="mb-8 text-lg font-medium leading-8 text-[#30383E]">{summary}</p>
             <div className="mb-8 grid overflow-hidden border border-[#DDE1E4] bg-white sm:grid-cols-3">
@@ -1541,7 +1551,7 @@ function ProductDetailStitchPage({ locale }: { readonly locale: Locale }) {
             />
           </div>
           <div className="flex flex-col justify-center">
-            <span className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-[#5D5F5F]">Model: YPT-500</span>
+            <span className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-[#5D5F5F]">{zh ? '型号' : 'Model'}: YPT-500</span>
             <h1 className="mb-4 text-4xl font-semibold leading-tight text-[#1A1A1A] md:text-5xl">
               {zh ? '高精度工业压力变送器' : 'High-Precision Industrial Pressure Transmitter'}
             </h1>
@@ -2232,20 +2242,9 @@ function ContactPage({ locale }: { readonly locale: Locale }) {
             <ContactLine icon={<Settings2 className="size-5" />} title="bruce@yufavor.com" body={zh ? '工程选型支持' : 'Engineering selection support'} />
           </div>
         </div>
-        <form action="/api/inquiry" method="post" className="grid gap-5 border border-[#E5E5E5] bg-[#F7F7F7] p-6 md:p-8">
-          <Input label={zh ? '姓名' : 'Name'} name="name" required />
-          <Input label={zh ? '公司' : 'Company'} name="company" required />
-          <Input label={zh ? '邮箱' : 'Email'} name="email" type="email" required />
-          <Input label={zh ? '国家/地区' : 'Country / Region'} name="country" required />
-          <label className="grid gap-2 text-sm font-medium">
-            {zh ? '需求内容' : 'Requirement'}
-            <textarea name="message" required rows={6} className="resize-y border border-[#E5E5E5] bg-white px-3 py-3 text-sm outline-none focus:border-[#005EB8]" placeholder={zh ? '型号、介质、压力范围、输出信号、数量...' : 'Model, media, pressure range, output signal, quantity...'} />
-          </label>
-          <button type="submit" className="inline-flex items-center justify-center gap-3 bg-[#1A1A1A] px-6 py-4 text-sm font-semibold text-white hover:bg-[#005EB8]">
-            {zh ? '提交需求' : 'Submit Requirement'}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </button>
-        </form>
+        <div className="border border-[#E5E5E5] bg-[#F7F7F7] p-6 md:p-8">
+          <ContactInquiryForm locale={locale} />
+        </div>
       </section>
     </article>
   )
@@ -2298,14 +2297,14 @@ function SectionIntro({ eyebrow, title, body }: { readonly eyebrow: string; read
   )
 }
 
-function FeaturePanel({ className, image, title, body, href }: { readonly className?: string; readonly image: string; readonly title: string; readonly body: string; readonly href: string }) {
+function FeaturePanel({ className, image, title, body, href, locale = 'en' }: { readonly className?: string; readonly image: string; readonly title: string; readonly body: string; readonly href: string; readonly locale?: Locale }) {
   return (
     <Link href={href} className={`group relative min-h-[430px] overflow-hidden border border-[#E5E5E5] bg-[#F7F7F7] ${className ?? ''}`}>
       <Image src={image} alt="" fill sizes="66vw" className="object-cover grayscale transition duration-700 group-hover:scale-105 group-hover:grayscale-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent" />
       <div className="relative flex h-full max-w-xl flex-col justify-between p-8 md:p-12">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#005EB8]">Featured System</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#005EB8]">{locale === 'zh' ? '重点系统' : 'Featured System'}</p>
           <h3 className="mt-5 text-4xl font-bold leading-tight text-[#1A1A1A] transition-colors group-hover:text-[#005EB8] md:text-5xl">{title}</h3>
         </div>
         <p className="mt-12 text-base leading-7 text-[#5D5F5F]">{body}</p>

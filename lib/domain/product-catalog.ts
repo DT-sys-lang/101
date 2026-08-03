@@ -533,7 +533,7 @@ export function toProductListItem(
     availability: product.identity.availability,
     availabilityLabel: getAvailabilityLabel(product.identity.availability, locale),
     keySpecs,
-    media: getProductListMedia(product, title),
+    media: getProductListMedia(product, title, locale),
     seoTitle: seo.title,
     seoDescription: seo.metaDescription,
     sortText: normalizeSearchText(`${title} ${summary} ${product.identity.model} ${product.identity.sku}`),
@@ -595,24 +595,38 @@ function getFamilyLabel(family: ProductFamily, locale: LocaleCode) {
   return labels[locale][family]
 }
 
-function getProductListMedia(product: ProductRecord, fallbackAlt: string): ProductListMedia {
+function getProductListMedia(
+  product: ProductRecord,
+  fallbackAlt: string,
+  locale: LocaleCode,
+): ProductListMedia {
   const visualAssets = (product.assets ?? []).filter(isProductVisualAsset)
   const primaryImage = visualAssets.find((asset) => asset.kind === 'primary-image') ?? visualAssets[0]
   const galleryImages = visualAssets
     .filter((asset) => asset.id !== primaryImage?.id)
-    .map((asset) => toProductListImage(asset, fallbackAlt))
+    .map((asset) => toProductListImage(asset, fallbackAlt, locale))
 
   return {
-    primaryImage: primaryImage ? toProductListImage(primaryImage, fallbackAlt) : undefined,
+    primaryImage: primaryImage ? toProductListImage(primaryImage, fallbackAlt, locale) : undefined,
     galleryImages,
   }
 }
 
-function toProductListImage(asset: ProductAsset, fallbackAlt: string): ProductListImage {
+function toProductListImage(
+  asset: ProductAsset,
+  fallbackAlt: string,
+  locale: LocaleCode,
+): ProductListImage {
+  const alt = asset.alt?.trim()
+
   return {
     kind: asset.kind,
     href: asset.href,
-    alt: asset.alt || fallbackAlt,
+    alt:
+      alt && ((locale === 'zh' && /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(alt)) ||
+        (locale === 'en' && isTextSafeForLocale(alt, locale)))
+        ? alt
+        : fallbackAlt,
   }
 }
 
@@ -759,7 +773,7 @@ function getProductListSpecs(product: ProductRecord, locale: LocaleCode) {
       },
       {
         label: localizeSpecLabel('output', locale),
-        value: compactCardSpecValue(product.sensorProfile.outputs.map((output) => output.value).join(';'), { maxTokens: 4, separator: ';' }),
+        value: compactCardSpecValue(localizeTechnicalValue(product.sensorProfile.outputs.map((output) => output.value).join(';'), locale), { maxTokens: 4, separator: ';' }),
       },
       {
         label: localizeSpecLabel('media', locale),
@@ -869,6 +883,18 @@ function localizeSpecLabel(label: string, locale: LocaleCode) {
     temperature: '温度',
     'switch-state': '开关量',
     ingressProtection: '防护等级',
+    'Measurement range': '测量范围',
+    Accuracy: '精度',
+    'Overload limit': '过载极限',
+    'Output signal': '输出信号',
+    'Supply voltage': '供电电压',
+    'Process connection': '过程连接',
+    'Electrical connection': '电气连接',
+    'Ingress protection': '防护等级',
+    'Wetted materials': '接液材质',
+    'Compatible media': '适用介质',
+    'Ambient temperature': '环境温度',
+    'Media temperature': '介质温度',
   }
 
   return labels[label] ?? label

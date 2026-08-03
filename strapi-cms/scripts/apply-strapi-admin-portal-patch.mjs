@@ -7,7 +7,7 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const cmsDirectory = path.resolve(scriptDirectory, '..');
 const adminDirectory = path.join(cmsDirectory, 'node_modules', '@strapi', 'admin');
 const contentTypeBuilderDirectory = path.join(cmsDirectory, 'node_modules', '@strapi', 'content-type-builder');
-const expectedVersion = '5.50.2';
+const expectedVersion = '5.51.1';
 
 const navBurgerTargets = [
   path.join(adminDirectory, 'dist', 'admin', 'admin', 'src', 'components', 'MainNav', 'NavBurgerMenu.mjs'),

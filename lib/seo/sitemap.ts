@@ -1,12 +1,30 @@
 import type { MetadataRoute } from 'next'
-import { routing } from '@/i18n/routing'
-import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, selectProductSeo, type ProductRecord } from '@/lib/domain'
+import { routing, type Locale } from '@/i18n/routing'
+import { getApplicationEntryPageViewModel, getIndustryEntryPageViewModel, selectProductSeo, type ProductRecord, type ResourceCollectionKind, type ResourceEntryViewModel } from '@/lib/domain'
 import { getRuntimeDomainProductRecords, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { getAbsoluteUrl, getLocalizedProductUrl } from './canonical'
 import { buildHomeHrefLangs, buildProductHrefLangs, buildStaticPathHrefLangs } from './hreflang'
 
 export function buildSitemap(): MetadataRoute.Sitemap {
   return buildSitemapForProducts(getRuntimeDomainProductRecords())
+}
+
+export function buildResourceSitemapEntries(
+  locale: Locale,
+  kind: ResourceCollectionKind,
+  entries: readonly ResourceEntryViewModel[],
+): MetadataRoute.Sitemap {
+  return entries.map((entry) => ({
+    url: getAbsoluteUrl(`/${locale}${entry.href}`),
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: kind === 'manuals' ? 0.7 : 0.65,
+    alternates: { languages: buildStaticPathHrefLangs(entry.href) },
+  }))
+}
+
+export function mergeSitemapEntries(...groups: readonly MetadataRoute.Sitemap[]): MetadataRoute.Sitemap {
+  return dedupeSitemapEntries(groups.flat())
 }
 
 export function buildSitemapForProducts(products: readonly ProductRecord[]): MetadataRoute.Sitemap {
@@ -20,7 +38,7 @@ export function buildSitemapForProducts(products: readonly ProductRecord[]): Met
     },
   }))
 
-  const staticEntryPaths = ['/', '/products', '/industries', '/applications', '/oem', '/company', '/resources', '/contact']
+  const staticEntryPaths = ['/', '/products', '/industries', '/applications', '/oem', '/company', '/company/manufacturing', '/manufacturing', '/resources', '/resources/blog', '/resources/cases', '/resources/manuals', '/contact']
   const staticEntries: MetadataRoute.Sitemap = staticEntryPaths.flatMap((path) =>
     routing.locales.map((locale) => ({
       url: getAbsoluteUrl(path === '/' ? `/${locale}` : `/${locale}${path}`),

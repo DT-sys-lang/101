@@ -68,8 +68,8 @@ jobs:
       - name: Build
         run: npm run build
 
-  strapi-node20-build:
-    name: Strapi Node 20 build
+  strapi-node24-build:
+    name: Strapi Node 24 build
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -77,10 +77,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20.20.2
+          node-version: 24
           cache: npm
           cache-dependency-path: strapi-cms/package-lock.json
 
@@ -95,7 +95,7 @@ jobs:
       - name: Verify Strapi production configuration shape
         shell: bash
         run: |
-          test "$(tr -d '\r\n' < strapi-cms/.node-version)" = "20"
+          test "$(tr -d '\r\n' < strapi-cms/.node-version)" = "24"
           grep -F "encryptionKey: env('ENCRYPTION_KEY')" strapi-cms/config/admin.js
           grep -F '"contentLocale"' strapi-cms/dist/src/api/document-asset/content-types/document-asset/schema.json
           grep -F '"contentLocale"' strapi-cms/dist/src/api/product-manual/content-types/product-manual/schema.json

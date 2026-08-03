@@ -95,7 +95,7 @@ export const specificationUnitFamilyUnits = {
   pressure: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o'],
   temperature: ['c', 'f', 'k'],
   length: ['mm', 'm', 'mh2o'],
-  measurement: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'custom'],
+  measurement: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'percent', 'custom'],
   current: ['ma'],
   voltage: ['v', 'mv'],
   frequency: ['hz'],
@@ -163,10 +163,10 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'measurement_range',
     en: 'Measurement range',
-    zh: 'Measurement range',
+    zh: '测量范围',
     valueType: 'string',
     unitFamily: 'measurement',
-    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'custom'],
+    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'percent', 'custom'],
     appliesToCategoryIds: measurementCategories,
     facet: { enabled: true, mode: 'range', priority: 10 },
     comparison: { enabled: true, priority: 10, normalize: true },
@@ -176,10 +176,10 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'range',
     en: 'Range',
-    zh: 'Range',
+    zh: '量程',
     valueType: 'string',
     unitFamily: 'measurement',
-    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'custom'],
+    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'percent', 'custom'],
     appliesToCategoryIds: measurementCategories,
     facet: { enabled: true, mode: 'range', priority: 10 },
     comparison: { enabled: true, priority: 10, normalize: true },
@@ -189,7 +189,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'accuracy',
     en: 'Accuracy',
-    zh: 'Accuracy',
+    zh: '精度',
     valueType: 'string',
     unitFamily: 'percent',
     allowedUnits: ['percent'],
@@ -202,10 +202,10 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'overload_limit',
     en: 'Overload limit',
-    zh: 'Overload limit',
+    zh: '过载极限',
     valueType: 'number',
     unitFamily: 'measurement',
-    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'custom'],
+    allowedUnits: ['pa', 'kpa', 'mpa', 'bar', 'mbar', 'psi', 'mh2o', 'mm', 'm', 'c', 'f', 'k', 'percent', 'custom'],
     appliesToCategoryIds: measurementCategories,
     facet: { enabled: false },
     comparison: { enabled: true, priority: 30, normalize: true },
@@ -215,7 +215,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'output_signal',
     en: 'Output signal',
-    zh: 'Output signal',
+    zh: '输出信号',
     valueType: 'string',
     appliesToCategoryIds: electricalCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 20 },
@@ -226,7 +226,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'output',
     en: 'Output',
-    zh: 'Output',
+    zh: '输出',
     valueType: 'string',
     appliesToCategoryIds: electricalCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 20 },
@@ -237,7 +237,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'supply_voltage',
     en: 'Supply voltage',
-    zh: 'Supply voltage',
+    zh: '供电电压',
     valueType: 'string',
     unitFamily: 'voltage',
     allowedUnits: ['v'],
@@ -250,7 +250,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'process_connection',
     en: 'Process connection',
-    zh: 'Process connection',
+    zh: '过程连接',
     valueType: 'string',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 40 },
@@ -261,7 +261,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'electrical_connection',
     en: 'Electrical connection',
-    zh: 'Electrical connection',
+    zh: '电气连接',
     valueType: 'string',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 50 },
@@ -272,7 +272,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'ingress_protection',
     en: 'Ingress protection',
-    zh: 'Ingress protection',
+    zh: '防护等级',
     valueType: 'string',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 60 },
@@ -283,7 +283,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'wetted_materials',
     en: 'Wetted materials',
-    zh: 'Wetted materials',
+    zh: '接液材质',
     valueType: 'multi-enum',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 90 },
@@ -294,7 +294,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'compatible_media',
     en: 'Compatible media',
-    zh: 'Compatible media',
+    zh: '适用介质',
     valueType: 'multi-enum',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: true, mode: 'multi-select', priority: 80 },
@@ -305,7 +305,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'ambient_temperature',
     en: 'Ambient temperature',
-    zh: 'Ambient temperature',
+    zh: '环境温度',
     valueType: 'string',
     unitFamily: 'temperature',
     allowedUnits: ['c', 'f', 'k'],
@@ -318,7 +318,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'media_temperature',
     en: 'Media temperature',
-    zh: 'Media temperature',
+    zh: '介质温度',
     valueType: 'string',
     unitFamily: 'temperature',
     allowedUnits: ['c', 'f', 'k'],
@@ -331,7 +331,7 @@ export const defaultSpecificationDefinitions = [
   definition({
     key: 'feature',
     en: 'Feature',
-    zh: 'Feature',
+    zh: '特性',
     valueType: 'string',
     appliesToCategoryIds: allIndustrialSensorCategories,
     facet: { enabled: false },

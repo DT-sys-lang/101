@@ -39,7 +39,7 @@ async function importCmsFactsIntoStrapi(strapi, cmsFacts, options = {}) {
 
   const now = new Date().toISOString()
   const operationStats = {}
-  const imported = await seed(strapi, cmsFacts, now, operationStats)
+  const imported = await strapi.db.transaction(() => seed(strapi, cmsFacts, now, operationStats))
 
   return {
     ok: true,

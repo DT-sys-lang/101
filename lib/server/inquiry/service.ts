@@ -15,12 +15,17 @@ import { getInquiryStoreConfig, getResendEmailConfig, getStrapiInquiryConfig } f
 
 const inquiryStoreConfig = getInquiryStoreConfig()
 const strapiInquiryConfig = getStrapiInquiryConfig()
+const productionPersistenceMissing = process.env.NODE_ENV === 'production' && !strapiInquiryConfig
 const inquiryPersistenceAdapter = strapiInquiryConfig
   ? createStrapiInquiryPersistenceAdapter(strapiInquiryConfig)
   : createJsonlInquiryPersistenceAdapter(inquiryStoreConfig)
 const inquiryOutboundAdapters = createInquiryOutboundAdapters(inquiryStoreConfig, getResendEmailConfig())
 
 export async function submitInquiry(input: unknown): Promise<InquiryApiResult> {
+  if (productionPersistenceMissing) {
+    throw new Error('Production inquiry persistence is not configured. Set the Strapi inquiry endpoint and token.')
+  }
+
   const normalized = normalizeInquiryPayload(input)
   const storedAt = new Date().toISOString()
   const outboundChannels = planInquiryOutboundChannels(normalized.submission.nextAction)

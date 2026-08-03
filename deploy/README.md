@@ -9,7 +9,7 @@ This deployment keeps the Next.js official site on Vercel and runs only the Stra
 - `../docker-compose.runtime.yml` runs the same stack from prebuilt images and does not build on the server.
 - `production.env.example` is the production environment template.
 - `postgres-backup.sh` creates daily `pg_dump --format=custom` backups.
-- `baota-nginx-cms.example.conf` is the BaoTa/Nginx reverse proxy snippet for `cms.example.com`.
+- `baota-nginx-cms.example.conf` is the BaoTa/Nginx reverse proxy snippet for `cms.yufavor.com`.
 
 ## First Deploy
 
@@ -74,7 +74,7 @@ docker compose --env-file deploy/production.env -f docker-compose.production.yml
 For runtime deployments, replace `docker-compose.production.yml` with
 `docker-compose.runtime.yml` in the commands above.
 
-BaoTa should proxy `https://cms.example.com` to `http://127.0.0.1:1337`.
+BaoTa should proxy `https://cms.yufavor.com` to `http://127.0.0.1:1337`.
 
 ## Updates
 

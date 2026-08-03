@@ -4,9 +4,16 @@ const defaultPages = [
   '/products?family=sensor',
   '/products?family=valve',
   '/industries',
+  '/applications',
+  '/oem',
+  '/company',
+  '/company/manufacturing',
+  '/manufacturing',
+  '/resources',
   '/resources/blog',
   '/resources/cases',
   '/resources/manuals',
+  '/contact',
 ]
 
 const localeRules = {
@@ -29,10 +36,16 @@ const localeRules = {
       /\bOpen manual\b/i,
       /\bRead article\b/i,
       /\bView case\b/i,
+      /\bFeatured System\b/i,
+      /\bModel:/i,
+      /\bDescription\b/i,
+      /\bDownloads\b/i,
+      /\bKey Features\b/i,
+      /\bValue\s*\/\s*Description\b/i,
     ],
   },
   en: {
-    blocked: [/[\u4e00-\u9fff]/],
+    blocked: [/[一-鿿]/],
   },
 }
 
@@ -45,7 +58,7 @@ const pages = (process.env.LOCALIZATION_AUDIT_PATHS ?? defaultPages.join(','))
   .split(',')
   .map((path) => path.trim())
   .filter(Boolean)
-const productDetailLimit = Number.parseInt(process.env.LOCALIZATION_AUDIT_PRODUCT_DETAIL_LIMIT ?? '5', 10)
+const productDetailLimit = Number.parseInt(process.env.LOCALIZATION_AUDIT_PRODUCT_DETAIL_LIMIT ?? '1000', 10)
 
 const failures = []
 const auditedPagesByLocale = {}
@@ -61,6 +74,7 @@ for (const locale of locales) {
   const localePages = uniqueStrings([
     ...pages,
     ...(await discoverProductDetailPaths(locale)),
+    ...(await discoverResourceDetailPaths(locale)),
   ])
   auditedPagesByLocale[locale] = localePages
 
@@ -74,7 +88,13 @@ for (const locale of locales) {
     }
 
     const html = await response.text()
-    const text = htmlToVisibleText(html)
+    const text = `${htmlToVisibleText(html)} ${htmlToImageAltText(html)}`.trim()
+    const htmlLang = readHtmlLang(html)
+    const expectedHtmlLang = locale === 'zh' ? 'zh-CN' : 'en'
+
+    if (htmlLang !== expectedHtmlLang) {
+      failures.push({ locale, path, issue: 'html-lang-mismatch', expected: expectedHtmlLang, actual: htmlLang })
+    }
 
     for (const pattern of rules.blocked) {
       const match = text.match(pattern)
@@ -105,20 +125,44 @@ async function discoverProductDetailPaths(locale) {
     return []
   }
 
-  const response = await fetch(new URL(`/${locale}/products`, baseUrl))
+  const discovered = []
 
-  if (!response.ok) {
-    return []
+  for (let page = 1; page <= 100; page += 1) {
+    const response = await fetch(new URL(`/${locale}/products?page=${page}`, baseUrl))
+    if (!response.ok) break
+
+    const html = await response.text()
+    const matches = [...html.matchAll(new RegExp(`href=["']/${locale}(/products/[^"'?#]+)["']`, 'g'))]
+      .map((match) => match[1])
+      .filter((path) => path !== '/products')
+      .filter((path) => !path.includes('/geo/'))
+    const before = discovered.length
+    discovered.push(...matches.filter((path) => !discovered.includes(path)))
+
+    if (!matches.length || discovered.length === before || discovered.length >= productDetailLimit) break
   }
 
-  const html = await response.text()
-  const matches = [...html.matchAll(new RegExp(`href=["']/${locale}(/products/[^"'?#]+)["']`, 'g'))]
+  return discovered.slice(0, productDetailLimit)
+}
 
-  return uniqueStrings(matches
-    .map((match) => match[1])
-    .filter((path) => path !== '/products')
-    .filter((path) => !path.includes('/geo/')))
-    .slice(0, productDetailLimit)
+async function discoverResourceDetailPaths(locale) {
+  const collectionPaths = ['/resources/blog', '/resources/cases', '/resources/manuals']
+  const discovered = []
+
+  for (const collectionPath of collectionPaths) {
+    const response = await fetch(new URL(`/${locale}${collectionPath}`, baseUrl))
+    if (!response.ok) continue
+
+    const html = await response.text()
+    const pattern = new RegExp(`href=["']/${locale}(${collectionPath}/[^"'?#]+)["']`, 'g')
+    discovered.push(...[...html.matchAll(pattern)].map((match) => match[1]))
+  }
+
+  return uniqueStrings(discovered)
+}
+
+function readHtmlLang(html) {
+  return html.match(/<html[^>]*\blang=["']([^"']+)["']/i)?.[1]
 }
 
 function htmlToVisibleText(html) {
@@ -131,6 +175,20 @@ function htmlToVisibleText(html) {
     .replace(/中文/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+function htmlToImageAltText(html) {
+  return [...html.matchAll(/<img\b[^>]*\balt=["']([^"']*)["'][^>]*>/gi)]
+    .map((match) => decodeHtmlText(match[1]))
+    .join(' ')
+}
+
+function decodeHtmlText(value) {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
 }
 
 function readContext(text, index) {

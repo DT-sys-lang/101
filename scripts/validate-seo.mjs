@@ -24,7 +24,7 @@ const SEO_CONTRACT_SNAPSHOT = {
   intentMappingVersion: 'search-intent-mapping-v1',
   locales: ['zh', 'en'],
   sitemap: {
-    staticLocalizedEntryCount: 7,
+    staticLocalizedEntryCount: 12,
     industryEntryCount: 6,
     applicationEntryCount: 3,
     homeChangeFrequency: 'weekly',

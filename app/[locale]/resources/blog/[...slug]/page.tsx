@@ -5,6 +5,7 @@ import { isLocale, type Locale, routing } from '@/i18n/routing'
 import { resolveResourceDetailPageViewModel } from '@/lib/domain'
 import { preloadRuntimeDomainProducts, runtimeProductViewModelSource } from '@/lib/runtime/domain-products'
 import { listRuntimeResourceContent } from '@/lib/runtime/domain-resources'
+import { buildResourceDetailMetadata } from '@/lib/seo/resources'
 
 export const revalidate = 3600
 
@@ -13,6 +14,17 @@ export function generateStaticParams() {
     { locale, slug: ['technical-knowledge'] },
     { locale, slug: ['engineering-blog'] },
   ])
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: readonly string[] }> }) {
+  const { locale, slug } = await params
+
+  if (!isLocale(locale)) return {}
+
+  await preloadRuntimeDomainProducts()
+  const content = await listRuntimeResourceContent(locale, 'blog')
+  const data = resolveResourceDetailPageViewModel(locale, 'blog', slug, runtimeProductViewModelSource, content)
+  return data ? buildResourceDetailMetadata(locale, 'blog', slug, data) : {}
 }
 
 export default async function BlogResourceDetailPage({

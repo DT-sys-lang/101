@@ -319,16 +319,30 @@ function buildCmsFactInput(graph) {
 
   return {
     categoryFacts: graph.categoryFacts.map(toCategoryFact).sort(compareById),
-    productFacts: graph.productFacts
-      .map((row) => toProductFact(row, {
-        categoryIdSet,
-        industryIdSet,
-        applicationIdSet,
-        documentAssetIdSet,
-        certificationCodeSet,
-      }))
-      .sort(compareById),
+    productFacts: buildProductFactsWithTolerance(graph.productFacts, {
+      categoryIdSet,
+      industryIdSet,
+      applicationIdSet,
+      documentAssetIdSet,
+      certificationCodeSet,
+    }),
   }
+}
+
+function buildProductFactsWithTolerance(rows, indexes) {
+  const productFacts = []
+
+  for (const row of rows) {
+    try {
+      productFacts.push(toProductFact(row, indexes))
+    } catch (error) {
+      const productId = optionalString(row?.factId) || optionalString(row?.model) || 'unknown-product'
+      const message = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[cms-facts] Rejected malformed product '${productId}' while keeping the remaining catalog available: ${message}`)
+    }
+  }
+
+  return productFacts.sort(compareById)
 }
 
 function toCategoryFact(row) {

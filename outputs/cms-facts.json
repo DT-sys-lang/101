@@ -1,0 +1,3118 @@
+{
+  "categoryFacts": [
+    {
+      "id": "cat_industrial_products",
+      "parentId": null,
+      "name": {
+        "en": "Industrial Products",
+        "zh": "工业产品",
+        "ru": "Промышленная продукция",
+        "es": "Productos industriales"
+      }
+    },
+    {
+      "id": "cat_industrial_sensors",
+      "parentId": "cat_industrial_products",
+      "name": {
+        "en": "Industrial Sensors",
+        "zh": "工业传感器",
+        "ru": "Промышленные датчики",
+        "es": "Sensores industriales"
+      }
+    },
+    {
+      "id": "cat_industrial_valves",
+      "parentId": "cat_industrial_products",
+      "name": {
+        "en": "Industrial Valves",
+        "zh": "工业阀门",
+        "ru": "Промышленные клапаны",
+        "es": "Válvulas industriales"
+      }
+    },
+    {
+      "id": "cat_level_sensors",
+      "parentId": "cat_industrial_sensors",
+      "name": {
+        "en": "Level Sensors",
+        "zh": "液位传感器",
+        "ru": "Датчик уровня жидкости",
+        "es": "Sensor de nivel de líquido"
+      }
+    },
+    {
+      "id": "cat_pressure_sensors",
+      "parentId": "cat_industrial_sensors",
+      "name": {
+        "en": "Pressure Sensors",
+        "zh": "压力传感器",
+        "ru": "Датчик давления",
+        "es": "Sensor de presión"
+      }
+    },
+    {
+      "id": "cat_pressure_transmitters",
+      "parentId": "cat_pressure_sensors",
+      "name": {
+        "en": "Pressure Transmitters",
+        "zh": "压力变送器",
+        "ru": "Преобразователь давления",
+        "es": "Transmisor de presión"
+      }
+    },
+    {
+      "id": "cat_solenoid_valves",
+      "parentId": "cat_industrial_valves",
+      "name": {
+        "en": "Solenoid Valves",
+        "zh": "电磁阀",
+        "ru": "Электромагнитный клапан",
+        "es": "Válvula solenoide"
+      }
+    },
+    {
+      "id": "cat_temperature_sensors",
+      "parentId": "cat_industrial_sensors",
+      "name": {
+        "en": "Temperature Sensors",
+        "zh": "温度传感器",
+        "ru": "Датчик температуры",
+        "es": "Sensor de temperatura"
+      }
+    }
+  ],
+  "productFacts": [
+    {
+      "id": "prd_yf_f1",
+      "family": "valve",
+      "core": {
+        "family": "valve",
+        "sku": "YF-F1",
+        "model": "YF-F1",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_industrial_valves",
+        "name": {
+          "en": "YF-F1 Integrated Pressure Regulating Valve",
+          "zh": "YF-F1 集成稳压阀"
+        },
+        "shortName": {
+          "en": "F1",
+          "zh": "F1"
+        },
+        "summary": {
+          "en": "It is applied to LNG engines. Natural gas flows out of the gas tank, passes through this valve for pressure reduction and pressure stabilization, and then enters the engine.",
+          "zh": "应用在LNG发动机上，是天然气从气罐出来后经过此阀进行减压/稳压后进入发\n动机。"
+        }
+      },
+      "valveProfile": {
+        "pressureRating": "8...20 bar",
+        "connection": "Customizable",
+        "material": "Custom material",
+        "mode": "Standard",
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ],
+        "size": "custom"
+      },
+      "sku": "YF-F1",
+      "model": "YF-F1",
+      "seriesId": "ser_valves_f1",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_industrial_valves",
+      "additionalCategoryIds": [],
+      "industryIds": [
+        "ind_water",
+        "ind_oem"
+      ],
+      "applicationIds": [
+        "app_fluid_control"
+      ],
+      "measurementKinds": [],
+      "name": {
+        "en": "YF-F1 Integrated Pressure Regulating Valve",
+        "zh": "YF-F1 集成稳压阀"
+      },
+      "shortName": {
+        "en": "F1",
+        "zh": "F1"
+      },
+      "summary": {
+        "en": "It is applied to LNG engines. Natural gas flows out of the gas tank, passes through this valve for pressure reduction and pressure stabilization, and then enters the engine.",
+        "zh": "应用在LNG发动机上，是天然气从气罐出来后经过此阀进行减压/稳压后进入发\n动机。"
+      },
+      "highlights": [
+        {
+          "en": "Working pressure 8~20barG",
+          "zh": "工作压力 8~20barG"
+        },
+        {
+          "en": "Customizable outlet pressure",
+          "zh": "出口压力可定制；工作温区 - 40~+120℃"
+        }
+      ],
+      "applications": [
+        {
+          "en": "LNG generator gas pressure stabilization",
+          "zh": "LNG 发电机组稳压减压；天然气管路调压；惰性气体稳压"
+        }
+      ],
+      "measurements": [],
+      "outputs": [],
+      "environmentalLimits": {
+        "wettedMaterials": [
+          "Custom material"
+        ],
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "valve",
+          "label": "Valve",
+          "values": [
+            {
+              "key": "feature",
+              "label": "Pressure rating",
+              "value": "8...20 bar",
+              "display": "8...20 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Size",
+              "value": "custom",
+              "display": "custom",
+              "sourceRefs": []
+            },
+            {
+              "key": "process_connection",
+              "label": "Connection",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Material",
+              "value": "Custom material",
+              "display": "Custom material",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Mode",
+              "value": "Standard",
+              "display": "Standard",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "working_pressure",
+          "label": "工作压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低工作压力",
+              "value": "8",
+              "display": "8",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高工作压力",
+              "value": "20",
+              "display": "20",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "outlet_pressure",
+          "label": "出口压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "出口压力",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "temp_range",
+          "label": "环境温度",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低环境温度",
+              "value": "-40",
+              "display": "-40",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高环境温度",
+              "value": "120",
+              "display": "120",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "medium",
+          "label": "适用介质",
+          "values": [
+            {
+              "key": "feature",
+              "label": "适配介质",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "leakage",
+          "label": "泄漏参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "内部泄漏量",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "外部泄漏",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "flow_rate",
+          "label": "流量参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最大流量",
+              "value": "≥130",
+              "display": "≥130",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "pressure_resist",
+          "label": "耐压爆破",
+          "values": [
+            {
+              "key": "feature",
+              "label": "耐压压力",
+              "value": "37.5",
+              "display": "37.5",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "爆破压力",
+              "value": "100",
+              "display": "100",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [],
+      "documents": [],
+      "assets": [
+        {
+          "id": "asset_yf_f1_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/F1/main.jpg",
+          "alt": "YF-F1 industrial valve"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_f2",
+      "family": "valve",
+      "core": {
+        "family": "valve",
+        "sku": "YF-F2",
+        "model": "YF-F2",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_industrial_valves",
+        "name": {
+          "en": "YF-F2 Low Pressure Cut-off Valve",
+          "zh": "YF-F2 低压切断阀"
+        },
+        "shortName": {
+          "en": "F2",
+          "zh": "F2"
+        },
+        "summary": {
+          "en": "For cutting off gas pipelines",
+          "zh": "用于气体的管路切断使用。"
+        }
+      },
+      "valveProfile": {
+        "pressureRating": "0...20 bar",
+        "connection": "Customizable",
+        "material": "Custom material",
+        "mode": "2-position 2-way normally closed solenoid valve",
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ],
+        "size": "12 mm"
+      },
+      "sku": "YF-F2",
+      "model": "YF-F2",
+      "seriesId": "ser_valves_f2",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_industrial_valves",
+      "additionalCategoryIds": [],
+      "industryIds": [
+        "ind_water",
+        "ind_oem"
+      ],
+      "applicationIds": [
+        "app_fluid_control"
+      ],
+      "measurementKinds": [],
+      "name": {
+        "en": "YF-F2 Low Pressure Cut-off Valve",
+        "zh": "YF-F2 低压切断阀"
+      },
+      "shortName": {
+        "en": "F2",
+        "zh": "F2"
+      },
+      "summary": {
+        "en": "For cutting off gas pipelines",
+        "zh": "用于气体的管路切断使用。"
+      },
+      "highlights": [
+        {
+          "en": "2-position 2-way normally closed solenoid valve",
+          "zh": "二位二通常闭电磁阀；工作压力 0~20barG"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Natural gas pipeline cut-off",
+          "zh": "天然气管路切断；惰性气体管路通断控制；燃气设备安全断气"
+        }
+      ],
+      "measurements": [],
+      "outputs": [],
+      "environmentalLimits": {
+        "wettedMaterials": [
+          "Custom material"
+        ],
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "valve",
+          "label": "Valve",
+          "values": [
+            {
+              "key": "feature",
+              "label": "Pressure rating",
+              "value": "0...20 bar",
+              "display": "0...20 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Size",
+              "value": "12 mm",
+              "display": "12 mm",
+              "sourceRefs": []
+            },
+            {
+              "key": "process_connection",
+              "label": "Connection",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Material",
+              "value": "Custom material",
+              "display": "Custom material",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Mode",
+              "value": "2-position 2-way normally closed solenoid valve",
+              "display": "2-position 2-way normally closed solenoid valve",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "valve_function",
+          "label": "阀门功能",
+          "values": [
+            {
+              "key": "feature",
+              "label": "阀体类型",
+              "value": "2-position 2-way normally closed solenoid valve",
+              "display": "2-position 2-way normally closed solenoid valve",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "working_pressure",
+          "label": "工作压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低工作压力",
+              "value": "0",
+              "display": "0",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高工作压力",
+              "value": "20",
+              "display": "20",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "passage_spec",
+          "label": "通径规格",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最小通径",
+              "value": "12",
+              "display": "12",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "leakage",
+          "label": "泄漏参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "外部泄漏",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "内部泄漏",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "temp_range",
+          "label": "环境温度",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低环境温度",
+              "value": "-40",
+              "display": "-40",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高环境温度",
+              "value": "120",
+              "display": "120",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "medium",
+          "label": "适用介质",
+          "values": [
+            {
+              "key": "feature",
+              "label": "适配介质",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "service_life",
+          "label": "使用寿命",
+          "values": [
+            {
+              "key": "feature",
+              "label": "循环寿命",
+              "value": "1000000",
+              "display": "1000000",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical_param",
+          "label": "电气参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "工作电压下限",
+              "value": "18",
+              "display": "18",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "工作电压上限",
+              "value": "32",
+              "display": "32",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "额定功率",
+              "value": "14",
+              "display": "14",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "线圈电阻",
+              "value": "42±7%@20℃",
+              "display": "42±7%@20℃",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "额定电流",
+              "value": "0.57",
+              "display": "0.57",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "protection",
+          "label": "防护等级",
+          "values": [
+            {
+              "key": "feature",
+              "label": "IP 防护等级",
+              "value": "IP67",
+              "display": "IP67",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "install_rule",
+          "label": "安装要求",
+          "values": [
+            {
+              "key": "feature",
+              "label": "安装方向",
+              "value": "Cable side upward",
+              "display": "Cable side upward",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [],
+      "documents": [],
+      "assets": [
+        {
+          "id": "asset_yf_f2_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/F2/main.jpg",
+          "alt": "YF-F2 industrial valve"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_f3",
+      "family": "valve",
+      "core": {
+        "family": "valve",
+        "sku": "YF-F3",
+        "model": "YF-F3",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_industrial_valves",
+        "name": {
+          "en": "YF-F3 High Pressure Integrated Reducer",
+          "zh": "YF-F3 高压集成减压器"
+        },
+        "shortName": {
+          "en": "F3",
+          "zh": "F3"
+        },
+        "summary": {
+          "en": "This product is applied to CNG engines. High-pressure natural gas flows out of the gas tank and passes through this valve for pressure reduction and pressure stabilization.",
+          "zh": "该产品应用在CNG 发动机上，是高压的天然气从气罐出来后经过此阀进行减压/稳压后"
+        }
+      },
+      "valveProfile": {
+        "pressureRating": "20...350 bar",
+        "connection": "Customizable",
+        "material": "Custom material",
+        "mode": "Standard",
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ],
+        "size": "custom"
+      },
+      "sku": "YF-F3",
+      "model": "YF-F3",
+      "seriesId": "ser_valves_f3",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_industrial_valves",
+      "additionalCategoryIds": [],
+      "industryIds": [
+        "ind_water",
+        "ind_oem"
+      ],
+      "applicationIds": [
+        "app_fluid_control"
+      ],
+      "measurementKinds": [],
+      "name": {
+        "en": "YF-F3 High Pressure Integrated Reducer",
+        "zh": "YF-F3 高压集成减压器"
+      },
+      "shortName": {
+        "en": "F3",
+        "zh": "F3"
+      },
+      "summary": {
+        "en": "This product is applied to CNG engines. High-pressure natural gas flows out of the gas tank and passes through this valve for pressure reduction and pressure stabilization.",
+        "zh": "该产品应用在CNG 发动机上，是高压的天然气从气罐出来后经过此阀进行减压/稳压后"
+      },
+      "highlights": [
+        {
+          "en": "High working pressure range 20~350barG",
+          "zh": "高压工作区间 20~350barG"
+        },
+        {
+          "en": "Customizable outlet pressure",
+          "zh": "出口压力按需设定；工作温度 - 40~+120℃"
+        }
+      ],
+      "applications": [
+        {
+          "en": "CNG engine high-pressure natural gas decompression",
+          "zh": "CNG 发电机组高压天然气减压；高压惰性气体调压；车载燃气供气稳压"
+        }
+      ],
+      "measurements": [],
+      "outputs": [],
+      "environmentalLimits": {
+        "wettedMaterials": [
+          "Custom material"
+        ],
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "valve",
+          "label": "Valve",
+          "values": [
+            {
+              "key": "feature",
+              "label": "Pressure rating",
+              "value": "20...350 bar",
+              "display": "20...350 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Size",
+              "value": "custom",
+              "display": "custom",
+              "sourceRefs": []
+            },
+            {
+              "key": "process_connection",
+              "label": "Connection",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Material",
+              "value": "Custom material",
+              "display": "Custom material",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Mode",
+              "value": "Standard",
+              "display": "Standard",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "working_pressure",
+          "label": "工作压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低工作压力",
+              "value": "20",
+              "display": "20",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高工作压力",
+              "value": "350",
+              "display": "350",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "outlet_pressure",
+          "label": "出口压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "出口压力",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "temp_range",
+          "label": "环境温度",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低环境温度",
+              "value": "-40",
+              "display": "-40",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高环境温度",
+              "value": "120",
+              "display": "120",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "medium",
+          "label": "适用介质",
+          "values": [
+            {
+              "key": "feature",
+              "label": "适配介质",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "leakage",
+          "label": "泄漏参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "内部泄漏",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "外部泄漏",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "flow_rate",
+          "label": "流量参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最大流量",
+              "value": "≥130",
+              "display": "≥130",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "pressure_resist",
+          "label": "耐压参数",
+          "values": [
+            {
+              "key": "feature",
+              "label": "耐压压力",
+              "value": "525",
+              "display": "525",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [],
+      "documents": [],
+      "assets": [
+        {
+          "id": "asset_yf_f3_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/F3/main.jpg",
+          "alt": "YF-F3 industrial valve"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_f4",
+      "family": "valve",
+      "core": {
+        "family": "valve",
+        "sku": "YF-F4",
+        "model": "YF-F4",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_industrial_valves",
+        "name": {
+          "en": "YF-F4 Check Valve",
+          "zh": "YF-F4 单向阀"
+        },
+        "shortName": {
+          "en": "F4",
+          "zh": "F4"
+        },
+        "summary": {
+          "en": "This product is used for unidirectional function of gas circuits.",
+          "zh": "该产品应用于气路的单向作用。"
+        }
+      },
+      "valveProfile": {
+        "pressureRating": "0...350 bar",
+        "connection": "Customizable",
+        "material": "Custom material",
+        "mode": "Standard",
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ],
+        "size": "4.7 mm"
+      },
+      "sku": "YF-F4",
+      "model": "YF-F4",
+      "seriesId": "ser_valves_f4",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_industrial_valves",
+      "additionalCategoryIds": [],
+      "industryIds": [
+        "ind_water",
+        "ind_oem"
+      ],
+      "applicationIds": [
+        "app_fluid_control"
+      ],
+      "measurementKinds": [],
+      "name": {
+        "en": "YF-F4 Check Valve",
+        "zh": "YF-F4 单向阀"
+      },
+      "shortName": {
+        "en": "F4",
+        "zh": "F4"
+      },
+      "summary": {
+        "en": "This product is used for unidirectional function of gas circuits.",
+        "zh": "该产品应用于气路的单向作用。"
+      },
+      "highlights": [
+        {
+          "en": "Max working pressure 350barG",
+          "zh": "最高工作压力 350barG"
+        },
+        {
+          "en": "Low cracking pressure 0.05bar",
+          "zh": "开启压力仅 0.05bar"
+        },
+        {
+          "en": "Wide operating temperature -40~+120℃",
+          "zh": "适用温度 - 40~+120℃"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Gas pipeline one-way flow control",
+          "zh": "气路单向流通控制；CNG/LNG 车载燃气回路防护；惰性气体管路防倒流"
+        }
+      ],
+      "measurements": [],
+      "outputs": [],
+      "environmentalLimits": {
+        "wettedMaterials": [
+          "Custom material"
+        ],
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "valve",
+          "label": "Valve",
+          "values": [
+            {
+              "key": "feature",
+              "label": "Pressure rating",
+              "value": "0...350 bar",
+              "display": "0...350 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Size",
+              "value": "4.7 mm",
+              "display": "4.7 mm",
+              "sourceRefs": []
+            },
+            {
+              "key": "process_connection",
+              "label": "Connection",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Material",
+              "value": "Custom material",
+              "display": "Custom material",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Mode",
+              "value": "Standard",
+              "display": "Standard",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "working_pressure",
+          "label": "工作压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最高工作压力",
+              "value": "350",
+              "display": "350",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "cracking_pressure",
+          "label": "开启压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "开启压力",
+              "value": "0.05",
+              "display": "0.05",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "temp_range",
+          "label": "环境温度",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低工作温度",
+              "value": "-40",
+              "display": "-40",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高工作温度",
+              "value": "120",
+              "display": "120",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "medium",
+          "label": "适用介质",
+          "values": [
+            {
+              "key": "feature",
+              "label": "适配介质",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "leakage",
+          "label": "泄漏指标",
+          "values": [
+            {
+              "key": "feature",
+              "label": "外部泄漏量",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "passage",
+          "label": "通径规格",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最小通径",
+              "value": "4.7",
+              "display": "4.7",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [],
+      "documents": [],
+      "assets": [
+        {
+          "id": "asset_yf_f4_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/F4/main.jpg",
+          "alt": "YF-F4 industrial valve"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_f5",
+      "family": "valve",
+      "core": {
+        "family": "valve",
+        "sku": "YF-F5",
+        "model": "YF-F5",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_industrial_valves",
+        "name": {
+          "en": "YF-F5 Safety Valve",
+          "zh": "YF-F5 安全阀"
+        },
+        "shortName": {
+          "en": "F5",
+          "zh": "F5"
+        },
+        "summary": {
+          "en": "This product serves a safety function in gas circuits. It will automatically shut off when the outlet pressure drops below the set value during downstream leakage or maintenance.",
+          "zh": "该产品应用于气路的安全作用，当下游发生泄漏或维修时，出口压力低于设定值后，自动切断"
+        }
+      },
+      "valveProfile": {
+        "pressureRating": "0...350 bar",
+        "connection": "Customizable",
+        "material": "Custom material",
+        "mode": "Normally closed",
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ],
+        "size": "5 mm"
+      },
+      "sku": "YF-F5",
+      "model": "YF-F5",
+      "seriesId": "ser_valves_f5",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_industrial_valves",
+      "additionalCategoryIds": [],
+      "industryIds": [
+        "ind_water",
+        "ind_oem"
+      ],
+      "applicationIds": [
+        "app_fluid_control"
+      ],
+      "measurementKinds": [],
+      "name": {
+        "en": "YF-F5 Safety Valve",
+        "zh": "YF-F5 安全阀"
+      },
+      "shortName": {
+        "en": "F5",
+        "zh": "F5"
+      },
+      "summary": {
+        "en": "This product serves a safety function in gas circuits. It will automatically shut off when the outlet pressure drops below the set value during downstream leakage or maintenance.",
+        "zh": "该产品应用于气路的安全作用，当下游发生泄漏或维修时，出口压力低于设定值后，自动切断"
+      },
+      "highlights": [
+        {
+          "en": "Rated working pressure 350barG",
+          "zh": "额定工作压力 350barG"
+        },
+        {
+          "en": "Cracking pressure 25barG",
+          "zh": "开启压力 25barG"
+        },
+        {
+          "en": "Wide temperature range -40~+120℃",
+          "zh": "工作温度 - 40~+120℃"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Gas pipeline safety cut-off",
+          "zh": "气路安全切断保护；CNG 发动机管路超压防护；管道检修自动断气；天然气设备泄漏安全阻断"
+        }
+      ],
+      "measurements": [],
+      "outputs": [],
+      "environmentalLimits": {
+        "wettedMaterials": [
+          "Custom material"
+        ],
+        "compatibleMedia": [
+          "Natural gas",
+          "Inert gas"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "valve",
+          "label": "Valve",
+          "values": [
+            {
+              "key": "feature",
+              "label": "Pressure rating",
+              "value": "0...350 bar",
+              "display": "0...350 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Size",
+              "value": "5 mm",
+              "display": "5 mm",
+              "sourceRefs": []
+            },
+            {
+              "key": "process_connection",
+              "label": "Connection",
+              "value": "Customizable",
+              "display": "Customizable",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Material",
+              "value": "Custom material",
+              "display": "Custom material",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "Mode",
+              "value": "Normally closed",
+              "display": "Normally closed",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "working_pressure",
+          "label": "工作压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "额定工作压力",
+              "value": "350",
+              "display": "350",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "cracking_pressure",
+          "label": "开启压力",
+          "values": [
+            {
+              "key": "feature",
+              "label": "开启压力",
+              "value": "25",
+              "display": "25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "temp_range",
+          "label": "环境温度",
+          "values": [
+            {
+              "key": "feature",
+              "label": "最低工作温度",
+              "value": "-40",
+              "display": "-40",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "最高工作温度",
+              "value": "120",
+              "display": "120",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "medium",
+          "label": "适用介质",
+          "values": [
+            {
+              "key": "feature",
+              "label": "适配介质",
+              "value": "Natural gas;Inert gas",
+              "display": "Natural gas;Inert gas",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "valve_type",
+          "label": "阀体类型",
+          "values": [
+            {
+              "key": "feature",
+              "label": "阀门结构类型",
+              "value": "Normally closed",
+              "display": "Normally closed",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "leakage",
+          "label": "泄漏指标",
+          "values": [
+            {
+              "key": "feature",
+              "label": "内部泄漏量",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            },
+            {
+              "key": "feature",
+              "label": "外部泄漏量",
+              "value": "≤0.25",
+              "display": "≤0.25",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "passage",
+          "label": "通径规格",
+          "values": [
+            {
+              "key": "feature",
+              "label": "流通孔径",
+              "value": "5",
+              "display": "5",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [],
+      "documents": [],
+      "assets": [
+        {
+          "id": "asset_yf_f5_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/F5/main.jpg",
+          "alt": "YF-F5 industrial valve"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_p10",
+      "family": "sensor",
+      "core": {
+        "family": "sensor",
+        "sku": "YF-P10",
+        "model": "YF-P10",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_pressure_transmitters",
+        "name": {
+          "en": "YF-P10 Series Cost-effective Pressure Transmitter",
+          "zh": "YF-P10 系列经济型压力变送器"
+        },
+        "shortName": {
+          "en": "P10",
+          "zh": "P10"
+        },
+        "summary": {
+          "en": "Pressure transmitter for industrial pressure monitoring.",
+          "zh": "用于工业压力监测的压力变送器。"
+        }
+      },
+      "sensorProfile": {
+        "measurements": [
+          {
+            "kind": "pressure",
+            "range": {
+              "min": 0,
+              "max": 50,
+              "unit": "bar",
+              "display": "0...50 bar"
+            },
+            "accuracy": "0.5% FS;1% FS",
+            "overloadLimit": {
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "kind": "analog-current",
+            "value": "0.5-4.5V;4-20mA;0-10V;IIC",
+            "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+          }
+        ],
+        "connections": {
+          "process": {
+            "kind": "thread",
+            "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+            "material": "Stainless steel"
+          },
+          "electrical": {
+            "kind": "connector",
+            "value": "直出线"
+          }
+        },
+        "environmentalLimits": {
+          "ingressProtection": "IP65",
+          "mediaTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "ambientTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "wettedMaterials": [
+            "Stainless steel",
+            "Ceramic",
+            "FKM"
+          ],
+          "compatibleMedia": [
+            "Water",
+            "Air",
+            "Oil"
+          ]
+        }
+      },
+      "sku": "YF-P10",
+      "model": "YF-P10",
+      "seriesId": "ser_pressure_p10",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": [],
+      "applicationIds": [],
+      "measurementKinds": [
+        "pressure"
+      ],
+      "name": {
+        "en": "YF-P10 Series Cost-effective Pressure Transmitter",
+        "zh": "YF-P10 系列经济型压力变送器"
+      },
+      "shortName": {
+        "en": "P10",
+        "zh": "P10"
+      },
+      "summary": {
+        "en": "Pressure transmitter for industrial pressure monitoring.",
+        "zh": "用于工业压力监测的压力变送器。"
+      },
+      "highlights": [
+        {
+          "en": "Cost-effective economical solution",
+          "zh": "高性价比经济型方案"
+        },
+        {
+          "en": "Multiple signal outputs: 0.5-4.5V,4-20mA,0-10V,IIC, customizable",
+          "zh": "多信号输出：0.5-4.5V/4-20mA/0-10V/IIC，可定制"
+        },
+        {
+          "en": "Compact structure, space-saving installation",
+          "zh": "体积小巧，节省安装空间"
+        },
+        {
+          "en": "Excellent long-term stability, drift ≤±0.3%FS per year",
+          "zh": "长期稳定性优异，年漂移≤±0.3% FS"
+        },
+        {
+          "en": "High overload capacity: 2X rated pressure",
+          "zh": "2 倍额定压力高过载能力"
+        },
+        {
+          "en": "Wide operating temperature: -40~125℃",
+          "zh": "宽温工作：-40~125℃"
+        },
+        {
+          "en": "Low power consumption for wireless applications",
+          "zh": "低功耗，适配无线设备"
+        },
+        {
+          "en": "Strong anti-shock & anti-vibration, IP67 protection",
+          "zh": "强抗震抗冲击，防护等级 IP67"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Constant pressure water supply",
+          "zh": "恒压供水"
+        },
+        {
+          "en": "Construction machinery",
+          "zh": "工程机械"
+        },
+        {
+          "en": "Industrial process control",
+          "zh": "工业过程控制"
+        },
+        {
+          "en": "Water pumps",
+          "zh": "水泵"
+        },
+        {
+          "en": "Small household appliances",
+          "zh": "小家电"
+        },
+        {
+          "en": "Medical equipment",
+          "zh": "医疗农机设备"
+        },
+        {
+          "en": "Air compressor",
+          "zh": "空气压缩机"
+        },
+        {
+          "en": "HVAC systems",
+          "zh": "空调温控系统"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 50,
+            "unit": "bar",
+            "display": "0...50 bar"
+          },
+          "accuracy": "0.5% FS;1% FS",
+          "overloadLimit": {
+            "value": 100,
+            "unit": "bar",
+            "display": "2倍额定压力"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-current",
+          "value": "0.5-4.5V;4-20mA;0-10V;IIC",
+          "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+          "material": "Stainless steel"
+        },
+        "electrical": {
+          "kind": "connector",
+          "value": "直出线"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP65",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "ambientTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "wettedMaterials": [
+          "Stainless steel",
+          "Ceramic",
+          "FKM"
+        ],
+        "compatibleMedia": [
+          "Water",
+          "Air",
+          "Oil"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...50 bar",
+              "unit": "bar",
+              "display": "0...50 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "accuracy",
+              "label": "Accuracy",
+              "value": "0.5% FS;1% FS",
+              "display": "0.5% FS;1% FS",
+              "sourceRefs": []
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "0.5-4.5V;4-20mA;0-10V;IIC",
+              "display": "0.5-4.5V;4-20mA;0-10V;IIC",
+              "sourceRefs": []
+            },
+            {
+              "key": "supply_voltage",
+              "label": "Supply voltage",
+              "value": "3-5V;8-32V;5V±10%",
+              "unit": "v",
+              "display": "3-5V;8-32V;5V±10%",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "mechanical",
+          "label": "mechanical",
+          "values": [
+            {
+              "key": "process_connection",
+              "label": "Process connection",
+              "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+              "display": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+              "sourceRefs": []
+            },
+            {
+              "key": "electrical_connection",
+              "label": "Electrical connection",
+              "value": "直出线",
+              "display": "直出线",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "environmental",
+          "label": "environmental",
+          "values": [
+            {
+              "key": "ingress_protection",
+              "label": "Ingress protection",
+              "value": "IP65",
+              "display": "IP65",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Water;Air;Oil",
+              "display": "Water;Air;Oil",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Wetted materials",
+              "value": "Stainless steel;Ceramic;FKM",
+              "display": "Stainless steel;Ceramic;FKM",
+              "sourceRefs": []
+            },
+            {
+              "key": "media_temperature",
+              "label": "Media temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            },
+            {
+              "key": "ambient_temperature",
+              "label": "Ambient temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [
+        "ce",
+        "rohs"
+      ],
+      "documents": [
+        {
+          "id": "doc_yf_p10_datasheet",
+          "title": "datasheet",
+          "kind": "datasheet",
+          "href": "/documents/products/p10-datasheet.pdf",
+          "contentLocale": "zh",
+          "revision": "A"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_yf_p10_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/p10/main.jpg",
+          "alt": "YF-P10 pressure transmitter"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_p10c",
+      "family": "sensor",
+      "core": {
+        "family": "sensor",
+        "sku": "YF-P10C",
+        "model": "YF-P10C",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_pressure_transmitters",
+        "name": {
+          "en": "YF-P10C Compact Economical Pressure Transmitter",
+          "zh": "YF-P10C 微型经济型压力变送器"
+        },
+        "shortName": {
+          "en": "P10C",
+          "zh": "P10C"
+        },
+        "summary": {
+          "en": "YF-P10C miniature pressure transmitter with compact 304 stainless steel structure, full-range calibration and temperature compensation. It supports ratiometric voltage, analog and digital signals, features 2X overload and 3X burst pressure, IP65/IP67 protection, operating temperature -40~+125℃, suitable for pressure detection of pumps, valves and pipelines.",
+          "zh": "YF-P10C 微型经济型压力变送器，304 不锈钢小巧结构，全量程校准带温度补偿；支持比率电压、模拟、数字多类输出，2 倍过载、3 倍爆破耐压，防护 IP65/IP67，工作温度 - 40~125℃，适用于泵、阀、管道压力检测。"
+        }
+      },
+      "sensorProfile": {
+        "measurements": [
+          {
+            "kind": "pressure",
+            "range": {
+              "min": 0,
+              "max": 50,
+              "unit": "bar",
+              "display": "0...50 bar"
+            },
+            "accuracy": "0.5% FS;1% FS",
+            "overloadLimit": {
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "kind": "analog-current",
+            "value": "0.5-4.5V;4-20mA;0-10V;IIC",
+            "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+          }
+        ],
+        "connections": {
+          "process": {
+            "kind": "thread",
+            "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+            "material": "Stainless steel"
+          },
+          "electrical": {
+            "kind": "connector",
+            "value": "直出线"
+          }
+        },
+        "environmentalLimits": {
+          "ingressProtection": "IP67",
+          "mediaTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "ambientTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "wettedMaterials": [
+            "Stainless steel",
+            "Ceramic",
+            "FKM"
+          ],
+          "compatibleMedia": [
+            "Water",
+            "Air",
+            "Oil"
+          ]
+        }
+      },
+      "sku": "YF-P10C",
+      "model": "YF-P10C",
+      "seriesId": "ser_pressure_p10",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": [],
+      "applicationIds": [],
+      "measurementKinds": [
+        "pressure"
+      ],
+      "name": {
+        "en": "YF-P10C Compact Economical Pressure Transmitter",
+        "zh": "YF-P10C 微型经济型压力变送器"
+      },
+      "shortName": {
+        "en": "P10C",
+        "zh": "P10C"
+      },
+      "summary": {
+        "en": "YF-P10C miniature pressure transmitter with compact 304 stainless steel structure, full-range calibration and temperature compensation. It supports ratiometric voltage, analog and digital signals, features 2X overload and 3X burst pressure, IP65/IP67 protection, operating temperature -40~+125℃, suitable for pressure detection of pumps, valves and pipelines.",
+        "zh": "YF-P10C 微型经济型压力变送器，304 不锈钢小巧结构，全量程校准带温度补偿；支持比率电压、模拟、数字多类输出，2 倍过载、3 倍爆破耐压，防护 IP65/IP67，工作温度 - 40~125℃，适用于泵、阀、管道压力检测。"
+      },
+      "highlights": [
+        {
+          "en": "Cost-effective compact design",
+          "zh": "高性价比微型结构；304 不锈钢安装螺纹接口；全量程校准，内置温度补偿；多信号输出：比率电压、模拟量、数字信号可选；结构坚固，2 倍过载、3 倍爆破耐压；量程、输出信号支持定制；宽温使用 - 40~125℃"
+        },
+        {
+          "en": "304 stainless steel process connection",
+          "zh": "IP65/IP67 防护等级可选"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Water pumps",
+          "zh": "水泵；阀门；管道监测；工业设备；流体压力检测"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 50,
+            "unit": "bar",
+            "display": "0...50 bar"
+          },
+          "accuracy": "0.5% FS;1% FS",
+          "overloadLimit": {
+            "value": 100,
+            "unit": "bar",
+            "display": "2倍额定压力"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-current",
+          "value": "0.5-4.5V;4-20mA;0-10V;IIC",
+          "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+          "material": "Stainless steel"
+        },
+        "electrical": {
+          "kind": "connector",
+          "value": "直出线"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP67",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "ambientTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "wettedMaterials": [
+          "Stainless steel",
+          "Ceramic",
+          "FKM"
+        ],
+        "compatibleMedia": [
+          "Water",
+          "Air",
+          "Oil"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...50 bar",
+              "unit": "bar",
+              "display": "0...50 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "accuracy",
+              "label": "Accuracy",
+              "value": "0.5% FS;1% FS",
+              "display": "0.5% FS;1% FS",
+              "sourceRefs": []
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "0.5-4.5V;4-20mA;0-10V;0-5V",
+              "display": "0.5-4.5V;4-20mA;0-10V;IIC",
+              "sourceRefs": []
+            },
+            {
+              "key": "supply_voltage",
+              "label": "Supply voltage",
+              "value": "5±0.5Vdc;24Vdc",
+              "unit": "v",
+              "display": "3-5V;8-32V;5V±10%",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "mechanical",
+          "label": "mechanical",
+          "values": [
+            {
+              "key": "process_connection",
+              "label": "Process connection",
+              "value": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+              "display": "G1/8;G1/4;NPT1/8;NPT1/4;其他",
+              "sourceRefs": []
+            },
+            {
+              "key": "electrical_connection",
+              "label": "Electrical connection",
+              "value": "直出线",
+              "display": "直出线",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "environmental",
+          "label": "environmental",
+          "values": [
+            {
+              "key": "ingress_protection",
+              "label": "Ingress protection",
+              "value": "IP67",
+              "display": "IP67",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Water;Air;Oil",
+              "display": "Water;Air;Oil",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Wetted materials",
+              "value": "Stainless steel;Ceramic;FKM",
+              "display": "Stainless steel;Ceramic;FKM",
+              "sourceRefs": []
+            },
+            {
+              "key": "media_temperature",
+              "label": "Media temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            },
+            {
+              "key": "ambient_temperature",
+              "label": "Ambient temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [
+        "ce",
+        "rohs"
+      ],
+      "documents": [
+        {
+          "id": "doc_yf_p10c_datasheet",
+          "title": "datasheet",
+          "kind": "datasheet",
+          "href": "/documents/products/p10C-datasheet.pdf",
+          "contentLocale": "zh",
+          "revision": "A"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_yf_p10c_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/p10c/main.jpg",
+          "alt": "YF-P10C pressure transmitter"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_p11",
+      "family": "sensor",
+      "core": {
+        "family": "sensor",
+        "sku": "YF-P11",
+        "model": "YF-P11",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_pressure_transmitters",
+        "name": {
+          "en": "YF-P11 Compact Digital IIC Pressure Transmitter",
+          "zh": "YF-P11 小型数字 IIC 压力变送器"
+        },
+        "shortName": {
+          "en": "P11",
+          "zh": "P11"
+        },
+        "summary": {
+          "en": "P11 compact pressure transmitter with good medium compatibility and long-term stability, only IIC digital output, powered by 3-5VDC, ultra-low current consumption ≤1mA, wide temperature range -40~125℃, IP67 protection, excellent shock and vibration resistance for gas and liquid pressure measurement compatible with stainless steel.",
+          "zh": "P11 紧凑型压力变送器，介质适配性强、长期稳定性优异；仅 IIC 数字信号输出，供电 3-5VDC，整机功耗≤1mA，工作温区 - 40~125℃，IP67 防护，抗震抗冲击，适用于不锈钢兼容气体、液体压力测量。"
+        }
+      },
+      "sensorProfile": {
+        "measurements": [
+          {
+            "kind": "pressure",
+            "range": {
+              "min": 0,
+              "max": 50,
+              "unit": "bar",
+              "display": "0...50 bar"
+            },
+            "accuracy": "1% FS",
+            "overloadLimit": {
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "kind": "analog-voltage",
+            "value": "0.5-4.5V",
+            "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+          }
+        ],
+        "connections": {
+          "process": {
+            "kind": "thread",
+            "value": "G1/4;NPT1/8;NPT1/4;其他",
+            "material": "Stainless steel"
+          },
+          "electrical": {
+            "kind": "connector",
+            "value": "直出线"
+          }
+        },
+        "environmentalLimits": {
+          "ingressProtection": "IP67",
+          "mediaTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "ambientTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "wettedMaterials": [
+            "Stainless steel",
+            "Ceramic",
+            "FKM"
+          ],
+          "compatibleMedia": [
+            "Water",
+            "Air",
+            "Oil"
+          ]
+        }
+      },
+      "sku": "YF-P11",
+      "model": "YF-P11",
+      "seriesId": "ser_pressure_p11",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": [],
+      "applicationIds": [],
+      "measurementKinds": [
+        "pressure"
+      ],
+      "name": {
+        "en": "YF-P11 Compact Digital IIC Pressure Transmitter",
+        "zh": "YF-P11 小型数字 IIC 压力变送器"
+      },
+      "shortName": {
+        "en": "P11",
+        "zh": "P11"
+      },
+      "summary": {
+        "en": "P11 compact pressure transmitter with good medium compatibility and long-term stability, only IIC digital output, powered by 3-5VDC, ultra-low current consumption ≤1mA, wide temperature range -40~125℃, IP67 protection, excellent shock and vibration resistance for gas and liquid pressure measurement compatible with stainless steel.",
+        "zh": "P11 紧凑型压力变送器，介质适配性强、长期稳定性优异；仅 IIC 数字信号输出，供电 3-5VDC，整机功耗≤1mA，工作温区 - 40~125℃，IP67 防护，抗震抗冲击，适用于不锈钢兼容气体、液体压力测量。"
+      },
+      "highlights": [
+        {
+          "en": "Cost-effective",
+          "zh": "性价比高；体积小巧；长期稳定性优异；高过载能力；IIC 数字信号输出；超低功耗≤1mA"
+        },
+        {
+          "en": "Compact size",
+          "zh": "宽温工作 - 40~125℃"
+        },
+        {
+          "en": "Excellent long-term stability",
+          "zh": "抗震抗冲击性能强；IP67 防护等级"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Pipeline monitoring",
+          "zh": "管道监测；小型工业设备；流体压力检测；通用机械；数字信号采集设备"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 50,
+            "unit": "bar",
+            "display": "0...50 bar"
+          },
+          "accuracy": "1% FS",
+          "overloadLimit": {
+            "value": 100,
+            "unit": "bar",
+            "display": "2倍额定压力"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-voltage",
+          "value": "0.5-4.5V",
+          "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/4;NPT1/8;NPT1/4;其他",
+          "material": "Stainless steel"
+        },
+        "electrical": {
+          "kind": "connector",
+          "value": "直出线"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP67",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "ambientTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "wettedMaterials": [
+          "Stainless steel",
+          "Ceramic",
+          "FKM"
+        ],
+        "compatibleMedia": [
+          "Water",
+          "Air",
+          "Oil"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...50 bar",
+              "unit": "bar",
+              "display": "0...50 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "accuracy",
+              "label": "Accuracy",
+              "value": "1% FS",
+              "display": "1% FS",
+              "sourceRefs": []
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 100,
+              "unit": "bar",
+              "display": "2倍额定压力",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "0.5-4.5V",
+              "display": "0.5-4.5V",
+              "sourceRefs": []
+            },
+            {
+              "key": "supply_voltage",
+              "label": "Supply voltage",
+              "value": "3-5V;8-32V;5V±10%",
+              "unit": "v",
+              "display": "3-5V;8-32V;5V±10%",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "mechanical",
+          "label": "mechanical",
+          "values": [
+            {
+              "key": "process_connection",
+              "label": "Process connection",
+              "value": "G1/4;NPT1/8;NPT1/4;其他",
+              "display": "G1/4;NPT1/8;NPT1/4;其他",
+              "sourceRefs": []
+            },
+            {
+              "key": "electrical_connection",
+              "label": "Electrical connection",
+              "value": "直出线",
+              "display": "直出线",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "environmental",
+          "label": "environmental",
+          "values": [
+            {
+              "key": "ingress_protection",
+              "label": "Ingress protection",
+              "value": "IP67",
+              "display": "IP67",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Water;Air;Oil",
+              "display": "Water;Air;Oil",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Wetted materials",
+              "value": "Stainless steel;Ceramic;FKM",
+              "display": "Stainless steel;Ceramic;FKM",
+              "sourceRefs": []
+            },
+            {
+              "key": "media_temperature",
+              "label": "Media temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            },
+            {
+              "key": "ambient_temperature",
+              "label": "Ambient temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [
+        "ce",
+        "rohs"
+      ],
+      "documents": [
+        {
+          "id": "doc_yf_p11_datasheet",
+          "title": "datasheet",
+          "kind": "datasheet",
+          "href": "/documents/products/p11-datasheet.pdf",
+          "contentLocale": "zh",
+          "revision": "A"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_yf_p11_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/p11/main.jpg",
+          "alt": "YF-P11 pressure transmitter"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_p12",
+      "family": "sensor",
+      "core": {
+        "family": "sensor",
+        "sku": "YF-P12",
+        "model": "YF-P12",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_pressure_transmitters",
+        "name": {
+          "en": "P12 Pressure Transmitter for Water Purifier & Beverage Equipment",
+          "zh": "P12 净水机咖啡机专用压力变送器"
+        },
+        "shortName": {
+          "en": "P12",
+          "zh": "P12"
+        },
+        "summary": {
+          "en": "P12 cost-effective pressure transmitter specially designed for small appliances like water purifiers, coffee machines and beverage dispensers. It outputs 0.5-4.5V ratiometric signal with 5V power supply, supports 40bar overload and 60bar burst pressure, equipped with overvoltage, reverse voltage and short-circuit protection, IP67 stainless steel housing, working temperature -40~125℃.",
+          "zh": "P12 高性价比压力变送器，专为净水机、咖啡机、饮料机等小家电定制；输出 0.5-4.5V 比率电压，5V 供电，40bar 过载、60bar 破坏压力，集成过压、反压、短路保护，304 不锈钢 IP67 外壳，工作温度 - 40~125℃。"
+        }
+      },
+      "sensorProfile": {
+        "measurements": [
+          {
+            "kind": "pressure",
+            "range": {
+              "min": 0,
+              "max": 25,
+              "unit": "bar",
+              "display": "0...25 bar"
+            },
+            "accuracy": "1% FS",
+            "overloadLimit": {
+              "value": 4,
+              "unit": "bar",
+              "display": "2倍额定压力"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "kind": "analog-voltage",
+            "value": "0.5-4.5V",
+            "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+          }
+        ],
+        "connections": {
+          "process": {
+            "kind": "thread",
+            "value": "G1/4;NPT1/4;其他",
+            "material": "Stainless steel"
+          },
+          "electrical": {
+            "kind": "connector",
+            "value": "直出线"
+          }
+        },
+        "environmentalLimits": {
+          "ingressProtection": "IP67",
+          "mediaTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "ambientTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "wettedMaterials": [
+            "Stainless steel",
+            "Ceramic",
+            "FKM"
+          ],
+          "compatibleMedia": [
+            "Water",
+            "Air",
+            "Oil"
+          ]
+        }
+      },
+      "sku": "YF-P12",
+      "model": "YF-P12",
+      "seriesId": "ser_pressure_p12",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": [],
+      "applicationIds": [],
+      "measurementKinds": [
+        "pressure"
+      ],
+      "name": {
+        "en": "P12 Pressure Transmitter for Water Purifier & Beverage Equipment",
+        "zh": "P12 净水机咖啡机专用压力变送器"
+      },
+      "shortName": {
+        "en": "P12",
+        "zh": "P12"
+      },
+      "summary": {
+        "en": "P12 cost-effective pressure transmitter specially designed for small appliances like water purifiers, coffee machines and beverage dispensers. It outputs 0.5-4.5V ratiometric signal with 5V power supply, supports 40bar overload and 60bar burst pressure, equipped with overvoltage, reverse voltage and short-circuit protection, IP67 stainless steel housing, working temperature -40~125℃.",
+        "zh": "P12 高性价比压力变送器，专为净水机、咖啡机、饮料机等小家电定制；输出 0.5-4.5V 比率电压，5V 供电，40bar 过载、60bar 破坏压力，集成过压、反压、短路保护，304 不锈钢 IP67 外壳，工作温度 - 40~125℃。"
+      },
+      "highlights": [
+        {
+          "en": "Cost-effective design",
+          "zh": "高性价比经济型；专为小家电工况定制；0.5-4.5V 比率电压输出；性能稳定；40bar 高过载、60bar 破坏压力；宽温 - 40~125℃工作；具备过压 / 反压 / 短路三重保护；304 不锈钢外壳；IP67 防护等级"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Water purifiers",
+          "zh": "净水机；咖啡机；饮料机；小型流体设备"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 25,
+            "unit": "bar",
+            "display": "0...25 bar"
+          },
+          "accuracy": "1% FS",
+          "overloadLimit": {
+            "value": 4,
+            "unit": "bar",
+            "display": "2倍额定压力"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-voltage",
+          "value": "0.5-4.5V",
+          "wiring": "Supply voltage: 3-5V;8-32V;5V±10%"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/4;NPT1/4;其他",
+          "material": "Stainless steel"
+        },
+        "electrical": {
+          "kind": "connector",
+          "value": "直出线"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP67",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "ambientTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "wettedMaterials": [
+          "Stainless steel",
+          "Ceramic",
+          "FKM"
+        ],
+        "compatibleMedia": [
+          "Water",
+          "Air",
+          "Oil"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...25 bar",
+              "unit": "bar",
+              "display": "0...25 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "accuracy",
+              "label": "Accuracy",
+              "value": "1% FS",
+              "display": "1% FS",
+              "sourceRefs": []
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 4,
+              "unit": "bar",
+              "display": "2倍额定压力",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "0.5-4.5V",
+              "display": "0.5-4.5V",
+              "sourceRefs": []
+            },
+            {
+              "key": "supply_voltage",
+              "label": "Supply voltage",
+              "value": "3-5V;8-32V;5V±10%",
+              "unit": "v",
+              "display": "3-5V;8-32V;5V±10%",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "mechanical",
+          "label": "mechanical",
+          "values": [
+            {
+              "key": "process_connection",
+              "label": "Process connection",
+              "value": "G1/4;NPT1/4;其他",
+              "display": "G1/4;NPT1/4;其他",
+              "sourceRefs": []
+            },
+            {
+              "key": "electrical_connection",
+              "label": "Electrical connection",
+              "value": "直出线",
+              "display": "直出线",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "environmental",
+          "label": "environmental",
+          "values": [
+            {
+              "key": "ingress_protection",
+              "label": "Ingress protection",
+              "value": "IP67",
+              "display": "IP67",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Water;Air;Oil",
+              "display": "Water;Air;Oil",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Wetted materials",
+              "value": "Stainless steel;Ceramic;FKM",
+              "display": "Stainless steel;Ceramic;FKM",
+              "sourceRefs": []
+            },
+            {
+              "key": "media_temperature",
+              "label": "Media temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            },
+            {
+              "key": "ambient_temperature",
+              "label": "Ambient temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [
+        "ce",
+        "rohs"
+      ],
+      "documents": [
+        {
+          "id": "doc_yf_p12_datasheet",
+          "title": "datasheet",
+          "kind": "datasheet",
+          "href": "/documents/products/p12-datasheet.pdf",
+          "contentLocale": "zh",
+          "revision": "A"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_yf_p12_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/p12/main.jpg",
+          "alt": "YF-P12 pressure transmitter"
+        }
+      ]
+    },
+    {
+      "id": "prd_yf_p13",
+      "family": "sensor",
+      "core": {
+        "family": "sensor",
+        "sku": "YF-P13",
+        "model": "YF-P13",
+        "brand": "Yufavor",
+        "primaryCategory": "cat_pressure_transmitters",
+        "name": {
+          "en": "P13 Pressure Transmitter for Coffee & Beverage Machines",
+          "zh": "P13 咖啡机饮料机专用压力变送器"
+        },
+        "shortName": {
+          "en": "P13",
+          "zh": "P13"
+        },
+        "summary": {
+          "en": "Cost-effective P13 pressure transmitter customized for coffee machines and beverage equipment, fixed 0~20bar measuring range with 0.5-4.5V ratiometric output, 5V power supply, 40bar overload and 60bar burst pressure. Built-in overvoltage, reverse voltage and short-circuit protection, aluminum housing, IP67 protection, operating temperature -40~125℃, equipped with XHB-3Y lock connector.",
+          "zh": "P13 高性价比压力变送器，专为咖啡机、饮料机定制；固定量程 0~20bar，0.5-4.5V 比率电压输出，5V 供电，40bar 过载、60bar 破坏压力；集成过压、反压、短路保护，铝合金外壳 IP67 防护，工作温度 - 40~125℃，标配 XHB-3Y 卡扣式接头。"
+        }
+      },
+      "sensorProfile": {
+        "measurements": [
+          {
+            "kind": "pressure",
+            "range": {
+              "min": 0,
+              "max": 20,
+              "unit": "bar",
+              "display": "0...20 bar"
+            },
+            "accuracy": "1% FS",
+            "overloadLimit": {
+              "value": 4,
+              "unit": "bar",
+              "display": "2倍额定压力"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "kind": "analog-voltage",
+            "value": "0.5-4.5V",
+            "wiring": "Supply voltage: 5±0.5Vdc"
+          }
+        ],
+        "connections": {
+          "process": {
+            "kind": "thread",
+            "value": "G1/8;其他",
+            "material": "Stainless steel"
+          },
+          "electrical": {
+            "kind": "connector",
+            "value": "航空插头"
+          }
+        },
+        "environmentalLimits": {
+          "ingressProtection": "IP67",
+          "mediaTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "ambientTemperature": {
+            "min": -40,
+            "max": 125,
+            "unit": "c",
+            "display": "-40...125 C"
+          },
+          "wettedMaterials": [
+            "Stainless steel",
+            "Ceramic",
+            "FKM"
+          ],
+          "compatibleMedia": [
+            "Water",
+            "Air",
+            "Oil"
+          ]
+        }
+      },
+      "sku": "YF-P13",
+      "model": "YF-P13",
+      "seriesId": "ser_pressure_p13",
+      "brand": "Yufavor",
+      "manufacturer": "Shanghai Yufavor Sensor Instrument Co.,Ltd",
+      "availability": "standard-lead-time",
+      "revisedAt": "2026-07-07",
+      "primaryCategoryId": "cat_pressure_transmitters",
+      "additionalCategoryIds": [],
+      "industryIds": [],
+      "applicationIds": [],
+      "measurementKinds": [
+        "pressure"
+      ],
+      "name": {
+        "en": "P13 Pressure Transmitter for Coffee & Beverage Machines",
+        "zh": "P13 咖啡机饮料机专用压力变送器"
+      },
+      "shortName": {
+        "en": "P13",
+        "zh": "P13"
+      },
+      "summary": {
+        "en": "Cost-effective P13 pressure transmitter customized for coffee machines and beverage equipment, fixed 0~20bar measuring range with 0.5-4.5V ratiometric output, 5V power supply, 40bar overload and 60bar burst pressure. Built-in overvoltage, reverse voltage and short-circuit protection, aluminum housing, IP67 protection, operating temperature -40~125℃, equipped with XHB-3Y lock connector.",
+        "zh": "P13 高性价比压力变送器，专为咖啡机、饮料机定制；固定量程 0~20bar，0.5-4.5V 比率电压输出，5V 供电，40bar 过载、60bar 破坏压力；集成过压、反压、短路保护，铝合金外壳 IP67 防护，工作温度 - 40~125℃，标配 XHB-3Y 卡扣式接头。"
+      },
+      "highlights": [
+        {
+          "en": "Cost-effective",
+          "zh": "高性价比；专为饮料小家电定制；0.5-4.5V 比率电压输出；性能稳定；40bar 高过载、60bar 破坏压力；宽温 - 40~125℃工作；具备过压 / 反压 / 短路三重保护；铝合金外壳；IP67 防护等级；标配 XHB-3Y 卡扣接头"
+        }
+      ],
+      "applications": [
+        {
+          "en": "Coffee machines",
+          "zh": "咖啡机；饮料机；小型流体小家电"
+        }
+      ],
+      "measurements": [
+        {
+          "kind": "pressure",
+          "range": {
+            "min": 0,
+            "max": 20,
+            "unit": "bar",
+            "display": "0...20 bar"
+          },
+          "accuracy": "1% FS",
+          "overloadLimit": {
+            "value": 4,
+            "unit": "bar",
+            "display": "2倍额定压力"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "kind": "analog-voltage",
+          "value": "0.5-4.5V",
+          "wiring": "Supply voltage: 5±0.5Vdc"
+        }
+      ],
+      "connections": {
+        "process": {
+          "kind": "thread",
+          "value": "G1/8;其他",
+          "material": "Stainless steel"
+        },
+        "electrical": {
+          "kind": "connector",
+          "value": "航空插头"
+        }
+      },
+      "environmentalLimits": {
+        "ingressProtection": "IP67",
+        "mediaTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "ambientTemperature": {
+          "min": -40,
+          "max": 125,
+          "unit": "c",
+          "display": "-40...125 C"
+        },
+        "wettedMaterials": [
+          "Stainless steel",
+          "Ceramic",
+          "FKM"
+        ],
+        "compatibleMedia": [
+          "Water",
+          "Air",
+          "Oil"
+        ]
+      },
+      "specificationGroups": [
+        {
+          "key": "measurement",
+          "label": "measurement",
+          "values": [
+            {
+              "key": "measurement_range",
+              "label": "Measurement range",
+              "value": "0...20 bar",
+              "unit": "bar",
+              "display": "0...20 bar",
+              "sourceRefs": []
+            },
+            {
+              "key": "accuracy",
+              "label": "Accuracy",
+              "value": "1% FS",
+              "display": "1% FS",
+              "sourceRefs": []
+            },
+            {
+              "key": "overload_limit",
+              "label": "Overload limit",
+              "value": 4,
+              "unit": "bar",
+              "display": "2倍额定压力",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "electrical",
+          "label": "electrical",
+          "values": [
+            {
+              "key": "output_signal",
+              "label": "Output signal",
+              "value": "0.5-4.5V",
+              "display": "0.5-4.5V",
+              "sourceRefs": []
+            },
+            {
+              "key": "supply_voltage",
+              "label": "Supply voltage",
+              "value": "5±0.5Vdc",
+              "unit": "v",
+              "display": "5±0.5Vdc",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "mechanical",
+          "label": "mechanical",
+          "values": [
+            {
+              "key": "process_connection",
+              "label": "Process connection",
+              "value": "G1/8;其他",
+              "display": "G1/8;其他",
+              "sourceRefs": []
+            },
+            {
+              "key": "electrical_connection",
+              "label": "Electrical connection",
+              "value": "航空插头",
+              "display": "航空插头",
+              "sourceRefs": []
+            }
+          ]
+        },
+        {
+          "key": "environmental",
+          "label": "environmental",
+          "values": [
+            {
+              "key": "ingress_protection",
+              "label": "Ingress protection",
+              "value": "IP67",
+              "display": "IP67",
+              "sourceRefs": []
+            },
+            {
+              "key": "compatible_media",
+              "label": "Compatible media",
+              "value": "Water;Air;Oil",
+              "display": "Water;Air;Oil",
+              "sourceRefs": []
+            },
+            {
+              "key": "wetted_materials",
+              "label": "Wetted materials",
+              "value": "Stainless steel;Ceramic;FKM",
+              "display": "Stainless steel;Ceramic;FKM",
+              "sourceRefs": []
+            },
+            {
+              "key": "media_temperature",
+              "label": "Media temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            },
+            {
+              "key": "ambient_temperature",
+              "label": "Ambient temperature",
+              "value": "-40...125 C",
+              "unit": "c",
+              "display": "-40...125 C",
+              "sourceRefs": []
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "certifications": [
+        "ce",
+        "rohs"
+      ],
+      "documents": [
+        {
+          "id": "doc_yf_p13_datasheet",
+          "title": "datasheet",
+          "kind": "datasheet",
+          "href": "/documents/products/p13-datasheet.pdf",
+          "contentLocale": "zh",
+          "revision": "A"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset_yf_p13_primary",
+          "kind": "primary-image",
+          "href": "/assets/products/p13/main.jpg",
+          "alt": "YF-P13 pressure transmitter"
+        }
+      ]
+    }
+  ]
+}

@@ -61,15 +61,11 @@ The checklist covers:
 
 ## Node / CI Notes
 
-The root workspace currently runs the Next.js and validation gates on the root Node toolchain. If Strapi needs separate CI, run it as an isolated job with a Strapi-supported Node version. Strapi 4 requires Node `>=18 <=20`; do not reuse or mix the root Node 24 CI runtime for Strapi 4.
+The frontend and Strapi CI jobs run independently on Node 24. This matches the current Strapi 5 package engines, `strapi-cms/.node-version`, and the Node 24 Strapi Docker image. Historical migration-only scripts that explicitly require Node 20.20.2 remain isolated from the production build/runtime path.
 
 ## Expected Sitemap Formula
 
-Current `staticLocalizedEntryCount` is `7`.
-
-```txt
-2 locales * (1 home + 7 static localized entries + 5 industry entries + 3 application entries + product count)
-```
+The sitemap contains localized static, industry, application, product, and resource-detail entries. Resource-detail counts are CMS-driven, so release validation must assert required URLs and uniqueness instead of relying on a fixed total formula.
 
 ## Final Rerun Evidence
 

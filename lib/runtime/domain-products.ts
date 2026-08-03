@@ -7,6 +7,7 @@ import {
   listCmsHomepageProducts,
   listCmsProducts,
   preloadCmsProductSnapshotAsync,
+  refreshCmsProductSnapshotAsync,
   type CmsProductSourceMode,
 } from '@/lib/cms/products'
 import type {
@@ -35,6 +36,10 @@ export interface DomainProductRuntimeSource {
 
 export async function preloadRuntimeDomainProducts(): Promise<void> {
   await preloadCmsProductSnapshotAsync()
+}
+
+export async function refreshRuntimeDomainProducts(): Promise<void> {
+  await refreshCmsProductSnapshotAsync()
 }
 
 export function getRuntimeDomainProductRecords(): readonly ProductRecord[] {
