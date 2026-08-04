@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight, Factory, FileCheck2, Globe2, type LucideIcon } from 'lucide-react'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import type { Locale } from '@/i18n/routing'
 import type { SiteLayoutProjection } from '@/lib/domain'
 

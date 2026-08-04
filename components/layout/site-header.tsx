@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowRight, Globe2, Menu, Search, X } from 'lucide-react'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import type { Locale } from '@/i18n/routing'
 import type { SiteLayoutProjection } from '@/lib/domain'
 import { cn } from '@/lib/utils'

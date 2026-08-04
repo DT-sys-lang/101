@@ -133,7 +133,34 @@ function useDeferredVideoPlayback() {
       return undefined
     }
 
-    const timeoutId = window.setTimeout(() => setEnabled(true), 1400)
+    if (!window.matchMedia('(min-width: 1024px)').matches) {
+      return undefined
+    }
+
+    const connection = (navigator as Navigator & {
+      readonly connection?: {
+        readonly downlink?: number
+        readonly effectiveType?: string
+        readonly saveData?: boolean
+      }
+    }).connection
+    const effectiveType = connection?.effectiveType ?? ''
+    const slowConnection = Boolean(
+      connection?.saveData
+      || effectiveType.includes('2g')
+      || effectiveType.includes('3g')
+      || (typeof connection?.downlink === 'number' && connection.downlink < 2.5),
+    )
+
+    if (slowConnection) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (document.visibilityState === 'visible') {
+        setEnabled(true)
+      }
+    }, 8000)
     return () => window.clearTimeout(timeoutId)
   }, [])
 
