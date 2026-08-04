@@ -704,7 +704,7 @@ function IndustryDetailNativePage({
 
             <section className="border border-[#E1E6EA] bg-white">
               <div className="relative h-44 bg-[#111820]">
-          <Image src={siteImage('engineering-development-lab.webp')} alt="" fill sizes="330px" className="object-cover" />
+          <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="330px" className="object-cover" />
               </div>
               <div className="p-7">
                 <h2 className="text-xl font-bold tracking-normal text-[#1A1A1A]">{zh ? '工程支持' : 'Engineering Support'}</h2>
@@ -810,7 +810,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto grid max-w-[1280px] gap-12 border-y border-[#E5E5E5] bg-white px-4 py-20 md:px-16 lg:grid-cols-[minmax(320px,420px)_1fr] lg:gap-16">
         <div className="group relative aspect-[900/1200] w-full max-w-[420px] overflow-hidden bg-gray-50">
           <div className="absolute inset-0 z-0 bg-gray-200/20 opacity-50" />
-          <Image src={siteImage('engineering-sensor-design.webp')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="relative z-10 object-cover contrast-105 opacity-95 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+          <Image src={siteImage('custom-sensor-development-vertical.webp')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="relative z-10 object-cover transition duration-700 group-hover:scale-105" />
         </div>
         <div className="flex flex-col justify-center bg-white py-4 lg:max-w-[560px]">
           <p className="mb-6 text-xs font-medium uppercase tracking-[0.15em] text-gray-500">{zh ? 'OEM 工程' : 'OEM Engineering'}</p>
@@ -1778,7 +1778,7 @@ function OemPage({ locale }: { readonly locale: Locale }) {
               <div className="grid gap-6 md:grid-cols-2">
                 <OemProjectCard
                   href={oemCaseHref}
-                  image={siteImage('inspection-workbench.webp')}
+                  image={siteImage('quality-test-bench.webp')}
                   title={zh ? '欧洲压力变送器定制' : 'European Pressure Transmitter for Aerospace'}
                   body={zh ? '针对高压力、高精度和特殊标签需求进行定制。' : 'Ultra-lightweight structure, extended range, and custom documentation for a demanding application.'}
                   ctaLabel={zh ? '查看 OEM 案例' : 'View OEM Case'}
@@ -1870,7 +1870,7 @@ function ManufacturingPage({ locale }: { readonly locale: Locale }) {
         body={zh ? '围绕稳定批量、工程确认和交付节奏建立工业产品制造页面。' : 'Production pages organized around stable batches, engineering confirmation, and delivery rhythm.'}
       />
       <section className="mx-auto grid max-w-[1280px] gap-6 px-4 py-20 md:grid-cols-3 md:px-16">
-        {[siteImage('manufacturing-robotics-bench.webp'), siteImage('quality-test-bench.webp'), siteImage('inspection-microscope.webp')].map((image, index) => (
+        {[siteImage('automation-production-line.webp'), siteImage('quality-test-bench.webp'), siteImage('thread-calibration-machine.webp')].map((image, index) => (
           <ImageCard
             key={image}
             index={index + 1}
