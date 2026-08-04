@@ -106,7 +106,7 @@ export function SiteHeader({ locale, site }: { locale: Locale; site: SiteLayoutP
 function BrandLink({ locale, site }: { locale: Locale; site: SiteLayoutProjection }) {
   return (
     <Link href={`/${locale}`} className="flex w-[168px] shrink-0 items-center justify-start gap-2 md:w-[184px] md:gap-2.5" aria-label={`${site.brand.name} - ${site.brand.descriptor}`}>
-      <Image src="/images/brand/yufavor-mark.png" alt="" width={196} height={188} priority className="h-10 w-10 object-contain md:h-12 md:w-12" />
+      <Image src="/images/brand/yufavor-mark.png" alt="" width={196} height={188} preload className="h-10 w-10 object-contain md:h-12 md:w-12" />
       <span className="flex min-w-0 items-baseline whitespace-nowrap font-serif text-[21px] font-bold italic leading-none tracking-normal text-steel-700 md:text-[24px]">
         Yufavor
       </span>

@@ -33,8 +33,8 @@ export function HeroMediaCarousel({
               src={slide.imageSrc}
               alt={index === activeIndex ? slide.imageAlt : ''}
               fill
-              priority={index === 0}
-              loading={index === 0 ? 'eager' : 'lazy'}
+              preload={index === 0}
+              loading={index === 0 ? undefined : 'lazy'}
               sizes="100vw"
               className="object-cover"
             />

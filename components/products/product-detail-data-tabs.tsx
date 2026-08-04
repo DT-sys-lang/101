@@ -1,9 +1,9 @@
 'use client'
 
 import { useId, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { CheckCircle2, Download } from 'lucide-react'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import type { Locale } from '@/i18n/routing'
 
 export type ProductDetailDataRow = {

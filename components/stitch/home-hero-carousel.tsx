@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import { cn } from '@/lib/utils'
 import { homeHeroOverlaySlides } from './home-hero-overlay.config'
 import { HomeHeroOverlayPresence } from './home-hero-overlay'
@@ -65,7 +65,7 @@ export function HomeHeroCarousel({
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
             {slide.kind === 'video' ? (
               <>
-                <Image src={slide.poster} alt={active ? slideLabel : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
+                <Image src={slide.poster} alt={active ? slideLabel : ''} fill preload={index === 0} sizes="100vw" className="object-cover" />
                 {active ? (
                   <video
                     key={slide.src}
@@ -86,7 +86,7 @@ export function HomeHeroCarousel({
                 ) : null}
               </>
             ) : (
-              <Image src={slide.src} alt={active ? slideLabel : ''} fill priority={index === 0} sizes="100vw" className="object-cover" />
+              <Image src={slide.src} alt={active ? slideLabel : ''} fill preload={index === 0} sizes="100vw" className="object-cover" />
             )}
           </div>
         )

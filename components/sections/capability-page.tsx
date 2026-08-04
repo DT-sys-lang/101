@@ -31,7 +31,7 @@ export function CapabilityPage({ locale, data }: { locale: Locale; data: Capabil
           </div>
 
           <div className="relative min-h-[360px] overflow-hidden border border-border bg-ink-50">
-            <Image src={data.heroImage.src} alt={data.heroImage.alt} fill priority sizes="(min-width: 1024px) 44vw, 100vw" className="object-cover" />
+            <Image src={data.heroImage.src} alt={data.heroImage.alt} fill preload sizes="(min-width: 1024px) 44vw, 100vw" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/65 via-ink-950/10 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 border-t border-white/20 bg-ink-950/75 p-5 text-white backdrop-blur-sm">
               <Badge variant="outline" className="border-white/35 text-white">{labels.metrics}</Badge>

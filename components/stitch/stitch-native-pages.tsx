@@ -1,9 +1,9 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ProductDetailDataTabs } from '@/components/products/product-detail-data-tabs'
 import { ContactInquiryForm } from '@/components/sections/contact-inquiry-form'
 import { HomeHeroCarousel, type HomeHeroSlide } from '@/components/stitch/home-hero-carousel'
 import { MobileProductNavigation, ProductMegaMenu } from '@/components/stitch/product-mega-menu'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import {
   ArrowRight,
   Check,
@@ -300,7 +300,7 @@ function StitchBrandLogo({ locale, compact = false }: { readonly locale: Locale;
         alt=""
         width={196}
         height={188}
-        priority
+        preload
         className={compact ? 'h-10 w-10 object-contain' : 'h-12 w-12 object-contain lg:h-[52px] lg:w-[52px]'}
       />
       <span className={compact
@@ -454,7 +454,7 @@ function IndustriesNativePage({ locale }: { readonly locale: Locale }) {
   return (
     <article className="bg-white">
       <section className="relative mx-auto h-[clamp(330px,36vw,520px)] max-w-[1440px] overflow-hidden bg-[#12181d]">
-      <Image src={asset('industries', 'asset-003.png')} alt="" fill priority sizes="100vw" className="object-cover object-center" />
+      <Image src={asset('industries', 'asset-003.png')} alt="" fill preload sizes="100vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/15" />
         <div className="relative z-10 mx-auto flex h-full max-w-[1280px] flex-col justify-center px-4 md:px-16">
           <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#2d9cff]">
@@ -603,7 +603,7 @@ function IndustryDetailNativePage({
         </div>
 
         <section className="relative mb-12 h-[clamp(330px,38vw,560px)] overflow-hidden bg-[#111820]">
-      <Image src={visual.image} alt="" fill priority sizes="(min-width: 1280px) 1152px, 100vw" className="object-cover" style={{ objectPosition: visual.position }} />
+      <Image src={visual.image} alt="" fill preload sizes="(min-width: 1280px) 1152px, 100vw" className="object-cover" style={{ objectPosition: visual.position }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
           <div className="absolute bottom-7 left-7 border-l-4 border-[#005EB8] bg-white px-5 py-4 shadow-xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#005EB8]">{zh ? '行业性能' : 'Industry Performance'}</p>
@@ -1392,7 +1392,7 @@ function ProductDetailPage({ locale }: { readonly locale: Locale }) {
       <section className="border-b border-[#E5E5E5]">
         <div className="mx-auto grid max-w-[1280px] gap-10 px-4 py-14 md:px-16 lg:grid-cols-[0.95fr_1.05fr] lg:py-20">
           <div className="group relative min-h-[460px] border border-[#E5E5E5] bg-[#F7F7F7]">
-            <Image src={asset('productDetail', 'asset-003.jpg')} alt={product.title} fill priority sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover transition duration-500" />
+            <Image src={asset('productDetail', 'asset-003.jpg')} alt={product.title} fill preload sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover transition duration-500" />
           </div>
           <div className="flex flex-col justify-center">
             <p className="eyebrow">{zh ? '产品详情' : 'Product Detail'}</p>
@@ -1443,7 +1443,7 @@ function ProductDetailDataPage({
 
         <section className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2">
           <div className="flex h-[500px] items-center justify-center border border-[#E5E5E5] bg-white p-8">
-            <Image src={image.href} alt={image.alt} width={720} height={720} priority className="h-full w-full object-contain" />
+            <Image src={image.href} alt={image.alt} width={720} height={720} preload className="h-full w-full object-contain" />
           </div>
           <div className="flex flex-col justify-center">
             <span className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-[#5D5F5F]">{zh ? '型号' : 'Model'}: {model}</span>
@@ -1546,7 +1546,7 @@ function ProductDetailStitchPage({ locale }: { readonly locale: Locale }) {
               alt={zh ? '高精度工业压力变送器' : 'High-precision industrial pressure transmitter'}
               width={640}
               height={640}
-              priority
+              preload
               className="h-full w-full object-contain"
             />
           </div>
@@ -1723,7 +1723,7 @@ function OemPage({ locale }: { readonly locale: Locale }) {
         </div>
 
         <section className="relative mb-12 h-[clamp(330px,36vw,520px)] overflow-hidden bg-[#111820]">
-          <Image src={asset('oem', 'asset-003.jpg')} alt="" fill priority sizes="(min-width: 1280px) 1152px, 100vw" className="object-cover" style={{ objectPosition: '50% 50%' }} />
+          <Image src={asset('oem', 'asset-003.jpg')} alt="" fill preload sizes="(min-width: 1280px) 1152px, 100vw" className="object-cover" style={{ objectPosition: '50% 50%' }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
           <div className="absolute bottom-7 left-7 border-l-4 border-[#005EB8] bg-white px-5 py-4 shadow-xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#005EB8]">{zh ? '定制工程' : 'Custom Engineering'}</p>
@@ -2171,7 +2171,7 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
             src={asset('oem', 'asset-003.jpg')}
             alt={zh ? '自动化实验室与测试设备' : 'Automation laboratory and test equipment'}
             fill
-            priority
+            preload
             sizes="(min-width: 1280px) 1152px, calc(100vw - 32px)"
             className="object-cover"
           />
@@ -2232,7 +2232,7 @@ function ContactPage({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto grid max-w-[1280px] gap-10 px-4 py-16 md:px-16 lg:grid-cols-[0.9fr_1.1fr] lg:py-24">
         <div>
           <div className="group relative mb-10 h-52 overflow-hidden">
-            <Image src={asset('contact', 'asset-003.png')} alt="" fill priority sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover transition duration-500" />
+            <Image src={asset('contact', 'asset-003.png')} alt="" fill preload sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover transition duration-500" />
           </div>
           <p className="eyebrow">{zh ? '联系工程团队' : 'Contact Engineering'}</p>
           <h1 className="mt-4 display-title">{zh ? '提交 RFQ 与选型需求' : 'RFQ & Support'}</h1>
@@ -2278,7 +2278,7 @@ function PageHero({
           </div>
         </div>
         <div className="group relative aspect-[16/10] border border-[#E5E5E5] bg-[#F7F7F7]">
-          <Image src={image} alt="" fill priority sizes="(min-width: 1024px) 48vw, 100vw" className="object-cover transition duration-500" />
+          <Image src={image} alt="" fill preload sizes="(min-width: 1024px) 48vw, 100vw" className="object-cover transition duration-500" />
         </div>
       </div>
     </section>

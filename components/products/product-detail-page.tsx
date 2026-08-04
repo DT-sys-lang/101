@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ChevronRight, Download, ImageIcon } from 'luc
 import { ProductGrid } from '@/components/products/product-grid'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import type { Locale } from '@/i18n/routing'
 import type { ProductDetailViewModel } from '@/lib/domain'
 
@@ -76,7 +77,39 @@ export function ProductDetailPageView({ locale, data }: { locale: Locale; data: 
 
 function ProductGallery({ data }: { data: ProductDetailViewModel }) {
   const primaryImage = data.media.primaryImage
-  return <div><div role="img" aria-label={primaryImage?.alt ?? data.hero.title} className="relative flex aspect-square items-center justify-center border border-border bg-panel p-8" style={primaryImage ? { backgroundImage: `url("${primaryImage.href}")`, backgroundPosition: 'center', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' } : undefined}>{!primaryImage ? <ImageIcon className="size-12 text-ink-400" aria-hidden="true" /> : null}</div>{data.media.galleryImages.length ? <div className="mt-3 grid grid-cols-4 gap-3">{data.media.galleryImages.slice(0, 4).map((image, index) => <div key={`${image.kind}-${image.href}-${index}`} role="img" aria-label={image.alt} className="aspect-square border border-border bg-panel" style={{ backgroundImage: `url("${image.href}")`, backgroundPosition: 'center', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />)}</div> : null}</div>
+  return (
+    <div>
+      <div className="relative flex aspect-square items-center justify-center overflow-hidden border border-border bg-panel">
+        {primaryImage ? (
+          <Image
+            src={primaryImage.href}
+            alt={primaryImage.alt}
+            fill
+            preload
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-contain p-8"
+          />
+        ) : (
+          <ImageIcon className="size-12 text-ink-400" aria-hidden="true" />
+        )}
+      </div>
+      {data.media.galleryImages.length ? (
+        <div className="mt-3 grid grid-cols-4 gap-3">
+          {data.media.galleryImages.slice(0, 4).map((image, index) => (
+            <div key={`${image.kind}-${image.href}-${index}`} className="relative aspect-square overflow-hidden border border-border bg-panel">
+              <Image
+                src={image.href}
+                alt={image.alt}
+                fill
+                sizes="(min-width: 768px) 12vw, 25vw"
+                className="object-contain p-2"
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
 function InfoPanel({ title, children }: { title: string; children: ReactNode }) {

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, ImageIcon } from 'lucide-react'
+import { OptimizedImage as Image } from '@/components/ui/optimized-image'
 import { cn } from '@/lib/utils'
 import type { ProductListItem } from '@/lib/domain'
 
@@ -7,9 +8,18 @@ export function ProductCard({ product, href, ctaLabel, className }: { product: P
   const primaryImage = product.media.primaryImage
   return (
     <article className={cn('group flex h-full flex-col border border-border bg-panel transition-colors hover:border-steel-700', className)}>
-      <Link href={href} aria-label={product.title} className="relative block aspect-square border-b border-border bg-ink-50 p-8" style={primaryImage ? { backgroundImage: `url("${primaryImage.href}")`, backgroundPosition: 'center', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' } : undefined}>
+      <Link href={href} aria-label={product.title} className="relative block aspect-square overflow-hidden border-b border-border bg-ink-50">
+        {primaryImage ? (
+          <Image
+            src={primaryImage.href}
+            alt={primaryImage.alt}
+            fill
+            sizes="(min-width: 1280px) 280px, (min-width: 768px) 33vw, 100vw"
+            className="object-contain p-8"
+          />
+        ) : null}
         {!primaryImage ? <span className="absolute inset-0 grid place-items-center text-ink-400"><ImageIcon className="size-10" aria-hidden="true" /></span> : null}
-        <span className="absolute right-4 top-4 inline-flex items-center gap-1 font-mono text-[10px] uppercase text-ink-600"><i className="h-2 w-2 bg-emerald-500" />{product.availabilityLabel}</span>
+        <span className="absolute right-4 top-4 z-10 inline-flex items-center gap-1 font-mono text-[10px] uppercase text-ink-600"><i className="h-2 w-2 bg-emerald-500" />{product.availabilityLabel}</span>
       </Link>
       <div className="flex flex-1 flex-col p-6">
         <div className="text-xs font-semibold uppercase text-ink-600">{product.categoryLabel}</div>
