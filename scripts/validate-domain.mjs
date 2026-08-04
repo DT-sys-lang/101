@@ -9,6 +9,7 @@ import {
 import { industrialSensorCategoryTree } from '../lib/domain/category.ts'
 import { mockProducts } from '../lib/domain/mock-products.ts'
 import { createProductCatalogIndex } from '../lib/domain/product-catalog.ts'
+import { buildProductNavigationViewModel } from '../lib/domain/product-navigation.ts'
 
 const domain = await loadDomainInput()
 const familyFixtureDomain = buildDomainFromCmsFacts(sensorValveCmsFactInput)
@@ -18,6 +19,12 @@ const errors = [
 ]
 
 validateOptionalFieldFixture(familyFixtureDomain, errors)
+validateProductNavigation(domain, errors, {
+  minimumSensorChildren: 1,
+  requireProductBackedChildren: true,
+  expectEmptyValveChildren: true,
+})
+validateProductNavigation(familyFixtureDomain, errors, { labelPrefix: 'sensor-valve-fixture' })
 
 if (errors.length) {
   console.error(JSON.stringify({ ok: false, errors }, null, 2))
@@ -151,6 +158,61 @@ function validateOptionalFieldFixture(domain, errors) {
 
   if (valve.measurements.length || valve.outputs.length || valve.connections) {
     errors.push(`${valve.identity.id}: fixture valve must not depend on sensor measurement, output, or electrical facts`)
+  }
+}
+
+function validateProductNavigation(domain, errors, options = {}) {
+  const label = options.labelPrefix ? `${options.labelPrefix}:product-navigation` : 'product-navigation'
+  const catalog = createProductCatalogIndex({ locale: 'zh', products: domain.products, categoryTree: domain.categoryTree })
+  const navigation = buildProductNavigationViewModel('zh', domain.categoryTree, catalog)
+  const sensors = navigation.groups.find((group) => group.id === 'sensors')
+  const valves = navigation.groups.find((group) => group.id === 'industrial-valves')
+
+  if (!sensors) {
+    errors.push(`${label}: missing stable sensors group`)
+  }
+
+  if (!valves) {
+    errors.push(`${label}: missing stable industrial valves group`)
+  }
+
+  if (!sensors || !valves) {
+    return
+  }
+
+  if (options.minimumSensorChildren && sensors.children.length < options.minimumSensorChildren) {
+    errors.push(`${label}: expected at least ${options.minimumSensorChildren} product-backed sensor categories`)
+  }
+
+  if (options.requireProductBackedChildren) {
+    validateProductBackedNavigationChildren(sensors.children, label, errors)
+    validateProductBackedNavigationChildren(valves.children, label, errors)
+  }
+
+  if (options.expectEmptyValveChildren && valves.children.length) {
+    errors.push(`${label}: industrial valves group must not expose empty child categories`)
+  }
+
+  const pressureCategory = sensors.children.find((category) => category.id === 'cat_pressure_sensors')
+
+  if (pressureCategory && pressureCategory.href !== '/products/pressure-sensors') {
+    errors.push(`${label}: pressure category href must use stable canonical path`)
+  }
+
+  for (const valveChild of valves.children) {
+    if (!valveChild.href.startsWith('/products/valves')) {
+      errors.push(`${label}: valve child href must use stable canonical path`)
+    }
+  }
+}
+
+function validateProductBackedNavigationChildren(categories, label, errors) {
+  for (const category of categories) {
+    if (category.productCount < 1) {
+      errors.push(`${label}: category ${category.id} must not be visible with zero products`)
+    }
+
+    validateProductBackedNavigationChildren(category.children, label, errors)
   }
 }
 

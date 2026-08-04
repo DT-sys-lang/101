@@ -37,6 +37,7 @@ export interface BusinessProductCategoryGroup {
 }
 
 const valveRootCategoryId = 'cat_industrial_valves' as CategoryId
+const sensorRootCategoryId = 'cat_industrial_sensors' as CategoryId
 
 const sensorNavigationLabelOverrides = {
   cat_pressure_sensors: {
@@ -98,7 +99,7 @@ export function buildProductNavigationViewModel(
       productCount,
       productCountLabel: copy.countLabel(productCount),
       children: remainingLevels > 0
-        ? getVisibleProductCategoryChildren(category, catalog).map((child) => toItem(child, remainingLevels - 1))
+        ? getVisibleNavigationCategoryChildren(category, catalog).map((child) => toItem(child, remainingLevels - 1))
         : [],
     }
   }
@@ -144,48 +145,40 @@ export function buildBusinessProductCategoryGroups(
         viewAllLabel: (label: string) => `View all ${label}`,
       }
   const rootCategory = categoryPath[0] ?? categoryTree.root
-  const visibleRootCategories = getVisibleProductCategoryChildren(rootCategory, catalog)
-  const valveRootCategory = findCategoryById(rootCategory, valveRootCategoryId) ?? catalog.categoryById.get(valveRootCategoryId)
+  const sensorRootCategory = resolveNavigationCategory(categoryTree, catalog, sensorRootCategoryId) ?? rootCategory
+  const valveRootCategory = resolveNavigationCategory(categoryTree, catalog, valveRootCategoryId)
   const valveCategoryIds = valveRootCategory ? getCategoryAndDescendantIds(catalog, valveRootCategory.id) : new Set<CategoryId>()
   const sensorCategories = sortBusinessCategories(
-    uniqueCategories(visibleRootCategories.flatMap((category) => {
-      if (valveCategoryIds.has(category.id)) {
-        return []
-      }
-
-      if (category.id === 'cat_industrial_sensors') {
-        return getVisibleProductCategoryChildren(category, catalog)
-      }
-
-      return [category]
-    })),
+    uniqueCategories(getVisibleNavigationCategoryChildren(sensorRootCategory, catalog).filter((category) => !valveCategoryIds.has(category.id))),
     preferredSensorCategoryOrder,
   )
   const visibleValveCategories = valveRootCategory
-    ? getVisibleProductCategoryChildren(valveRootCategory, catalog)
-    : visibleRootCategories.filter((category) => valveCategoryIds.has(category.id))
-  const valveCategories = uniqueCategories(visibleValveCategories.length ? visibleValveCategories : valveRootCategory ? [valveRootCategory] : [])
+    ? getVisibleNavigationCategoryChildren(valveRootCategory, catalog)
+    : []
+  const valveCategoryProductCount = valveRootCategory ? getCategoryProductCount(catalog, valveRootCategory.id) : 0
+  const valveCategories = uniqueCategories(visibleValveCategories.length ? visibleValveCategories : valveCategoryProductCount > 0 && valveRootCategory ? [valveRootCategory] : [])
   const currentCategoryIds = new Set(categoryPath.map((category) => category.id))
   const valveActive = [...currentCategoryIds].some((categoryId) => valveCategoryIds.has(categoryId))
   const sensorCount = getFamilyProductCount(catalog, 'sensor')
-  const valveCount = getFamilyProductCount(catalog, 'valve') || getGroupedCategoryProductCount(catalog, valveCategories)
+  const valveCount = getFamilyProductCount(catalog, 'valve') || valveCategoryProductCount || getGroupedCategoryProductCount(catalog, valveCategories)
   const groups: BusinessProductCategoryGroup[] = []
+  const sensorProductCount = sensorCount || getGroupedCategoryProductCount(catalog, sensorCategories)
 
-  if (sensorCategories.length > 0 || sensorCount > 0) {
+  if (sensorRootCategory) {
     groups.push({
       id: 'sensors',
       label: copy.sensorLabel,
       href: '/products?family=sensor',
       description: copy.sensorDescription,
-      productCount: sensorCount || getGroupedCategoryProductCount(catalog, sensorCategories),
-      productCountLabel: copy.countLabel(sensorCount || getGroupedCategoryProductCount(catalog, sensorCategories)),
+      productCount: sensorProductCount,
+      productCountLabel: copy.countLabel(sensorProductCount),
       viewAllLabel: copy.viewAllLabel(copy.sensorLabel),
       active: !valveActive,
       categories: sensorCategories,
     })
   }
 
-  if (valveCount > 0) {
+  if (valveRootCategory) {
     groups.push({
       id: 'industrial-valves',
       label: copy.valveLabel,
@@ -210,8 +203,8 @@ export function getBusinessProductCategoryLabel(category: CategoryNode, locale: 
 
 function getPublicCategoryHref(category: CategoryNode) {
   // The list route accepts historical category slugs without the catalog-root segment.
-  const stableCategory = findCategoryById(industrialSensorCategoryTree.root, category.id) ?? category
-  if (stableCategory !== category) {
+  const stableCategory = findCategoryById(industrialSensorCategoryTree.root, category.id)
+  if (stableCategory) {
     return stableCategory.canonicalPath
   }
 
@@ -235,8 +228,16 @@ function findCategoryById(category: CategoryNode, categoryId: CategoryId): Categ
   return undefined
 }
 
-function getSortedChildren(category: CategoryNode) {
-  return [...(category.children ?? [])].sort((left, right) => left.sortOrder - right.sortOrder || left.id.localeCompare(right.id))
+function getVisibleNavigationCategoryChildren(category: CategoryNode, catalog: ProductCatalogIndex) {
+  const stableCategory = findCategoryById(industrialSensorCategoryTree.root, category.id)
+
+  return getVisibleProductCategoryChildren(stableCategory ?? category, catalog)
+}
+
+function resolveNavigationCategory(categoryTree: CategoryTree, catalog: ProductCatalogIndex, categoryId: CategoryId) {
+  return findCategoryById(industrialSensorCategoryTree.root, categoryId)
+    ?? findCategoryById(categoryTree.root, categoryId)
+    ?? catalog.categoryById.get(categoryId)
 }
 
 function getCategoryAndDescendantIds(catalog: ProductCatalogIndex, categoryId: CategoryId) {
