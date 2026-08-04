@@ -125,6 +125,16 @@ export function StitchNativePage({
           display: none !important;
         }
 
+        .stitch-color-reveal {
+          filter: grayscale(1) saturate(0);
+          transition-property: filter, transform, opacity;
+        }
+
+        .group:hover .stitch-color-reveal,
+        .stitch-color-reveal:hover {
+          filter: grayscale(0) saturate(1);
+        }
+
       `}</style>
       <div className="stitch-native-page" aria-hidden="true" />
       <StitchHeader locale={locale} active={screen} productNavigation={productNavigation} />
@@ -496,7 +506,7 @@ function IndustriesNativePage({ locale }: { readonly locale: Locale }) {
         <div className="grid grid-cols-1 gap-px bg-white sm:grid-cols-2 lg:grid-cols-3">
           {sectors.map((sector) => (
             <Link key={sector.title} href={sector.href} className="group relative h-[230px] overflow-hidden bg-[#111820]">
-              <Image src={sector.image} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" style={{ objectPosition: sector.position }} />
+              <Image src={sector.image} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="stitch-color-reveal object-cover transition duration-700 group-hover:scale-105" style={{ objectPosition: sector.position }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/28 to-transparent transition-colors group-hover:from-[#005EB8]/85" />
               <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-5">
                 <h3 className="max-w-[220px] text-xl font-bold leading-tight tracking-normal text-white">{sector.title}</h3>
@@ -704,7 +714,7 @@ function IndustryDetailNativePage({
 
             <section className="border border-[#E1E6EA] bg-white">
               <div className="relative h-44 bg-[#111820]">
-          <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="330px" className="object-cover" />
+          <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="330px" className="stitch-color-reveal object-cover" />
               </div>
               <div className="p-7">
                 <h2 className="text-xl font-bold tracking-normal text-[#1A1A1A]">{zh ? '工程支持' : 'Engineering Support'}</h2>
@@ -780,7 +790,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
               </p>
             </div>
             <div className="absolute right-0 top-0 z-0 h-full w-1/2 overflow-hidden opacity-95 transition-opacity duration-700 group-hover:opacity-100">
-              <Image src={siteImage('industry-water-wide.webp')} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
+              <Image src={siteImage('industry-water-wide.webp')} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="stitch-color-reveal object-cover transition duration-700 group-hover:scale-105" />
             </div>
           </Link>
           <div className="relative z-20 flex flex-col justify-between gap-5 lg:col-span-4 lg:-ml-20 lg:py-4">
@@ -810,7 +820,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto grid max-w-[1280px] gap-12 border-y border-[#E5E5E5] bg-white px-4 py-20 md:px-16 lg:grid-cols-[minmax(320px,420px)_1fr] lg:gap-16">
         <div className="group relative aspect-[900/1200] w-full max-w-[420px] overflow-hidden bg-gray-50">
           <div className="absolute inset-0 z-0 bg-gray-200/20 opacity-50" />
-          <Image src={siteImage('custom-sensor-development-vertical.webp')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="relative z-10 object-cover transition duration-700 group-hover:scale-105" />
+          <Image src={siteImage('custom-sensor-development-vertical.webp')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="stitch-color-reveal relative z-10 object-cover transition duration-700 group-hover:scale-105" />
         </div>
         <div className="flex flex-col justify-center bg-white py-4 lg:max-w-[560px]">
           <p className="mb-6 text-xs font-medium uppercase tracking-[0.15em] text-gray-500">{zh ? 'OEM 工程' : 'OEM Engineering'}</p>
@@ -850,7 +860,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
         </div>
         <div className="group relative min-h-[430px] overflow-visible">
           <div className="relative ml-auto h-[430px] w-full overflow-hidden md:w-[78%]">
-            <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="(min-width: 768px) 78vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
+            <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="(min-width: 768px) 78vw, 100vw" className="stitch-color-reveal object-cover transition duration-700 group-hover:scale-105" />
           </div>
           <div className="absolute -bottom-10 left-0 z-10 max-w-lg border-t-4 border-[#005EB8] bg-white p-8 shadow-2xl md:left-24 md:p-10">
             <h2 className="mb-6 text-3xl font-light tracking-normal text-[#1A1A1A]">{zh ? '精密制造' : 'Precision Manufacturing'}</h2>
@@ -883,7 +893,7 @@ function HomeIndustryMiniCard({
 }) {
   return (
     <Link href={href} className={`group relative z-10 h-[126px] overflow-hidden border border-white/60 bg-[#111820] shadow-[0_18px_45px_rgba(17,24,32,0.16)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_rgba(0,94,184,0.22)] ${offset ? 'lg:-ml-8 lg:z-30' : ''}`}>
-      <Image src={image} alt="" fill sizes="(min-width: 1024px) 360px, 100vw" className="object-cover transition duration-700 group-hover:scale-105" style={{ objectPosition: imagePosition }} />
+      <Image src={image} alt="" fill sizes="(min-width: 1024px) 360px, 100vw" className="stitch-color-reveal object-cover transition duration-700 group-hover:scale-105" style={{ objectPosition: imagePosition }} />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0B1116]/92 via-[#0B1116]/60 to-[#005EB8]/10 transition-colors duration-500 group-hover:from-[#005EB8]/88 group-hover:via-[#0B1116]/60" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-[#005EB8]" />
       <div className="relative flex h-full flex-col justify-between p-5">
@@ -2304,7 +2314,7 @@ function SectionIntro({ eyebrow, title, body }: { readonly eyebrow: string; read
 function FeaturePanel({ className, image, title, body, href, locale = 'en' }: { readonly className?: string; readonly image: string; readonly title: string; readonly body: string; readonly href: string; readonly locale?: Locale }) {
   return (
     <Link href={href} className={`group relative min-h-[430px] overflow-hidden border border-[#E5E5E5] bg-[#F7F7F7] ${className ?? ''}`}>
-      <Image src={image} alt="" fill sizes="66vw" className="object-cover transition duration-700 group-hover:scale-105" />
+      <Image src={image} alt="" fill sizes="66vw" className="stitch-color-reveal object-cover transition duration-700 group-hover:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent" />
       <div className="relative flex h-full max-w-xl flex-col justify-between p-8 md:p-12">
         <div>
@@ -2330,7 +2340,7 @@ function SplitEngineeringBlock({ locale, image, eyebrow, title, body, href }: { 
   return (
     <section className="grid border-y border-[#E5E5E5] bg-white lg:grid-cols-2">
       <div className="group relative min-h-[440px] bg-[#F7F7F7]">
-        <Image src={image} alt="" fill sizes="50vw" className="object-cover transition duration-500" />
+        <Image src={image} alt="" fill sizes="50vw" className="stitch-color-reveal object-cover transition duration-500" />
       </div>
       <div className="flex flex-col justify-center p-8 md:p-16">
         <p className="eyebrow">{eyebrow}</p>
@@ -2350,7 +2360,7 @@ function QualityStrip({ locale, image }: { readonly locale: Locale; readonly ima
     <section className="bg-[#F7F7F7] py-20">
       <div className="mx-auto max-w-[1280px] px-4 md:px-16">
         <div className="group relative min-h-[420px] border border-[#E5E5E5]">
-          <Image src={image} alt="" fill sizes="100vw" className="object-cover opacity-95 transition duration-500 group-hover:opacity-100" />
+          <Image src={image} alt="" fill sizes="100vw" className="stitch-color-reveal object-cover opacity-95 transition duration-500 group-hover:opacity-100" />
           <div className="absolute bottom-6 left-6 max-w-lg border border-[#E5E5E5] bg-white p-8">
             <p className="eyebrow">{zh ? '质量与制造' : 'Quality Assurance'}</p>
             <h2 className="mt-4 text-3xl font-semibold">{zh ? '精密制造与多点校准' : 'Precision manufacturing and multi-point calibration'}</h2>
@@ -2432,7 +2442,7 @@ function ImageCard({ index, title, body, image }: { readonly index: number; read
   return (
     <article className="group overflow-hidden border border-[#E5E5E5] bg-white transition hover:border-[#005EB8] hover:shadow-lg">
       <div className="relative h-52 bg-[#F7F7F7]">
-      <Image src={image} alt="" fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
+      <Image src={image} alt="" fill sizes="(min-width: 768px) 33vw, 100vw" className="stitch-color-reveal object-cover transition duration-500 group-hover:scale-105" />
       </div>
       <div className="p-7">
         <span className="font-mono text-xs text-[#005EB8]">0{index}</span>
@@ -2469,7 +2479,7 @@ function OemProjectCard({
   return (
     <Link href={href} className="group block border border-[#E1E6EA] bg-white p-5 transition-all hover:border-[#005EB8] hover:shadow-lg">
       <div className="relative mb-5 h-44 bg-[#F2F4F6]">
-        <Image src={image} alt={title} fill sizes="(min-width: 768px) 360px, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
+        <Image src={image} alt={title} fill sizes="(min-width: 768px) 360px, 100vw" className="stitch-color-reveal object-cover transition duration-500 group-hover:scale-105" />
       </div>
       <h3 className="text-lg font-bold tracking-normal text-[#1A1A1A]">{title}</h3>
       <p className="mt-3 text-sm font-medium leading-6 text-[#30383E]">{body}</p>
