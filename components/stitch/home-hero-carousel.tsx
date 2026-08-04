@@ -25,6 +25,7 @@ export function HomeHeroCarousel({
   readonly slides: readonly HomeHeroSlide[]
 }) {
   const [activeIndex, setActiveIndex] = useAutoplayIndex(slides.length)
+  const videoPlaybackEnabled = useDeferredVideoPlayback()
   const [readyVideoSrcs, setReadyVideoSrcs] = useState<ReadonlySet<string>>(() => new Set())
   const carouselT = useTranslations('home.hero.carousel')
   const storyT = useTranslations('home.hero.story')
@@ -66,7 +67,7 @@ export function HomeHeroCarousel({
             {slide.kind === 'video' ? (
               <>
                 <Image src={slide.poster} alt={active ? slideLabel : ''} fill preload={index === 0} sizes="100vw" className="object-cover" />
-                {active ? (
+                {active && videoPlaybackEnabled ? (
                   <video
                     key={slide.src}
                     aria-label={slideLabel}
@@ -77,7 +78,7 @@ export function HomeHeroCarousel({
                     muted
                     playsInline
                     poster={slide.poster}
-                    preload="auto"
+                    preload="metadata"
                     onCanPlay={() => markVideoReady(slide.src)}
                     onLoadedData={() => markVideoReady(slide.src)}
                   >
@@ -122,6 +123,21 @@ export function HomeHeroCarousel({
       ) : null}
     </section>
   )
+}
+
+function useDeferredVideoPlayback() {
+  const [enabled, setEnabled] = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => setEnabled(true), 1400)
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
+  return enabled
 }
 
 function useAutoplayIndex(slideCount: number) {
