@@ -99,6 +99,10 @@ function asset(screen: StitchNativeScreen, file: string) {
   return `${exportBasePath}/${screenFolders[screen]}/assets/${file}`
 }
 
+function siteImage(file: string) {
+  return `/images/site/${file}`
+}
+
 export function StitchNativePage({
   locale,
   screen,
@@ -396,38 +400,38 @@ function IndustriesNativePage({ locale }: { readonly locale: Locale }) {
     {
       title: zh ? '石油与天然气' : 'Oil & Gas',
       href: `/${locale}/industries/oil-gas`,
-      image: asset('industries', 'asset-006.png'),
-      position: '24% 50%',
+      image: siteImage('offshore-platform.webp'),
+      position: '50% 50%',
     },
     {
       title: zh ? '水处理' : 'Water Treatment',
       href: `/${locale}/industries/water-treatment`,
-      image: asset('industries', 'asset-008.png'),
+      image: siteImage('industry-water-treatment.webp'),
       position: '50% 50%',
     },
     {
       title: zh ? '能源系统' : 'Solar Energy',
       href: `/${locale}/industries/energy`,
-      image: asset('industries', 'asset-003.png'),
-      position: '73% 54%',
+      image: siteImage('industry-solar-energy.webp'),
+      position: '50% 50%',
     },
     {
       title: zh ? '工业自动化' : 'Industrial Automation',
       href: `/${locale}/industries/industrial-automation`,
-      image: asset('industries', 'asset-008.png'),
+      image: siteImage('automation-production-line.webp'),
       position: '52% 50%',
     },
     {
       title: zh ? '机械工程' : 'Machine Engineering',
       href: `/${locale}/industries/manufacturing`,
-      image: asset('industries', 'asset-009.png'),
+      image: siteImage('manufacturing-robotics-bench.webp'),
       position: '50% 50%',
     },
     {
       title: zh ? '化工过程产线' : 'Chemical Processing Lines',
       href: `/${locale}/industries/chemical-processing`,
-      image: asset('industries', 'asset-006.png'),
-      position: '86% 50%',
+      image: siteImage('chemical-processing-plant.webp'),
+      position: '50% 50%',
     },
   ] as const
   const ecosystem = [
@@ -700,7 +704,7 @@ function IndustryDetailNativePage({
 
             <section className="border border-[#E1E6EA] bg-white">
               <div className="relative h-44 bg-[#111820]">
-          <Image src={asset('oem', 'asset-003.jpg')} alt="" fill sizes="330px" className="object-cover" />
+          <Image src={siteImage('engineering-development-lab.webp')} alt="" fill sizes="330px" className="object-cover" />
               </div>
               <div className="p-7">
                 <h2 className="text-xl font-bold tracking-normal text-[#1A1A1A]">{zh ? '工程支持' : 'Engineering Support'}</h2>
@@ -776,27 +780,27 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
               </p>
             </div>
             <div className="absolute right-0 top-0 z-0 h-full w-1/2 overflow-hidden opacity-95 transition-opacity duration-700 group-hover:opacity-100">
-              <Image src={asset('home', 'asset-008.png')} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
+              <Image src={siteImage('industry-water-wide.webp')} alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
             </div>
           </Link>
           <div className="relative z-20 flex flex-col justify-between gap-5 lg:col-span-4 lg:-ml-20 lg:py-4">
             <HomeIndustryMiniCard
               title={zh ? '水处理' : 'Water Treatment'}
               href={`/${locale}/industries/water-treatment`}
-              image={asset('industries', 'asset-008.png')}
+              image={siteImage('industry-water-treatment.webp')}
               imagePosition="50% 50%"
               offset
             />
             <HomeIndustryMiniCard
               title={zh ? '工业自动化' : 'Industrial Automation'}
               href={`/${locale}/industries/industrial-automation`}
-              image={asset('industries', 'asset-009.png')}
+              image={siteImage('automation-production-line.webp')}
               imagePosition="50% 50%"
             />
             <HomeIndustryMiniCard
               title={zh ? '更多行业方案' : 'More Industry Solutions'}
               href={`/${locale}/industries`}
-              image={asset('industries', 'asset-006.png')}
+              image={siteImage('chemical-processing-plant.webp')}
               imagePosition="78% 50%"
             />
           </div>
@@ -806,7 +810,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto grid max-w-[1280px] gap-12 border-y border-[#E5E5E5] bg-white px-4 py-20 md:px-16 lg:grid-cols-[minmax(320px,420px)_1fr] lg:gap-16">
         <div className="group relative aspect-[900/1200] w-full max-w-[420px] overflow-hidden bg-gray-50">
           <div className="absolute inset-0 z-0 bg-gray-200/20 opacity-50" />
-          <Image src={asset('home', 'asset-009.png')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="relative z-10 object-cover contrast-105 opacity-95 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+          <Image src={siteImage('engineering-sensor-design.webp')} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="relative z-10 object-cover contrast-105 opacity-95 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
         </div>
         <div className="flex flex-col justify-center bg-white py-4 lg:max-w-[560px]">
           <p className="mb-6 text-xs font-medium uppercase tracking-[0.15em] text-gray-500">{zh ? 'OEM 工程' : 'OEM Engineering'}</p>
@@ -846,7 +850,7 @@ function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
         </div>
         <div className="group relative min-h-[430px] overflow-visible">
           <div className="relative ml-auto h-[430px] w-full overflow-hidden md:w-[78%]">
-            <Image src={asset('home', 'asset-010.png')} alt="" fill sizes="(min-width: 768px) 78vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
+            <Image src={siteImage('quality-test-bench.webp')} alt="" fill sizes="(min-width: 768px) 78vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
           </div>
           <div className="absolute -bottom-10 left-0 z-10 max-w-lg border-t-4 border-[#005EB8] bg-white p-8 shadow-2xl md:left-24 md:p-10">
             <h2 className="mb-6 text-3xl font-light tracking-normal text-[#1A1A1A]">{zh ? '精密制造' : 'Precision Manufacturing'}</h2>
@@ -1684,11 +1688,11 @@ function WaterPumpSystemsPage({ locale }: { readonly locale: Locale }) {
       />
       <section className="mx-auto grid max-w-[1280px] gap-6 px-4 pb-24 md:grid-cols-3 md:px-16">
         {[
-          [zh ? '泵出口压力监测' : 'Pump outlet monitoring', 'asset-004.jpg'],
-          [zh ? '过滤器压差检测' : 'Filter differential pressure', 'asset-005.jpg'],
-          [zh ? '补水阀门联动' : 'Make-up valve control', 'asset-006.jpg'],
+          [zh ? '泵出口压力监测' : 'Pump outlet monitoring', siteImage('industry-water-treatment.webp')],
+          [zh ? '过滤器压差检测' : 'Filter differential pressure', siteImage('industry-process-tanks.webp')],
+          [zh ? '补水阀门联动' : 'Make-up valve control', siteImage('sensor-waterproof-test.webp')],
         ].map(([title, image], index) => (
-          <ImageCard key={title} index={index + 1} title={title} image={asset('waterPumpSystems', image)} body={zh ? '推荐压力传感器、变送器和阀门形成可询价组合。' : 'Recommended sensors, transmitters, and valves form a quote-ready package.'} />
+          <ImageCard key={title} index={index + 1} title={title} image={image} body={zh ? '推荐压力传感器、变送器和阀门形成可询价组合。' : 'Recommended sensors, transmitters, and valves form a quote-ready package.'} />
         ))}
       </section>
     </article>
@@ -1774,14 +1778,14 @@ function OemPage({ locale }: { readonly locale: Locale }) {
               <div className="grid gap-6 md:grid-cols-2">
                 <OemProjectCard
                   href={oemCaseHref}
-                  image={asset('oem', 'asset-004.png')}
+                  image={siteImage('inspection-workbench.webp')}
                   title={zh ? '欧洲压力变送器定制' : 'European Pressure Transmitter for Aerospace'}
                   body={zh ? '针对高压力、高精度和特殊标签需求进行定制。' : 'Ultra-lightweight structure, extended range, and custom documentation for a demanding application.'}
                   ctaLabel={zh ? '查看 OEM 案例' : 'View OEM Case'}
                 />
                 <OemProjectCard
                   href={oemCaseHref}
-                  image={asset('productDetail', 'asset-003.jpg')}
+                  image={siteImage('thread-calibration-machine.webp')}
                   title={zh ? '高温液位传感器' : 'High-Temperature Level Sensor for Food Grade'}
                   body={zh ? '围绕食品级材料、温度范围和输出信号建立样品方案。' : 'PTFE compatible material, wide temperature window, and application-specific output configuration.'}
                   ctaLabel={zh ? '查看 OEM 案例' : 'View OEM Case'}
@@ -1866,12 +1870,12 @@ function ManufacturingPage({ locale }: { readonly locale: Locale }) {
         body={zh ? '围绕稳定批量、工程确认和交付节奏建立工业产品制造页面。' : 'Production pages organized around stable batches, engineering confirmation, and delivery rhythm.'}
       />
       <section className="mx-auto grid max-w-[1280px] gap-6 px-4 py-20 md:grid-cols-3 md:px-16">
-        {['asset-004.png', 'asset-005.png', 'asset-006.png'].map((image, index) => (
+        {[siteImage('manufacturing-robotics-bench.webp'), siteImage('quality-test-bench.webp'), siteImage('inspection-microscope.webp')].map((image, index) => (
           <ImageCard
             key={image}
             index={index + 1}
             title={[zh ? '装配标准' : 'Assembly standards', zh ? '过程记录' : 'Process records', zh ? '交付节奏' : 'Delivery rhythm'][index]}
-            image={asset('manufacturing', image)}
+            image={image}
             body={zh ? '用可验证流程支持稳定供应。' : 'Verified processes support stable supply.'}
           />
         ))}
@@ -2465,7 +2469,7 @@ function OemProjectCard({
   return (
     <Link href={href} className="group block border border-[#E1E6EA] bg-white p-5 transition-all hover:border-[#005EB8] hover:shadow-lg">
       <div className="relative mb-5 h-44 bg-[#F2F4F6]">
-        <Image src={image} alt={title} fill sizes="(min-width: 768px) 360px, 100vw" className="object-contain p-6 transition" />
+        <Image src={image} alt={title} fill sizes="(min-width: 768px) 360px, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
       </div>
       <h3 className="text-lg font-bold tracking-normal text-[#1A1A1A]">{title}</h3>
       <p className="mt-3 text-sm font-medium leading-6 text-[#30383E]">{body}</p>
