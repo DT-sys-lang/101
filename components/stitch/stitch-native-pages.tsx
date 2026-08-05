@@ -468,7 +468,7 @@ function IndustriesNativePage({ locale }: { readonly locale: Locale }) {
   return (
     <article className="bg-white">
       <section className="relative mx-auto h-[clamp(330px,36vw,520px)] max-w-[1440px] overflow-hidden bg-[#12181d]">
-      <Image src={asset('industries', 'asset-003.png')} alt="" fill preload sizes="100vw" className="object-cover object-center" />
+      <Image src={siteImage('industrial-iot-connectivity-hero.webp')} alt="" fill preload sizes="100vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/15" />
         <div className="relative z-10 mx-auto flex h-full max-w-[1280px] flex-col justify-center px-4 md:px-16">
           <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#2d9cff]">
