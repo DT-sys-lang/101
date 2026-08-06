@@ -1737,7 +1737,14 @@ function OemPage({ locale }: { readonly locale: Locale }) {
         </div>
 
         <section className="relative mb-12 h-[clamp(330px,36vw,520px)] overflow-hidden bg-[#111820]">
-          <Image src={asset('oem', 'asset-003.jpg')} alt="" fill preload sizes="(min-width: 1280px) 1152px, 100vw" className="object-cover" style={{ objectPosition: '50% 50%' }} />
+          <Image
+            src={siteImage('oem-custom-engineering-hero.webp')}
+            alt={zh ? '工程师在实验室组装精密传感器' : 'Engineer assembling a precision sensor in a laboratory'}
+            fill
+            preload
+            sizes="(min-width: 1280px) 1152px, 100vw"
+            className="object-cover object-[32%_center] md:object-center"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
           <div className="absolute bottom-7 left-7 border-l-4 border-[#005EB8] bg-white px-5 py-4 shadow-xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#005EB8]">{zh ? '定制工程' : 'Custom Engineering'}</p>
@@ -2124,6 +2131,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开资料' : 'Open Files',
       href: '/resources/manuals',
       icon: Download,
+      image: siteImage('resource-product-manuals.webp'),
+      imageAlt: zh ? '产品手册与精密连接件' : 'Product manuals and precision fittings',
+      imagePosition: 'center center',
     },
     {
       eyebrow: zh ? '应用案例' : 'Application',
@@ -2134,6 +2144,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开板块' : 'Open Section',
       href: '/resources/cases/iot-application-cases',
       icon: FileCheck2,
+      image: siteImage('resource-iot-application-cases.webp'),
+      imageAlt: zh ? '压力表与平板数据监测界面' : 'Pressure gauge and tablet monitoring data',
+      imagePosition: '42% center',
     },
     {
       eyebrow: zh ? '技术资料' : 'Technical',
@@ -2144,6 +2157,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开板块' : 'Open Section',
       href: '/resources/blog/technical-knowledge',
       icon: Settings2,
+      image: siteImage('resource-technical-knowledge.webp'),
+      imageAlt: zh ? '工程图纸与传感器结构设计' : 'Engineering drawing and sensor structure design',
+      imagePosition: 'center center',
     },
     {
       eyebrow: zh ? '解决方案' : 'Solutions',
@@ -2154,6 +2170,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开板块' : 'Open Section',
       href: '/resources/cases/oem-cases',
       icon: SlidersHorizontal,
+      image: siteImage('resource-oem-cases.webp'),
+      imageAlt: zh ? '定制传感器模组与电子组件' : 'Custom sensor modules and electronic components',
+      imagePosition: 'center center',
     },
     {
       eyebrow: zh ? '质量与认证' : 'Quality & Certification',
@@ -2164,6 +2183,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开板块' : 'Open Section',
       href: '/resources/manuals/company-materials',
       icon: Factory,
+      image: siteImage('resource-company-materials.webp'),
+      imageAlt: zh ? '公司资料册与传感器产品' : 'Company brochure and sensor products',
+      imagePosition: 'center center',
     },
     {
       eyebrow: zh ? '行业洞察' : 'Insight',
@@ -2174,6 +2196,9 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       action: zh ? '打开板块' : 'Open Section',
       href: '/resources/blog/engineering-blog',
       icon: Gauge,
+      image: siteImage('resource-engineering-blog.webp'),
+      imageAlt: zh ? '实验室工作台上的工程资料文档' : 'Engineering resource document on a laboratory desk',
+      imagePosition: 'center center',
     },
   ]
 
@@ -2182,12 +2207,12 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto max-w-[1280px] px-4 pt-10 md:px-16">
         <div className="relative h-[210px] overflow-hidden bg-[#DDE4EA] md:h-[300px]">
           <Image
-            src={asset('oem', 'asset-003.jpg')}
-            alt={zh ? '自动化实验室与测试设备' : 'Automation laboratory and test equipment'}
+            src={siteImage('resource-center-hero.webp')}
+            alt={zh ? '工程师在实验室组装精密传感器' : 'Engineer assembling a precision sensor in a laboratory'}
             fill
             preload
             sizes="(min-width: 1280px) 1152px, calc(100vw - 32px)"
-            className="object-cover"
+            className="object-cover object-[32%_center] md:object-center"
           />
         </div>
       </section>
@@ -2203,16 +2228,21 @@ function ResourcesPage({ locale }: { readonly locale: Locale }) {
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {cards.map((card) => {
-            const Icon = card.icon
-
             return (
               <Link
                 key={card.title}
                 href={`/${locale}${card.href}`}
                 className="group flex min-h-[356px] flex-col border border-[#DEE3E7] bg-white transition-all hover:border-[#005EB8] hover:shadow-[0_16px_38px_rgba(20,33,44,0.10)]"
               >
-                <div className="grid aspect-[16/8] place-items-center border-b border-[#DEE3E7] bg-[#F1F4F7] text-[#005EB8]">
-                  <Icon className="size-7" aria-hidden="true" />
+                <div className="relative aspect-[16/8] overflow-hidden border-b border-[#DEE3E7] bg-[#F1F4F7]">
+                  <Image
+                    src={card.image}
+                    alt={card.imageAlt}
+                    fill
+                    sizes="(min-width: 1280px) 352px, (min-width: 768px) calc((100vw - 148px) / 2), calc(100vw - 32px)"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    style={{ objectPosition: card.imagePosition }}
+                  />
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex flex-wrap items-center gap-2">
