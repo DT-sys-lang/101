@@ -28,7 +28,7 @@ export function HomePage({ locale, data }: { locale: Locale; data: HomepageProje
           </div>
           <div className="border border-border bg-ink-50 p-6">
             <div className="relative aspect-[4/3] border border-border bg-panel">
-              <Image src="/images/hero/industrial-instrumentation.png" alt={data.hero.imageAlt} fill preload sizes="(min-width: 1024px) 44vw, 100vw" className="object-cover grayscale" />
+              <Image src="/images/hero/industrial-instrumentation.webp" alt={data.hero.imageAlt} fill preload sizes="(min-width: 1024px) 44vw, 100vw" className="object-cover grayscale" />
             </div>
             <div className="mt-6 grid gap-px border border-border bg-border sm:grid-cols-3">
               {data.hero.metrics.map((metric) => (

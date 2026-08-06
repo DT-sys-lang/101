@@ -10,7 +10,7 @@ export function ContactInquiryPage({ locale, data }: { locale: Locale; data: Sta
     <article className="bg-background">
       <section className="relative flex min-h-[400px] items-center border-b border-border bg-panel">
         <div className="absolute inset-0 opacity-30 grayscale" aria-hidden="true">
-          <Image src="/images/hero/industrial-instrumentation.png" alt="" fill preload sizes="100vw" className="object-cover" />
+          <Image src="/images/hero/industrial-instrumentation.webp" alt="" fill preload sizes="100vw" className="object-cover" />
         </div>
         <div className="stitch-shell relative py-16">
           <h1 className="stitch-display max-w-3xl">{isChinese ? '联系工程团队' : 'Consult with Our Engineering Team'}</h1>

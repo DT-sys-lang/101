@@ -17,16 +17,16 @@ export interface PageVisualAsset {
 const stitchBase = '/stitch/heiyu-trans-industrial-design-system'
 
 const visuals = {
-  productSensor: `${stitchBase}/02-product-catalog-industrial-sensors-valves/assets/asset-003.jpg`,
-  precisionSensor: `${stitchBase}/03-product-detail-precision-pressure-sensor-series/assets/asset-003.jpg`,
-  processBench: `${stitchBase}/04-water-pump-systems-updated-hero-image/assets/asset-003.png`,
-  oemLine: `${stitchBase}/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg`,
-  manufacturing: `${stitchBase}/07-manufacturing-global-production-standards/assets/asset-003.jpg`,
-  company: `${stitchBase}/08-about-us-modern-industrial-redesign/assets/asset-003.png`,
-  resourceDocument: `${stitchBase}/03-product-detail-precision-pressure-sensor-series/assets/asset-003.jpg`,
-  contact: `${stitchBase}/11-contact-engineering-rfq-support/assets/asset-003.png`,
-  applicationCase: `${stitchBase}/04-water-pump-systems-updated-hero-image/assets/asset-003.png`,
-  oemCase: `${stitchBase}/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg`,
+  productSensor: `${stitchBase}/02-product-catalog-industrial-sensors-valves/assets/asset-003.webp`,
+  precisionSensor: `${stitchBase}/03-product-detail-precision-pressure-sensor-series/assets/asset-003.webp`,
+  processBench: `${stitchBase}/04-water-pump-systems-updated-hero-image/assets/asset-003.webp`,
+  oemLine: `${stitchBase}/05-oem-solutions-enhanced-hero-background/assets/asset-003.webp`,
+  manufacturing: `${stitchBase}/07-manufacturing-global-production-standards/assets/asset-003.webp`,
+  company: `${stitchBase}/08-about-us-modern-industrial-redesign/assets/asset-003.webp`,
+  resourceDocument: `${stitchBase}/03-product-detail-precision-pressure-sensor-series/assets/asset-003.webp`,
+  contact: `${stitchBase}/11-contact-engineering-rfq-support/assets/asset-003.webp`,
+  applicationCase: `${stitchBase}/04-water-pump-systems-updated-hero-image/assets/asset-003.webp`,
+  oemCase: `${stitchBase}/05-oem-solutions-enhanced-hero-background/assets/asset-003.webp`,
 } as const
 
 function localizedAlt(locale: Locale, zh: string, en: string) {

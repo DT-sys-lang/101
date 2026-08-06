@@ -303,7 +303,7 @@ The fresh 2026-07-13 local-only audit is `tmp/strapi-v5-production-evidence/phas
 
 This is a blocking access condition, not a passed rehearsal. `industrial_cms`, v4, DNS, traffic, production credentials, and production infrastructure remain untouched; `productionCutoverAuthorized` remains false.
 
-An earlier development-server log contained `Unexpected end of JSON input`. After deleting only the dedicated transient Next output and restarting with Node 20, the issue did not reproduce: repeated `/en`, `/en/products`, and `/en/resources` requests returned HTTP 200. At verification time, the clean-restart log contained only a Next development LCP advisory for `/images/hero/industrial-instrumentation.png`; it is nonblocking and is not performance-validation evidence.
+An earlier development-server log contained `Unexpected end of JSON input`. After deleting only the dedicated transient Next output and restarting with Node 20, the issue did not reproduce: repeated `/en`, `/en/products`, and `/en/resources` requests returned HTTP 200. At verification time, the clean-restart log contained only a Next development LCP advisory for `/images/hero/industrial-instrumentation.webp`; it is nonblocking and is not performance-validation evidence.
 
 
 ## 7. 维护窗口、职责与放量

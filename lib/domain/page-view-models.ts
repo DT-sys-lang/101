@@ -882,7 +882,7 @@ const capabilityPageDetails = {
   en: {
     quality: {
       heroImage: {
-        src: '/images/hero/industrial-instrumentation.png',
+        src: '/images/hero/industrial-instrumentation.webp',
         alt: 'Industrial pressure testing lab with gauges and calibration equipment',
       },
       metrics: [
@@ -923,7 +923,7 @@ const capabilityPageDetails = {
     },
     manufacturing: {
       heroImage: {
-        src: '/images/hero/industrial-instrumentation.png',
+        src: '/images/hero/industrial-instrumentation.webp',
         alt: 'Clean industrial manufacturing floor with organized production equipment',
       },
       metrics: [
@@ -966,7 +966,7 @@ const capabilityPageDetails = {
   zh: {
     quality: {
       heroImage: {
-        src: '/images/hero/industrial-instrumentation.png',
+        src: '/images/hero/industrial-instrumentation.webp',
         alt: '带压力表和校准设备的工业压力测试实验室',
       },
       metrics: [
@@ -1007,7 +1007,7 @@ const capabilityPageDetails = {
     },
     manufacturing: {
       heroImage: {
-        src: '/images/hero/industrial-instrumentation.png',
+        src: '/images/hero/industrial-instrumentation.webp',
         alt: '整洁的工业制造车间与有序生产设备',
       },
       metrics: [
@@ -1603,10 +1603,10 @@ function getManualResourceEntries(
 
 function getStaticResourceEntries(locale: LocaleCode, kind: ResourceCollectionKind): readonly ResourceEntryViewModel[] {
   const zh = locale === 'zh'
-  const commonCover = '/stitch/heiyu-trans-industrial-design-system/03-product-detail-precision-pressure-sensor-series/assets/asset-003.jpg'
-  const labCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg'
-  const caseCover = '/stitch/heiyu-trans-industrial-design-system/04-water-pump-systems-updated-hero-image/assets/asset-003.png'
-  const oemCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.jpg'
+  const commonCover = '/stitch/heiyu-trans-industrial-design-system/03-product-detail-precision-pressure-sensor-series/assets/asset-003.webp'
+  const labCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.webp'
+  const caseCover = '/stitch/heiyu-trans-industrial-design-system/04-water-pump-systems-updated-hero-image/assets/asset-003.webp'
+  const oemCover = '/stitch/heiyu-trans-industrial-design-system/05-oem-solutions-enhanced-hero-background/assets/asset-003.webp'
 
   const entries: Record<ResourceCollectionKind, readonly ResourceContentInput[]> = {
     manuals: [

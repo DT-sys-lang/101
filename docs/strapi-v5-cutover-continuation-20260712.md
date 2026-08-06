@@ -60,7 +60,7 @@ This result is **local isolated evidence only**. Browser validation in CI or on 
 
 An earlier development-server stderr contained `Unexpected end of JSON input` during page rendering. The only page-rendering `JSON.parse` fallback was reviewed, `outputs/cms-facts.json` parsed with Node 20, and the dedicated transient Next output was removed before restarting the server with Node 20.
 
-After the clean restart, repeated `/en`, `/en/products`, and `/en/resources` requests returned HTTP 200; the parse exception did not reproduce. The clean-restart log showed only a Next development advisory that `/images/hero/industrial-instrumentation.png` was the Largest Contentful Paint image and might need `loading="eager"`. This is nonblocking local development guidance, not performance-validation evidence.
+After the clean restart, repeated `/en`, `/en/products`, and `/en/resources` requests returned HTTP 200; the parse exception did not reproduce. The clean-restart log showed only a Next development advisory that `/images/hero/industrial-instrumentation.webp` was the Largest Contentful Paint image and might need `loading="eager"`. This is nonblocking local development guidance, not performance-validation evidence.
 
 ## Remaining production blockers
 

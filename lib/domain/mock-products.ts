@@ -937,7 +937,7 @@ function toProductRecord(seed: MockProductSeed): ProductRecord {
       {
         id: assetId(seed),
         kind: 'primary-image',
-        href: '/images/hero/industrial-instrumentation.png',
+        href: '/images/hero/industrial-instrumentation.webp',
         alt: seed.name.en,
       },
     ],

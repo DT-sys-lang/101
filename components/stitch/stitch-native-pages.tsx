@@ -676,7 +676,7 @@ function IndustryDetailNativePage({
                 {(schematicProducts.length > 0 ? schematicProducts : products).slice(0, 2).map((product) => (
                   <Link key={product.id} href={`/${locale}${product.href}`} className="group border border-[#E1E6EA] bg-white p-5 transition-all hover:border-[#005EB8] hover:shadow-lg">
                     <div className="relative mb-5 h-44 bg-[#F2F4F6]">
-                      <Image src={product.media.primaryImage?.href ?? '/images/hero/industrial-instrumentation.png'} alt={product.media.primaryImage?.alt ?? product.title} fill sizes="(min-width: 768px) 360px, 100vw" className="object-contain p-6 transition" />
+                      <Image src={product.media.primaryImage?.href ?? '/images/hero/industrial-instrumentation.webp'} alt={product.media.primaryImage?.alt ?? product.title} fill sizes="(min-width: 768px) 360px, 100vw" className="object-contain p-6 transition" />
                     </div>
                     <p className="font-mono text-xs text-[#005EB8]">{product.model}</p>
                     <h3 className="mt-2 text-lg font-bold tracking-normal text-[#1A1A1A]">{product.title}</h3>
@@ -746,22 +746,22 @@ function IndustryDetailNativePage({
 
 function getIndustryDetailVisual(path: string) {
   if (path.includes('water')) {
-    return { image: asset('industries', 'asset-006.png'), position: '48% 50%' }
+    return { image: asset('industries', 'asset-006.webp'), position: '48% 50%' }
   }
 
   if (path.includes('automation') || path.includes('manufacturing')) {
-    return { image: asset('industries', 'asset-008.png'), position: '50% 50%' }
+    return { image: asset('industries', 'asset-008.webp'), position: '50% 50%' }
   }
 
   if (path.includes('energy')) {
-    return { image: asset('industries', 'asset-003.png'), position: '74% 50%' }
+    return { image: asset('industries', 'asset-003.webp'), position: '74% 50%' }
   }
 
   if (path.includes('chemical-processing')) {
-    return { image: asset('industries', 'asset-006.png'), position: '86% 50%' }
+    return { image: asset('industries', 'asset-006.webp'), position: '86% 50%' }
   }
 
-  return { image: asset('industries', 'asset-006.png'), position: '24% 50%' }
+  return { image: asset('industries', 'asset-006.webp'), position: '24% 50%' }
 }
 
 function HomeStitchContentSections({ locale }: { readonly locale: Locale }) {
@@ -940,7 +940,7 @@ function ProductCatalogPage({
     {
       category: zh ? '压力传感器' : 'PRESSURE SENSOR',
       name: 'PT-X 1000 Heavy Duty',
-      image: asset('products', 'asset-003.jpg'),
+      image: asset('products', 'asset-003.webp'),
       href: `/${locale}/products/industrial-products/pressure-sensors/yf-p10`,
       specs: [
         [zh ? '量程' : 'Range', '0...10 to 0...1000 bar'],
@@ -951,7 +951,7 @@ function ProductCatalogPage({
     {
       category: zh ? '温度传感器' : 'TEMPERATURE SENSOR',
       name: 'TR-34 RTD Assembly',
-      image: asset('products', 'asset-004.jpg'),
+      image: asset('products', 'asset-004.webp'),
       href: `/${locale}/products/industrial-products/pressure-sensors/yf-p10c`,
       specs: [
         [zh ? '元件' : 'Element', 'PT100, Class A'],
@@ -962,7 +962,7 @@ function ProductCatalogPage({
     {
       category: zh ? '液位传感器' : 'LEVEL SENSOR',
       name: 'LS-10 Submersible',
-      image: asset('products', 'asset-005.jpg'),
+      image: asset('products', 'asset-005.webp'),
       href: `/${locale}/products/industrial-products/pressure-sensors/yf-p11`,
       specs: [
         [zh ? '量程' : 'Range', '0...01 to...25 bar'],
@@ -977,7 +977,7 @@ function ProductCatalogPage({
     ? importedProducts.map((product) => ({
         category: product.categoryLabel.toUpperCase(),
         name: product.title.replace(/\s+\|\s+Yufavor$/i, ''),
-        image: product.media.primaryImage?.href ?? product.media.galleryImages[0]?.href ?? asset('products', 'asset-003.jpg'),
+        image: product.media.primaryImage?.href ?? product.media.galleryImages[0]?.href ?? asset('products', 'asset-003.webp'),
         href: `/${locale}${product.href}`,
         status: product.availabilityLabel,
         specs: product.keySpecs.slice(0, 3).map((spec) => [spec.label, spec.value] as const),
@@ -1208,15 +1208,15 @@ function getCatalogCategoryImage(categoryId: string) {
   }
 
   if (categoryId.includes('temperature') || categoryId.includes('rtd') || categoryId.includes('thermocouple')) {
-    return asset('products', 'asset-004.jpg')
+    return asset('products', 'asset-004.webp')
   }
 
   if (categoryId.includes('gauge')) {
-    return asset('products', 'asset-003.jpg')
+    return asset('products', 'asset-003.webp')
   }
 
   if (categoryId.includes('wireless')) {
-    return asset('products', 'asset-005.jpg')
+    return asset('products', 'asset-005.webp')
   }
 
   if (categoryId.includes('switch')) {
@@ -1406,7 +1406,7 @@ function ProductDetailPage({ locale }: { readonly locale: Locale }) {
       <section className="border-b border-[#E5E5E5]">
         <div className="mx-auto grid max-w-[1280px] gap-10 px-4 py-14 md:px-16 lg:grid-cols-[0.95fr_1.05fr] lg:py-20">
           <div className="group relative min-h-[460px] border border-[#E5E5E5] bg-[#F7F7F7]">
-            <Image src={asset('productDetail', 'asset-003.jpg')} alt={product.title} fill preload sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover transition duration-500" />
+            <Image src={asset('productDetail', 'asset-003.webp')} alt={product.title} fill preload sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover transition duration-500" />
           </div>
           <div className="flex flex-col justify-center">
             <p className="eyebrow">{zh ? '产品详情' : 'Product Detail'}</p>
@@ -1440,7 +1440,7 @@ function ProductDetailDataPage({
   readonly productDetailData?: ProductDetailViewModel
 }) {
   const zh = locale === 'zh'
-  const fallbackImage = asset('productDetail', 'asset-003.jpg')
+  const fallbackImage = asset('productDetail', 'asset-003.webp')
   const image = productDetailData?.media.primaryImage ?? { href: fallbackImage, alt: zh ? '产品图片' : 'Product image' }
   const title = productDetailData?.hero.title ?? (zh ? '精密压力传感器系列' : 'Precision Pressure Sensor Series')
   const summary = productDetailData?.hero.summary ?? (zh ? '适用于泵系统、流体控制和 OEM 设备的紧凑型压力测量平台。' : 'A compact pressure measurement platform for pump systems, fluid control, and OEM equipment.')
@@ -1519,7 +1519,7 @@ function ProductDetailDataSections({
       downloads={downloads}
       primaryDownload={primaryDownload}
       dimensionImage={{
-        href: productDetailData?.media.primaryImage?.href ?? asset('productDetail', 'asset-003.jpg'),
+        href: productDetailData?.media.primaryImage?.href ?? asset('productDetail', 'asset-003.webp'),
         alt: productDetailData?.media.primaryImage?.alt ?? (zh ? '产品尺寸图片' : 'Product dimension image'),
       }}
     />
@@ -1556,7 +1556,7 @@ function ProductDetailStitchPage({ locale }: { readonly locale: Locale }) {
         <section className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex h-[500px] items-center justify-center border border-[#E5E5E5] bg-white p-8">
             <Image
-              src={asset('productDetail', 'asset-003.jpg')}
+              src={asset('productDetail', 'asset-003.webp')}
               alt={zh ? '高精度工业压力变送器' : 'High-precision industrial pressure transmitter'}
               width={640}
               height={640}
@@ -1686,7 +1686,7 @@ function WaterPumpSystemsPage({ locale }: { readonly locale: Locale }) {
     <article className="bg-white">
       <PageHero
         locale={locale}
-        image={asset('waterPumpSystems', 'asset-003.png')}
+        image={asset('waterPumpSystems', 'asset-003.webp')}
         eyebrow={zh ? '行业方案' : 'Industry Solution'}
         title={zh ? '水泵与水处理系统' : 'Water Pump Systems'}
         body={zh ? '围绕压力监测、干转保护、管路控制和阀门联动建立完整的系统入口。' : 'A complete selection path for pressure monitoring, dry-run protection, pipe control, and valve coordination.'}
@@ -1881,7 +1881,7 @@ function ManufacturingPage({ locale }: { readonly locale: Locale }) {
     <article className="bg-white">
       <PageHero
         locale={locale}
-        image={asset('manufacturing', 'asset-003.jpg')}
+        image={asset('manufacturing', 'asset-003.webp')}
         eyebrow={zh ? '制造能力' : 'Manufacturing'}
         title={zh ? '全球生产与交付标准' : 'Global Production Standards'}
         body={zh ? '围绕稳定批量、工程确认和交付节奏建立工业产品制造页面。' : 'Production pages organized around stable batches, engineering confirmation, and delivery rhythm.'}
@@ -1942,7 +1942,7 @@ function CompanyHeroMedia({
 
   return (
     <div className="group relative z-10 overflow-hidden rounded-xl border border-[#E5E5E5] shadow-lg">
-      <Image src={asset('company', 'asset-003.png')} alt={fallbackAlt} width={900} height={420} className="h-full w-full object-cover transition duration-500" />
+      <Image src={asset('company', 'asset-003.webp')} alt={fallbackAlt} width={900} height={420} className="h-full w-full object-cover transition duration-500" />
     </div>
   )
 }
@@ -2276,7 +2276,7 @@ function ContactPage({ locale }: { readonly locale: Locale }) {
       <section className="mx-auto grid max-w-[1280px] gap-10 px-4 py-16 md:px-16 lg:grid-cols-[0.9fr_1.1fr] lg:py-24">
         <div>
           <div className="group relative mb-10 h-52 overflow-hidden">
-            <Image src={asset('contact', 'asset-003.png')} alt="" fill preload sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover transition duration-500" />
+            <Image src={asset('contact', 'asset-003.webp')} alt="" fill preload sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover transition duration-500" />
           </div>
           <p className="eyebrow">{zh ? '联系工程团队' : 'Contact Engineering'}</p>
           <h1 className="mt-4 display-title">{zh ? '提交 RFQ 与选型需求' : 'RFQ & Support'}</h1>
