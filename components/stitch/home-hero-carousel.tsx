@@ -26,7 +26,6 @@ export function HomeHeroCarousel({
 }) {
   const [activeIndex, setActiveIndex] = useAutoplayIndex(slides.length)
   const videoPlaybackEnabled = useDeferredVideoPlayback()
-  const [readyVideoSrcs, setReadyVideoSrcs] = useState<ReadonlySet<string>>(() => new Set())
   const [mountedSlides, setMountedSlides] = useState<readonly number[]>(() => (slides.length ? [0] : []))
   const carouselT = useTranslations('home.hero.carousel')
   const storyT = useTranslations('home.hero.story')
@@ -38,18 +37,6 @@ export function HomeHeroCarousel({
 
   const showPrevious = () => setActiveIndex((current) => (current - 1 + slideCount) % slideCount)
   const showNext = () => setActiveIndex((current) => (current + 1) % slideCount)
-  const markVideoReady = (src: string) => {
-    setReadyVideoSrcs((current) => {
-      if (current.has(src)) {
-        return current
-      }
-
-      const next = new Set(current)
-      next.add(src)
-      return next
-    })
-  }
-
   useEffect(() => {
     setMountedSlides((current) => (current.includes(activeIndex) ? current : [...current, activeIndex]))
   }, [activeIndex])
@@ -76,7 +63,6 @@ export function HomeHeroCarousel({
         const isMounted = mountedSlides.includes(index)
         const overlayConfig = homeHeroOverlaySlides[index]
         const slideLabel = overlayConfig ? storyT(`${overlayConfig.translationKey}.${overlayConfig.mediaLabelKey}`) : ''
-        const videoReady = slide.kind === 'video' && readyVideoSrcs.has(slide.src)
 
         return (
           <div
@@ -93,15 +79,13 @@ export function HomeHeroCarousel({
                     key={slide.src}
                     aria-label={slideLabel}
                     autoPlay
-                    className={cn('absolute inset-0 h-full w-full object-cover transition-opacity duration-500 motion-reduce:transition-none', videoReady ? 'opacity-100' : 'opacity-0')}
+                    className="absolute inset-0 h-full w-full object-cover"
                     disablePictureInPicture
                     loop
                     muted
                     playsInline
                     poster={slide.poster}
-                    preload="metadata"
-                    onCanPlay={() => markVideoReady(slide.src)}
-                    onLoadedData={() => markVideoReady(slide.src)}
+                    preload="auto"
                   >
                     <source src={slide.src} type="video/mp4" />
                   </video>
