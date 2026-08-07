@@ -181,7 +181,7 @@ function useDeferredVideoPlayback() {
       if (document.visibilityState === 'visible') {
         setEnabled(true)
       }
-    }, 8000)
+    }, 1500)
     return () => window.clearTimeout(timeoutId)
   }, [])
 
