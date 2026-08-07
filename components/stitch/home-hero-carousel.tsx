@@ -27,6 +27,7 @@ export function HomeHeroCarousel({
   const [activeIndex, setActiveIndex] = useAutoplayIndex(slides.length)
   const videoPlaybackEnabled = useDeferredVideoPlayback()
   const [readyVideoSrcs, setReadyVideoSrcs] = useState<ReadonlySet<string>>(() => new Set())
+  const [mountedSlides, setMountedSlides] = useState<readonly number[]>(() => (slides.length ? [0] : []))
   const carouselT = useTranslations('home.hero.carousel')
   const storyT = useTranslations('home.hero.story')
   const slideCount = slides.length
@@ -49,10 +50,30 @@ export function HomeHeroCarousel({
     })
   }
 
+  useEffect(() => {
+    setMountedSlides((current) => (current.includes(activeIndex) ? current : [...current, activeIndex]))
+  }, [activeIndex])
+
+  useEffect(() => {
+    if (slideCount < 2) {
+      return undefined
+    }
+
+    const nextSlide = slides[(activeIndex + 1) % slideCount]
+    const nextSrc = nextSlide.kind === 'video' ? nextSlide.poster : nextSlide.src
+    const timerId = window.setTimeout(() => {
+      const preloadImage = new window.Image()
+      preloadImage.src = nextSrc
+    }, 1200)
+
+    return () => window.clearTimeout(timerId)
+  }, [activeIndex, slideCount, slides])
+
   return (
     <section className="group relative mx-auto h-[clamp(260px,34vw,520px)] w-full max-w-[1440px] overflow-hidden bg-black" id="hero-carousel" aria-label={carouselT('ariaLabel')}>
       {slides.map((slide, index) => {
         const active = index === activeIndex
+        const isMounted = mountedSlides.includes(index)
         const overlayConfig = homeHeroOverlaySlides[index]
         const slideLabel = overlayConfig ? storyT(`${overlayConfig.translationKey}.${overlayConfig.mediaLabelKey}`) : ''
         const videoReady = slide.kind === 'video' && readyVideoSrcs.has(slide.src)
@@ -64,9 +85,9 @@ export function HomeHeroCarousel({
             className={cn('absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none', active ? 'opacity-100' : 'pointer-events-none opacity-0')}
           >
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
-            {slide.kind === 'video' ? (
+            {isMounted && slide.kind === 'video' ? (
               <>
-                <Image src={slide.poster} alt={active ? slideLabel : ''} fill preload={index === 0} sizes="100vw" className="object-cover" />
+                <Image src={slide.poster} alt={active ? slideLabel : ''} fill preload={active} sizes="100vw" className="object-cover" />
                 {active && videoPlaybackEnabled ? (
                   <video
                     key={slide.src}
@@ -86,9 +107,9 @@ export function HomeHeroCarousel({
                   </video>
                 ) : null}
               </>
-            ) : (
-              <Image src={slide.src} alt={active ? slideLabel : ''} fill preload={index === 0} sizes="100vw" className="object-cover" />
-            )}
+            ) : isMounted ? (
+              <Image src={slide.src} alt={active ? slideLabel : ''} fill preload={active} sizes="100vw" className="object-cover" />
+            ) : null}
           </div>
         )
       })}
