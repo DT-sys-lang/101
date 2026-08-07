@@ -19,8 +19,6 @@ import {
   type CmsProductSourceResult,
 } from './source'
 
-import { unstable_cache } from 'next/cache'
-
 export type { CmsProductSourceMode } from './source'
 
 export interface CmsProductStatus {
@@ -58,16 +56,6 @@ let productSnapshotCache: CmsProductSnapshot | undefined
 let productSnapshotHydrationPromise: Promise<CmsProductSnapshot> | undefined
 const catalogCache = new Map<LocaleCode, ProductCatalogIndex>()
 const cmsProductSnapshotTtlMs = readPositiveInteger(process.env.CMS_FACTS_CACHE_TTL_MS, 5 * 60 * 1000)
-
-const cmsFactsRevalidateSeconds = Math.max(60, Math.floor(cmsProductSnapshotTtlMs / 1000))
-
-const cachedCmsFactsSource = unstable_cache(
-  async (): Promise<CmsProductSourceResult> => {
-    return readCmsProductSourceAsync()
-  },
-  ['cms-facts-source'],
-  { revalidate: cmsFactsRevalidateSeconds, tags: ['cms-facts'] },
-)
 
 export function getCmsProductRecords(): readonly ProductRecord[] {
   return getCmsProductSnapshot().records
@@ -182,7 +170,7 @@ function getCmsProductSnapshot(): CmsProductSnapshot {
 
 async function hydrateCmsProductSnapshotAsync(): Promise<CmsProductSnapshot> {
   try {
-    const source = await cachedCmsFactsSource()
+    const source = await readCmsProductSourceAsync()
     return setCmsProductSnapshot(source)
   } finally {
     productSnapshotHydrationPromise = undefined

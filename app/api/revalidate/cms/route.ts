@@ -19,7 +19,6 @@ export async function POST(request: Request) {
   try {
     const webhook = parseCmsWebhookRevalidationRequest(request.headers, await request.text())
     await refreshRuntimeDomainProducts()
-    revalidateTag('cms-facts', 'default')
     const impact = calculateRevalidationImpact(webhook.revalidationInput)
 
     for (const path of impact.paths) {
